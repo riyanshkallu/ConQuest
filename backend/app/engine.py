@@ -379,7 +379,7 @@ def record_character_move(state: RoundState, flag_id: str | None, pressure: int 
 def ask_proof_analysis() -> Analysis:
     """The Ask for proof button is a known challenge, so it skips the AI analyzer."""
     return Analysis(decision_type="challenge", suspicion_change=ASK_PROOF_SUSPICION,
-                    trust_change=-5, reason="Asked the contact to prove who they are.")
+                    trust_change=-5, reason="You asked the contact to prove who they are.")
 
 
 # ---------------------------------------------------------------------------

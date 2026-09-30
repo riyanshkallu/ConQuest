@@ -63,16 +63,16 @@ def mock_analysis(ctx: TurnContext) -> Analysis:
 
     completion = [c.lower() for c in ctx.version.get("completion_replies", [])]
     if not state.is_scam and re.sub(r"[^a-z' ]", "", text).strip() in completion:
-        return Analysis("full_compliance", 0, 10, reason="Answered the contact's question.")
+        return Analysis("full_compliance", 0, 10, reason="You answered the contact's question.")
 
     if _has(text, VERIFY_WORDS):
-        a = Analysis("safe_verification", 15, -5, reason="Said they would check through an official channel.")
+        a = Analysis("safe_verification", 15, -5, reason="You said you'd check through an official channel.")
     elif _has(text, CHALLENGE_WORDS):
-        a = Analysis("challenge", 15, -10, reason="Questioned who the contact really was.")
+        a = Analysis("challenge", 15, -10, reason="You questioned who the contact really was.")
     elif _has_word(text, COMPLY_WORDS):
-        a = Analysis("partial_compliance", -5, 10, reason="Went along with what the contact asked.")
+        a = Analysis("partial_compliance", -5, 10, reason="You went along with what the contact asked.")
     else:
-        a = Analysis("neutral", 0, 0, reason="Kept the conversation going.")
+        a = Analysis("neutral", 0, 0, reason="You kept the conversation going.")
 
     if state.is_scam and a.decision_type in PUSHBACK:
         for tactic, words in TACTIC_WORDS.items():
