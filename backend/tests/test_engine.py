@@ -302,3 +302,15 @@ def test_no_completion_bonus_when_scammed():
     state = scam_round()
     play(state, "482913")
     assert engine.xp_for_round(state) == state.points
+
+
+def test_escaped_without_mistakes_gets_its_own_message():
+    state = scam_round()
+    engine.apply_action(state, "hang_up")
+    assert state.ending == "ESCAPED"
+    assert engine.ending_message(state) == engine.ESCAPED_CLEAN_MESSAGE
+
+    state = scam_round()
+    play(state, "jordan.rivera@mail.example")
+    engine.apply_action(state, "hang_up")
+    assert engine.ending_message(state) == engine.ENDINGS["ESCAPED"][1]

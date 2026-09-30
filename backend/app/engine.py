@@ -57,6 +57,15 @@ ENDINGS: dict[str, tuple[str, str, bool]] = {
     "FALSE_ALARM": ("False Alarm", "This was a real contact. Here is what showed it was genuine.", False),
 }
 PAR_BONUS_ENDINGS = {"OUTSMARTED", "ESCAPED", "SMART_AND_SAFE"}
+ESCAPED_CLEAN_MESSAGE = ("You got out safely. To fully outsmart them, verify independently "
+                         "or call out the trick they were using.")
+
+
+def ending_message(state: RoundState) -> str:
+    """The ending's message, with a variant for escaping without any mistakes."""
+    if state.ending == "ESCAPED" and state.mistakes == 0 and not state.info_shared:
+        return ESCAPED_CLEAN_MESSAGE
+    return ENDINGS[state.ending][1]
 
 
 # ---------------------------------------------------------------------------
@@ -386,6 +395,8 @@ def apply_action(state: RoundState, action: str) -> str:
     if action not in ENDING_ACTIONS:
         raise ValueError(f"not an ending action: {action}")
     clean = state.mistakes == 0 and not state.info_shared
+    if action != "trust":
+        _resolve_pending(state, fell_for_it=False)  # walking away resists the last tactic
 
     if action == "verify":
         state.verified = True
