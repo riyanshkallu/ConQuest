@@ -30,6 +30,25 @@ lines. Set `AI_PROVIDER=live` and add a free Groq and/or Gemini key to use real 
 .venv/Scripts/python scripts/try_models.py  # compare free models (needs keys)
 ```
 
+## Deploy (Render, free)
+
+`render.yaml` in the repo root describes the service, so setup is mostly clicking:
+
+1. On render.com, sign in with GitHub and allow access to the `Scam-Shield` repo.
+2. **New > Blueprint**, pick the repo and the `main` branch. Render reads `render.yaml`.
+3. When asked, paste `GROQ_API_KEY` and `GEMINI_API_KEY` (the same values as your `.env`).
+4. Click **Apply**. The first build takes a few minutes. The app is then live at
+   `https://outsmart-scam-game.onrender.com` (Render may add a suffix if the name is taken).
+5. Check `https://<your-url>/api/health`. It should say `"ai_provider": "live"`.
+
+Every push to `main` redeploys automatically. Rounds are kept in memory until the Supabase
+step, so a redeploy or restart clears them.
+
+**Keep it awake:** free Render services sleep after 15 minutes with no visitors, and the first
+visit after that takes about a minute. On uptimerobot.com (free), add an HTTP monitor for
+`https://<your-url>/api/health` every 5 minutes. One always-on service uses about 744 of the 750
+free hours a month, so don't run a second free Render service in the same account.
+
 ## How it fits together
 
 ```

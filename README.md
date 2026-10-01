@@ -19,7 +19,7 @@ actually real, and have to decide who to trust. Built for the Congressional App 
 | AI (backup) | Google Gemini API (AI Studio key) | No card needed. Flash models only, with daily request caps. Older 2.5 models are closed to new keys |
 | Database | Supabase | Pauses after 7 days with no activity |
 | Hosting | Render web service | Sleeps after 15 min idle (about 1 min to wake up), 750 hours/month |
-| Keep-awake | GitHub Actions cron | Pings the app so judges don't hit a sleeping server |
+| Keep-awake | UptimeRobot (free) | Pings `/api/health` every 5 min so judges don't hit a sleeping server |
 
 Each chat turn uses 2 AI calls (analyzer + character), so one 10-turn round is about 20 calls.
 When a model hits its limit, the backend moves on to the next model, then to
