@@ -372,9 +372,20 @@ Only after the round ended (otherwise `409 round_not_ended`).
 
 ---
 
-## Decisions to confirm (backend proposals, not yet agreed)
+## Decisions to confirm
 
-These fill gaps in the plan doc. Frontend teammate: reply yes/no on each.
+These fill gaps in the plan doc. **Backend: agreed to all six (Sep 30). Frontend: waiting for your
+yes/no on each.** Once you agree, change "waiting" to "agreed" here. The backend already works
+this way.
+
+| # | Decision | Backend | Frontend |
+| --- | --- | --- | --- |
+| 1 | `trust` action / "It's legit" button | agreed | waiting |
+| 2 | Finishing a legit contact's request ends the round | agreed | waiting |
+| 3 | Clean hang-up: OUTSMARTED only if a trick was called out | agreed | waiting |
+| 4 | `open_link` action for tapped links | agreed | waiting |
+| 5 | One-time code arrives in both scam and legit rounds | agreed | waiting |
+| 6 | Settings and reset endpoints | agreed | waiting |
 
 1. **`trust` action ("It's legit").** The plan had no way to say "I believe you," so the
    LUCKY and SMART AND SAFE endings had no clear trigger. In a legit round, `trust` gives
@@ -384,8 +395,18 @@ These fill gaps in the plan doc. Frontend teammate: reply yes/no on each.
    to confirm a charge with the real bank. That ends the round like `trust` does, so a legit round
    can't end in an awkward FALSE_ALARM just because the player hangs up after the conversation is over.
 3. **Clean hang-up in a scam round.** OUTSMARTED needs zero mistakes, nothing shared, and at
-   least one scam tactic the player called out. Otherwise the ending is ESCAPED.
+   least one scam tactic the player called out. Otherwise the ending is ESCAPED. A clean
+   ESCAPED gets its own message ("You got out safely…"), so always show `ending.message`
+   from the API instead of hard-coding the text for each ending.
 4. **Links** are reported with the `open_link` action. Risk +25, not a turn.
 5. **The one-time code** arrives as a `notification` on a set turn in *both* scam and legit
    rounds, so its arrival doesn't give away which kind of round it is.
 6. **Settings and reset endpoints** (above) were added for the Settings screen.
+
+### Still open
+
+- **Family Player badge.** The plan awards it for "a second profile on the same device," but
+  only the browser knows about other profiles. Idea: when creating a player, the frontend sends
+  the ids already saved in `localStorage`, for example
+  `POST /api/player {"display_name": "Grandpa", "other_player_ids": ["p_7f3c9a1e2b4d"]}`.
+  Not built yet. Discuss at the Oct 4 integration day.
