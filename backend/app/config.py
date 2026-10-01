@@ -24,8 +24,8 @@ class Settings(BaseSettings):
 
     # Models to try in order, as "provider:model". If one fails or is rate limited,
     # the next is tried, then the pre-written fallback lines.
-    analyzer_models: str = "groq:llama-3.1-8b-instant,gemini:gemini-2.5-flash-lite"
-    character_models: str = "groq:llama-3.3-70b-versatile,gemini:gemini-2.5-flash"
+    analyzer_models: str = "groq:openai/gpt-oss-20b,gemini:gemini-3.5-flash-lite"
+    character_models: str = "groq:qwen/qwen3.8-27b,groq:openai/gpt-oss-120b,gemini:gemini-3.5-flash-lite"
     ai_timeout_seconds: float = 8.0
 
     # Game tuning

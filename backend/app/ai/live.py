@@ -83,7 +83,7 @@ class LiveAI:
     async def analyze(self, ctx: TurnContext) -> Analysis:
         out = await self.llm.json_call(
             self.analyzer_models, prompts.analyzer_system(ctx), prompts.analyzer_user(ctx),
-            AnalyzerOut, max_tokens=200,
+            AnalyzerOut, max_tokens=300,
         )
         if out is None:
             return mock_analysis(ctx)
@@ -100,7 +100,7 @@ class LiveAI:
     async def character_move(self, ctx: TurnContext) -> CharacterMove:
         out = await self.llm.json_call(
             self.character_models, prompts.character_system(ctx), prompts.character_user(ctx),
-            CharacterOut, check=lambda o: check_character(o, ctx), max_tokens=250,
+            CharacterOut, check=lambda o: check_character(o, ctx), max_tokens=400,
         )
         if out is None:
             return mock_character_move(ctx)

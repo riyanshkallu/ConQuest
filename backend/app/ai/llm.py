@@ -40,6 +40,21 @@ def parse_models(spec: str) -> list[tuple[str, str]]:
     return pairs
 
 
+def request_kwargs(model: str, system: str, user: str, max_tokens: int) -> dict:
+    """The exact request sent for a model. Shared with scripts/try_models.py so the test matches the game."""
+    kwargs = {
+        "model": model,
+        "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
+        "response_format": {"type": "json_object"},
+        "temperature": 0.8,
+        "max_tokens": max_tokens,
+    }
+    if "gpt-oss" in model:
+        # Reasoning model: without this it spends the token budget thinking and returns broken JSON.
+        kwargs["extra_body"] = {"reasoning_effort": "low"}
+    return kwargs
+
+
 def _extract_json(text: str) -> str:
     """Some models wrap JSON in ```json fences or add a sentence around it."""
     match = re.search(r"\{.*\}", text, re.DOTALL)
@@ -72,23 +87,25 @@ class LLM:
         """
         for provider, model in models:
             client = self.clients.get(provider)
-            if client is None or time.monotonic() < self._cooldown_until.get(provider, 0):
+            # Free-tier limits are per model, so one model hitting its limit doesn't block the others.
+            if client is None or time.monotonic() < self._cooldown_until.get(model, 0):
                 continue
             for attempt in (1, 2):
                 started = time.monotonic()
                 try:
                     resp = await client.chat.completions.create(
-                        model=model,
-                        messages=[{"role": "system", "content": system}, {"role": "user", "content": user}],
-                        response_format={"type": "json_object"},
-                        temperature=0.8,
-                        max_tokens=max_tokens,
-                        timeout=self.timeout,
-                    )
+                        **request_kwargs(model, system, user, max_tokens), timeout=self.timeout)
                 except openai.RateLimitError:
-                    log.warning("%s rate limited, cooling down", provider)
-                    self._cooldown_until[provider] = time.monotonic() + RATE_LIMIT_COOLDOWN_SECONDS
+                    log.warning("%s:%s rate limited, cooling down", provider, model)
+                    self._cooldown_until[model] = time.monotonic() + RATE_LIMIT_COOLDOWN_SECONDS
                     break
+                except openai.BadRequestError as exc:
+                    if "json" not in str(exc).lower():
+                        log.warning("%s:%s failed: %s", provider, model, exc)
+                        break
+                    # The provider itself rejected malformed JSON: counts as a bad reply.
+                    log.warning("%s:%s attempt %d produced invalid JSON", provider, model, attempt)
+                    continue
                 except openai.OpenAIError as exc:
                     log.warning("%s:%s failed: %s", provider, model, exc)
                     break

@@ -46,7 +46,7 @@ def rate_limit() -> openai.RateLimitError:
 
 
 def llm_with(**clients) -> LLM:
-    llm = LLM(Settings(groq_api_key="", gemini_api_key=""))
+    llm = LLM(Settings(_env_file=None))
     llm.clients = clients
     return llm
 
@@ -122,8 +122,8 @@ def test_json_inside_code_fences_is_accepted():
 
 
 def test_live_ai_falls_back_to_prewritten_lines_when_all_models_fail():
-    ai = LiveAI(Settings(groq_api_key="", gemini_api_key=""))
-    ai.llm.clients = {"groq": FakeClient([rate_limit()])}
+    ai = LiveAI(Settings(_env_file=None))
+    ai.llm.clients = {"groq": FakeClient([rate_limit()] * 10)}  # every model on it is rate limited
     ctx = make_ctx()
     move = asyncio.run(ai.character_move(ctx))
     assert move.message and move.flag in ctx.version["allowed_tactics"]
@@ -135,8 +135,29 @@ def test_live_analyzer_output_is_clamped_and_unknown_flags_dropped():
     reply = json.dumps({"decision_type": "challenge", "suspicion_change": 90, "trust_change": -5,
                         "tactic_recognized": "mind_control", "flag_noticed": None,
                         "mistake": False, "reason": "You asked who they were."})
-    ai = LiveAI(Settings(groq_api_key="", gemini_api_key=""))
+    ai = LiveAI(Settings(_env_file=None))
     ai.llm.clients = {"groq": FakeClient([reply])}
     ai.analyzer_models = [("groq", "m")]
     analysis = asyncio.run(ai.analyze(make_ctx()))
     assert analysis.suspicion_change == 20 and analysis.tactic_recognized is None
+
+
+def test_rate_limit_on_one_model_does_not_block_another_on_same_provider():
+    groq = FakeClient([rate_limit(), good_scam_reply()])
+    out = asyncio.run(llm_with(groq=groq).json_call(
+        [("groq", "qwen"), ("groq", "gpt-oss")], "s", "u", CharacterOut))
+    assert out is not None and groq.calls == 2
+
+
+def test_provider_json_rejection_counts_as_a_bad_reply_and_is_retried():
+    response = httpx.Response(400, request=httpx.Request("POST", "https://example.invalid"))
+    json_error = openai.BadRequestError("Failed to validate JSON", response=response, body=None)
+    groq = FakeClient([json_error, good_scam_reply()])
+    out = asyncio.run(llm_with(groq=groq).json_call([("groq", "m")], "s", "u", CharacterOut))
+    assert out is not None and groq.calls == 2
+
+
+def test_gpt_oss_models_get_low_reasoning_effort():
+    from app.ai.llm import request_kwargs
+    assert request_kwargs("openai/gpt-oss-20b", "s", "u", 100)["extra_body"] == {"reasoning_effort": "low"}
+    assert "extra_body" not in request_kwargs("qwen/qwen3.8-27b", "s", "u", 100)

@@ -24,11 +24,13 @@ from app import engine  # noqa: E402
 from app.ai import prompts  # noqa: E402
 from app.ai.base import TurnContext  # noqa: E402
 from app.ai.live import AnalyzerOut, CharacterOut, check_character  # noqa: E402
-from app.ai.llm import LLM, _extract_json, parse_models  # noqa: E402
+from app.ai.llm import LLM, _extract_json, parse_models, request_kwargs  # noqa: E402
 from app.config import get_settings  # noqa: E402
 from app.scenarios import get_scenario, new_id_card  # noqa: E402
 
-TRIALS = 3
+TRIALS = 2
+# Free tiers allow ~8,000 tokens/minute per model and each call is ~600 tokens, so pace the calls.
+PAUSE_SECONDS = 5
 REFUSAL_WORDS = ("i can't", "i cannot", "i'm not able", "i am not able", "i won't", "as an ai", "i'm sorry, but")
 
 
@@ -60,11 +62,10 @@ ANALYZER_SCENES = {
 
 
 async def one_call(client, model: str, system: str, user: str, max_tokens: int):
+    await asyncio.sleep(PAUSE_SECONDS)
     started = time.monotonic()
     try:
-        resp = await client.chat.completions.create(
-            model=model, response_format={"type": "json_object"}, temperature=0.8, max_tokens=max_tokens,
-            messages=[{"role": "system", "content": system}, {"role": "user", "content": user}], timeout=20)
+        resp = await client.chat.completions.create(**request_kwargs(model, system, user, max_tokens), timeout=20)
         return resp.choices[0].message.content or "", time.monotonic() - started, None
     except Exception as exc:  # report every failure kind in the table
         return "", time.monotonic() - started, f"{type(exc).__name__}: {str(exc)[:80]}"
@@ -81,7 +82,7 @@ async def test_model(llm: LLM, provider: str, model: str) -> None:
     for name, ctx in CHARACTER_SCENES.items():
         for _ in range(TRIALS):
             text, secs, err = await one_call(client, model, prompts.character_system(ctx),
-                                             prompts.character_user(ctx), 250)
+                                             prompts.character_user(ctx), 400)
             if err:
                 problems.append(f"{name}: {err}")
                 continue
@@ -102,7 +103,7 @@ async def test_model(llm: LLM, provider: str, model: str) -> None:
     for expected, ctx in ANALYZER_SCENES.items():
         for _ in range(TRIALS):
             text, secs, err = await one_call(client, model, prompts.analyzer_system(ctx),
-                                             prompts.analyzer_user(ctx), 200)
+                                             prompts.analyzer_user(ctx), 300)
             if err:
                 problems.append(f"{expected}: {err}")
                 continue

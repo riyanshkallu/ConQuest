@@ -56,8 +56,22 @@ data/scenarios/  One JSON file per scam/legit scenario pair
 
 ## Free-tier notes
 
-- Each chat turn is 2 AI calls, so a 10-turn round is about 20. If Groq returns "rate limited",
-  that provider is skipped for 20 seconds and Gemini is used; if both fail, the pre-written
-  lines keep the round going.
-- Groq's larger models allow about 12,000 tokens per minute on the free tier, which is enough
-  for a few players at once but not a whole classroom. Keep prompts short.
+Models were picked on 2026-09-30 with `scripts/try_models.py` (every model: valid JSON on
+every character reply, no refusals, all under 1 second):
+
+| Role | Models, in fallback order | Why |
+| --- | --- | --- |
+| AI Character | `groq:qwen/qwen3.8-27b`, `groq:openai/gpt-oss-120b`, `gemini:gemini-3.5-flash-lite` | Qwen adapted best when the player pushed back |
+| Player Analyzer | `groq:openai/gpt-oss-20b`, `gemini:gemini-3.5-flash-lite` | 6/6 correct, and a different model from the character, so they don't share a quota |
+
+- Measured in the full game with live AI: about **0.6 to 0.7 seconds per turn**, well under the plan's 4-second target.
+- Groq's free limits are **per model**: 1,000 requests/day and 8,000 tokens/minute. Each call is
+  about 600 tokens, so one model handles roughly 13 calls a minute. Splitting the two roles
+  across two models doubles that, and a 10-turn round uses about 10 calls per model. That's
+  roughly 100 rounds a day on Groq alone, before Gemini.
+- If a model returns "rate limited", only that model is skipped for 20 seconds. If every
+  model fails, the pre-written lines keep the round going.
+- `gpt-oss` models "think" before answering, so they're sent `reasoning_effort: low`.
+  Without it, they run out of tokens and return broken JSON.
+- Free model lists change: Groq removed its Llama models and Gemini closed the 2.5 models to
+  new keys. If a model disappears, run `scripts/try_models.py --list` and update `.env`.
