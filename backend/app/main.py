@@ -6,7 +6,7 @@ Then open http://127.0.0.1:8000 (game) or http://127.0.0.1:8000/docs (API docs).
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from . import game, schemas
@@ -114,6 +114,12 @@ def _player_out(player) -> schemas.PlayerResponse:
     return schemas.PlayerResponse(
         player_id=player.id, display_name=player.display_name,
         settings=schemas.Settings(hints=player.hints, save_conversations=player.save_conversations))
+
+
+@app.get("/play", include_in_schema=False)
+async def test_console():
+    """Backend test page for playing rounds before the real frontend exists. Not the game UI."""
+    return FileResponse(BACKEND_DIR / "devtools" / "play.html")
 
 
 # --- Frontend -----------------------------------------------------------------

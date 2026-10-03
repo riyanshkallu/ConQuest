@@ -169,3 +169,8 @@ def test_turn_limit_ends_round():
 
 def test_frontend_is_served():
     assert client.get("/").status_code == 200
+
+
+def test_test_console_is_served():
+    r = client.get("/play")
+    assert r.status_code == 200 and "Outsmart test console" in r.text
