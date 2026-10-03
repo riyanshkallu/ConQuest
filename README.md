@@ -15,14 +15,14 @@ actually real, and have to decide who to trust. Built for the Congressional App 
 
 | Piece | Service | Free-tier limits to know about |
 | --- | --- | --- |
-| AI (main) | Groq API | No card needed. Limits are per model, about 30 requests/minute and 1,000+ per day |
-| AI (backup) | Google Gemini API (AI Studio key) | No card needed. Flash models only, with daily request caps |
+| AI (main) | Groq API | No card needed. Each model gets its own 1,000 requests/day and 8,000 tokens/minute |
+| AI (backup) | Google Gemini API (AI Studio key) | No card needed. Flash models only, with daily request caps. Older 2.5 models are closed to new keys |
 | Database | Supabase | Pauses after 7 days with no activity |
 | Hosting | Render web service | Sleeps after 15 min idle (about 1 min to wake up), 750 hours/month |
-| Keep-awake | GitHub Actions cron | Pings the app so judges don't hit a sleeping server |
+| Keep-awake | UptimeRobot (free) | Pings `/api/health` every 5 min so judges don't hit a sleeping server |
 
 Each chat turn uses 2 AI calls (analyzer + character), so one 10-turn round is about 20 calls.
-When a provider hits its limit, the backend moves on to the next provider, then to
+When a model hits its limit, the backend moves on to the next model, then to
 pre-written fallback lines, so the game never stops.
 
 ## Running the backend locally
