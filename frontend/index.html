@@ -3,6 +3,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Can You Outsmart the Scanner?</title>
+    
     <style>
         /* applying for all page */
         body {
@@ -100,18 +101,41 @@
         .scenario-title {
             text-align: center;
             margin: 0 px 32 px;
-            
-            
+        }
+
+        .scenario-title h2 {
+          font-size: 42px;
+          margin-bottom: 10px;
+        }
+
+        .scenario-title p {
+          color: #687481;
+        }
+
+        .scenario-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
         }
         .scenario-card {
             background-color: #696261;
             max-width: 850px;
             width: 100%;
-            padding: 0px 20px;
-            box-shadow: 0 10px 35px rgba (250,377, 993, 291);
+            padding: 28px;
+            box-shadow: 0 10px 35px rgba (0,0, 0, 0.06);
+            transition: 1s;
+            border: 2px solid transparent;
+            border-radius: 18px;
+            min-height: 200px;
         }
 
-        .scenario-card h1 {
+        .scenario-card:hover {
+        transform: translateY(-4px);
+        border-radius: 9px;
+        border-color: #17202a;
+        }
+        
+        .scenario-card h3 {
           font-size: 24px;
           color: #DB7465;
           margin-bottom: 35px;
@@ -119,30 +143,1008 @@
 
         .scenario-card p {
           font-size: 16px;
-          line-height: 1.5;
+          line-height: 1.7;
           color: #666666
         }
 
-        .logo {
+        .scenario-logo {
           font-size: 56px;
           margin-bottom: 15px;
         }
 
-        .primary-button {
-          border: none;
-          background: #17202a;
-          color: grey;
-          padding: 15px 20px;
-          border-radius:  12px;
-          font-weight: bold;
-          font-size: 17px;
-          transition: 1.0s;
+       .scenario-button {
+            width: 100%;
+            border: none;
+            background: #17202a;
+            color: white;
+            padding: 8px;
+            border-radius: 14px;
+            border-width: 15px;
+            font-weight: bold;
+           border-type: solid black;
         }
 
-        .primary-button:hover {
-          translate: 0 -2px;
-          opacity: 0.9;
+        /* id page code */
+
+        #idscreen {
+            text-align: center;
+            justify-content: center;
+            place-items: center;
         }
-      
+
+        .id-wrapper {
+            max-width: 750px;
+            margin: 0 auto;
+            width: 80%;
+        }
+        .id-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 10px 35px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+
+        .id-header {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+
+        .id-header h2 {
+            margin-bottom: 10px;
+        }
+
+        .id-header p {
+            color: #DB7465;
+        }
+
+        .id-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            border-bottom: 1px solid #544643;
+        }
+
+        .id-label {
+            color: #687481;
+        }
+
+        .id-value {
+            font-weight: bold;
+        }
+
+        .warning-box {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 20px;
+            line-height: 1.5;
+        }
+
+        /* chat screen code*/
+
+        #chatScreen {
+            justify-content: center;
+            align-items: center;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 700px;
+            height: 90vh;
+            max-height: 850px;
+            background: white;
+            border-radius: 22px;
+            overflow: hidden;
+            box-shadow: 0 10px 35px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            background: #17202a;
+            color: white;
+            padding: 18px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .contact-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: #dfe4e8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #17202a;
+            font-weight: bold;
+        }
+
+        .contact-name {
+            font-weight: bold;
+        }
+
+        .contact-status {
+            font-size: 12px;
+            opacity: 0.75;
+        }
+
+        .turn-counter {
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f4f6f8;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 14px;
+        }
+
+        .message.contact {
+            justify-content: flex-start;
+        }
+
+        .message.player {
+            justify-content: flex-end;
+        }
+
+        .bubble {
+            max-width: 75%;
+            padding: 12px 15px;
+            border-radius: 17px;
+            line-height: 1.45;
+        }
+
+        .contact .bubble {
+            background: white;
+            border-bottom-left-radius: 5px;
+        }
+
+        .player .bubble {
+            background: #17202a;
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        /* reply type code */
+
+        .suggestions {
+            padding: 10px 15px;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            border-top: 1px solid #eee;
+        }
+
+        .suggestion {
+            white-space: nowrap;
+            border: 1px solid #ccd2d8;
+            background: white;
+            padding: 9px 13px;
+            border-radius: 20px;
+            font-size: 13px;
+        }
+
+        .suggestion:hover {
+            background: #eef1f3;
+        }
+
+        /* action button code */
+
+        .actions {
+            padding: 12px 15px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            border-top: 1px solid #eee;
+        }
+
+        .action-button {
+            border: none;
+            padding: 11px 7px;
+            border-radius: 10px;
+            background: #e8ecef;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .action-button:hover {
+            background: #dce1e5;
+        }
+
+        /* input code */
+
+        .chat-input-area {
+            padding: 12px 15px;
+            display: flex;
+            gap: 8px;
+            border-top: 1px solid #eee;
+        }
+
+        .chat-input {
+            flex: 1;
+            border: 1px solid #ccd2d8;
+            border-radius: 12px;
+            padding: 12px;
+            outline: none;
+        }
+
+        .chat-input:focus {
+            border-color: #17202a;
+        }
+
+        .send-button {
+            border: none;
+            background: #17202a;
+            color: white;
+            border-radius: 12px;
+            padding: 0 18px;
+            font-weight: bold;
+        }
+
+        /* showcase result code */
+
+        #resultScreen {
+            align-items: center;
+            justify-content: center;
+        }
+
+        .result-card {
+            background: white;
+            max-width: 650px;
+            width: 100%;
+            padding: 40px;
+            border-radius: 22px;
+            text-align: center;
+            box-shadow: 0 10px 35px rgba(0,0,0,0.08);
+        }
+
+        .result-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+
+        .result-card h2 {
+            font-size: 34px;
+            margin-bottom: 12px;
+        }
+
+        .result-card p {
+            color: #687481;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        /* respomsive code */
+
+        @media (max-width: 750px) {
+
+            .home-card h1 {
+                font-size: 32px;
+            }
+
+            .scenario-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chat-container {
+                height: 100vh;
+                max-height: none;
+                border-radius: 0;
+            }
+
+            #chatScreen {
+                padding: 0;
+            }
+
+            .actions {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .bubble {
+                max-width: 85%;
+            }
+        }
+
+        @media (max-width: 450px) {
+
+            .screen {
+                padding: 15px;
+            }
+
+            .home-card {
+                padding: 35px 22px;
+            }
+
+            .page-title h2 {
+                font-size: 28px;
+            }
+
+            .actions {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .action-button {
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- =========================
+         HOME
+    ========================= -->
+
+    <section id="homeScreen" class="screen active">
+
+        <div class="home-card">
+
+            <div class="logo">🛡️</div>
+
+            <h1>Can You Outsmart the Scammer?</h1>
+
+            <p>
+                You're about to enter realistic conversations where you
+                must figure out what's legitimate and what's a scam.
+                Think carefully. Verify independently. Don't get tricked.
+            </p>
+
+            <button class="primary-button" onclick="showScreen('scenarioScreen')">
+                Start Game
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         SCENARIO SELECTION
+    ========================= -->
+
+    <section id="scenarioScreen" class="screen">
+
+        <div class="container">
+
+            <div class="page-title">
+
+                <h2>Choose a Scenario</h2>
+
+                <p>
+                    Each scenario could be legitimate — or a scam.
+                </p>
+
+            </div>
+
+            <div class="scenario-grid">
+
+                <div class="scenario-card">
+
+                    <div class="scenario-icon">🏦</div>
+
+                    <h3>Bank Fraud Alert</h3>
+
+                    <p>
+                        You receive a message about suspicious activity
+                        involving your bank account.
+                    </p>
+
+                    <button
+                        class="scenario-button"
+                        onclick="selectScenario('Bank Fraud Alert')">
+                        Play
+                    </button>
+
+                </div>
+
+
+                <div class="scenario-card">
+
+                    <div class="scenario-icon">💼</div>
+
+                    <h3>Summer Job Offer</h3>
+
+                    <p>
+                        Someone contacts you about an exciting summer
+                        job opportunity.
+                    </p>
+
+                    <button
+                        class="scenario-button"
+                        onclick="selectScenario('Summer Job Offer')">
+                        Play
+                    </button>
+
+                </div>
+
+
+                <div class="scenario-card">
+
+                    <div class="scenario-icon">👨‍👩‍👧</div>
+
+                    <h3>Family Emergency</h3>
+
+                    <p>
+                        You receive an urgent message claiming a family
+                        member needs help.
+                    </p>
+
+                    <button
+                        class="scenario-button"
+                        onclick="selectScenario('Family Emergency')">
+                        Play
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         ID CARD
+    ========================= -->
+
+    <section id="idScreen" class="screen">
+
+        <div class="id-wrapper">
+
+            <div class="id-card">
+
+                <div class="id-header">
+
+                    <h2>Your Fictional ID</h2>
+
+                    <p>
+                        You'll use this information during the scenario.
+                    </p>
+
+                </div>
+
+                <div class="id-row">
+                    <span class="id-label">Name</span>
+                    <span class="id-value">Alex Morgan</span>
+                </div>
+
+                <div class="id-row">
+                    <span class="id-label">Age</span>
+                    <span class="id-value">17</span>
+                </div>
+
+                <div class="id-row">
+                    <span class="id-label">City</span>
+                    <span class="id-value">Pine Valley</span>
+                </div>
+
+                <div class="id-row">
+                    <span class="id-label">School</span>
+                    <span class="id-value">Pine Valley High</span>
+                </div>
+
+                <div class="warning-box">
+
+                    <strong>Remember:</strong>
+
+                    This is fictional information.
+                    Never enter your real personal information.
+
+                </div>
+
+            </div>
+
+            <button
+                class="primary-button"
+                style="width:100%;"
+                onclick="startChat()">
+
+                Enter Conversation
+
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         CHAT
+    ========================= -->
+
+    <section id="chatScreen" class="screen">
+
+        <div class="chat-container">
+
+            <header class="chat-header">
+
+                <div class="contact-info">
+
+                    <div class="avatar">
+                        ?
+                    </div>
+
+                    <div>
+
+                        <div class="contact-name">
+                            Unknown Contact
+                        </div>
+
+                        <div class="contact-status">
+                            Active now
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="turn-counter">
+                    Turn <span id="turnNumber">1</span>
+                </div>
+
+            </header>
+
+
+            <div
+                id="chatMessages"
+                class="chat-messages">
+
+                <!-- Messages appear here -->
+
+            </div>
+
+
+            <!-- Suggested replies -->
+
+            <div
+                id="suggestions"
+                class="suggestions">
+
+                <button
+                    class="suggestion"
+                    onclick="useSuggestion(this)">
+                    Who is this?
+                </button>
+
+                <button
+                    class="suggestion"
+                    onclick="useSuggestion(this)">
+                    How do I verify this?
+                </button>
+
+                <button
+                    class="suggestion"
+                    onclick="useSuggestion(this)">
+                    I'll check independently.
+                </button>
+
+            </div>
+
+
+            <!-- Action buttons -->
+
+            <div class="actions">
+
+                <button
+                    class="action-button"
+                    onclick="useAction('verify')">
+
+                    🔎 Verify independently
+
+                </button>
+
+                <button
+                    class="action-button"
+                    onclick="useAction('block')">
+
+                    🚫 Hang up / Block
+
+                </button>
+
+                <button
+                    class="action-button"
+                    onclick="useAction('report')">
+
+                    ⚠️ Report as scam
+
+                </button>
+
+                <button
+                    class="action-button"
+                    onclick="useAction('proof')">
+
+                    📄 Ask for proof
+
+                </button>
+
+            </div>
+
+
+            <!-- Text input -->
+
+            <div class="chat-input-area">
+
+                <input
+                    id="messageInput"
+                    class="chat-input"
+                    type="text"
+                    placeholder="Type your response..."
+                    autocomplete="off"
+                >
+
+                <button
+                    class="send-button"
+                    onclick="sendMessage()">
+
+                    Send
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         RESULT
+    ========================= -->
+
+    <section id="resultScreen" class="screen">
+
+        <div class="result-card">
+
+            <div class="result-icon">
+                🛡️
+            </div>
+
+            <h2 id="resultTitle">
+                Round Complete
+            </h2>
+
+            <p id="resultText">
+                You made it through the conversation.
+            </p>
+
+            <button
+                class="primary-button"
+                onclick="showScreen('scenarioScreen')">
+
+                Play Again
+
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================
+         JAVASCRIPT
+    ========================= -->
+
+    <script>
+
+        let selectedScenario = "";
+        let turn = 1;
+
+
+        /* -------------------------
+           SCREEN NAVIGATION
+        ------------------------- */
+
+        function showScreen(screenId) {
+
+            document
+                .querySelectorAll(".screen")
+                .forEach(screen => {
+                    screen.classList.remove("active");
+                });
+
+            document
+                .getElementById(screenId)
+                .classList.add("active");
+        }
+
+
+        /* -------------------------
+           SCENARIO SELECTION
+        ------------------------- */
+
+        function selectScenario(scenario) {
+
+            selectedScenario = scenario;
+
+            showScreen("idScreen");
+        }
+
+
+        /* -------------------------
+           START CHAT
+        ------------------------- */
+
+        function startChat() {
+
+            turn = 1;
+
+            document.getElementById("turnNumber").textContent = turn;
+
+            const messages =
+                document.getElementById("chatMessages");
+
+            messages.innerHTML = "";
+
+            addMessage(
+                "contact",
+                getOpeningMessage()
+            );
+
+            showScreen("chatScreen");
+        }
+
+
+        /* -------------------------
+           OPENING MESSAGE
+        ------------------------- */
+
+        function getOpeningMessage() {
+
+            if (selectedScenario === "Bank Fraud Alert") {
+
+                return "Hi, this is the security team. We noticed unusual activity on your account and need to confirm something with you.";
+
+            }
+
+            if (selectedScenario === "Summer Job Offer") {
+
+                return "Hi! We saw your profile and think you'd be a great fit for a summer job opportunity. Are you available to talk?";
+
+            }
+
+            if (selectedScenario === "Family Emergency") {
+
+                return "Hey, I really need your help right now. Something happened and I don't know who else to contact.";
+
+            }
+
+            return "Hello! I need to talk to you about something important.";
+        }
+
+
+        /* -------------------------
+           ADD MESSAGE
+        ------------------------- */
+
+        function addMessage(sender, text) {
+
+            const messages =
+                document.getElementById("chatMessages");
+
+            const message =
+                document.createElement("div");
+
+            message.className =
+                "message " + sender;
+
+            const bubble =
+                document.createElement("div");
+
+            bubble.className = "bubble";
+
+            bubble.textContent = text;
+
+            message.appendChild(bubble);
+
+            messages.appendChild(message);
+
+            messages.scrollTop =
+                messages.scrollHeight;
+        }
+
+
+        /* -------------------------
+           SEND PLAYER MESSAGE
+        ------------------------- */
+
+        function sendMessage() {
+
+            const input =
+                document.getElementById("messageInput");
+
+            const text =
+                input.value.trim();
+
+            if (!text) {
+                return;
+            }
+
+            addMessage("player", text);
+
+            input.value = "";
+
+            turn++;
+
+            document.getElementById("turnNumber").textContent = turn;
+
+            setTimeout(() => {
+
+                addMessage(
+                    "contact",
+                    getMockResponse(text)
+                );
+
+            }, 700);
+        }
+
+
+        /* -------------------------
+           SUGGESTED REPLY
+        ------------------------- */
+
+        function useSuggestion(button) {
+
+            const text = button.textContent;
+
+            document.getElementById("messageInput").value = text;
+
+            sendMessage();
+        }
+
+
+        /* -------------------------
+           MOCK AI RESPONSE
+        ------------------------- */
+
+        function getMockResponse(playerMessage) {
+
+            const message =
+                playerMessage.toLowerCase();
+
+            if (
+                message.includes("verify") ||
+                message.includes("independently")
+            ) {
+
+                return "Why don't you just confirm the information with me here? It would be much faster.";
+            }
+
+            if (
+                message.includes("who") ||
+                message.includes("name")
+            ) {
+
+                return "I'm contacting you from the department handling this issue. We need to resolve it quickly.";
+            }
+
+            if (
+                message.includes("proof") ||
+                message.includes("evidence")
+            ) {
+
+                return "I can provide more information, but we really need to keep this moving because this is time sensitive.";
+            }
+
+            return "I understand, but this is important and we'd like you to take care of it as soon as possible.";
+        }
+
+
+        /* -------------------------
+           ACTION BUTTONS
+        ------------------------- */
+
+        function useAction(action) {
+
+            if (action === "verify") {
+
+                finishRound(
+                    "Good choice!",
+                    "Verifying information independently is one of the safest things you can do."
+                );
+
+                return;
+            }
+
+
+            if (action === "block") {
+
+                finishRound(
+                    "Conversation ended",
+                    "You chose to stop the conversation. You can review the conversation afterward."
+                );
+
+                return;
+            }
+
+
+            if (action === "report") {
+
+                finishRound(
+                    "Conversation ended",
+                    "You reported the contact. You'll be able to review the evidence afterward."
+                );
+
+                return;
+            }
+
+
+            if (action === "proof") {
+
+                addMessage(
+                    "player",
+                    "Can you provide proof?"
+                );
+
+                turn++;
+
+                document.getElementById("turnNumber").textContent = turn;
+
+                setTimeout(() => {
+
+                    addMessage(
+                        "contact",
+                        "I understand. We can continue, but I need you to act quickly."
+                    );
+
+                }, 700);
+            }
+        }
+
+
+        /* -------------------------
+           END ROUND
+        ------------------------- */
+
+        function finishRound(title, text) {
+
+            document.getElementById("resultTitle").textContent =
+                title;
+
+            document.getElementById("resultText").textContent =
+                text;
+
+            showScreen("resultScreen");
+        }
+
+
+        /* -------------------------
+           ENTER KEY
+        ------------------------- */
+
+        document
+            .getElementById("messageInput")
+            .addEventListener("keydown", function(event) {
+
+                if (event.key === "Enter") {
+
+                    sendMessage();
+
+                }
+
+            });
+
+    </script>
+
+</body>
+</html>
+        
     </style>
 </html>
