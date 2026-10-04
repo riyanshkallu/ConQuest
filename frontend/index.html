@@ -1,115 +1,123 @@
 <!DOCTYPE html>
-<html>
-    <meta charset="utf-8">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Can You Outsmart the Scanner?</title>
-    
+
+    <title>Can You Outsmart the Scammer?</title>
+
     <style>
-        /* applying for all page */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-          box-sizing: border-box;
-          margin:0;
-          padding: 0;
-          font-family: "Courier New", Courier, monospace;
-          background-color: #121212;
-          color: #E7E8EB;
-          min-height: 80 vh;
-          min-width: 95 vw;  
-        }
-
-        button {
-          font: inherit;
-          cursor: pointer;
-        }
-
-        .screen {
-            top-margin: 0 auto;
-            bottom-margin: 0 auto;
-            padding: 0 30px;
-            min-width: 100vw;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f4f6f8;
+            color: #17202a;
             min-height: 100vh;
         }
 
-        screen.active {
-            display: flex;  
-        }
-        .container {
-            max-width: 1200px; 
-            width: 100%;       
-            margin: 0 auto;   
-            padding: 0 30px;  
-            box-sizing: border-box; 
+        button {
+            font: inherit;
+            cursor: pointer;
         }
 
-        
-        /* home screen code */
-        #homescreen {
-            text-align: center;
+        /* =========================
+           GENERAL LAYOUT
+        ========================= */
+
+        .screen {
+            display: none;
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        /* =========================
+           HOME SCREEN
+        ========================= */
+
+        #homeScreen {
+            align-items: center;
             justify-content: center;
-            place-items: center;
+            text-align: center;
         }
 
         .home-card {
-            background-color: #696261;
-            max-width: 850px;
+            background: white;
+            border-radius: 24px;
+            padding: 50px 35px;
+            max-width: 700px;
             width: 100%;
-            padding: 0px 20px;
-            box-shadow: 0 10px 35px rgba (250,377, 993, 291);
-        }
-
-        .home-card h1 {
-          font-size: 24px;
-          color: #DB7465;
-          margin-bottom: 35px;
-        }
-
-        .home-card p {
-          font-size: 16px;
-          line-height: 1.5;
-          color: #666666
+            box-shadow: 0 10px 35px rgba(0,0,0,0.08);
         }
 
         .logo {
-          font-size: 56px;
-          margin-bottom: 15px;
+            font-size: 56px;
+            margin-bottom: 15px;
         }
 
-        /* home button code */
+        .home-card h1 {
+            font-size: 42px;
+            margin-bottom: 15px;
+        }
+
+        .home-card p {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #5d6875;
+            margin-bottom: 30px;
+        }
+
         .primary-button {
-          border: none;
-          background: #17202a;
-          color: grey;
-          padding: 15px 20px;
-          border-radius:  12px;
-          font-weight: bold;
-          font-size: 17px;
-          transition: 1.0s;
+            border: none;
+            background: #17202a;
+            color: white;
+            padding: 15px 28px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 17px;
+            transition: 0.2s;
         }
 
         .primary-button:hover {
-          translate: 0 -2px;
-          opacity: 0.9;
+            transform: translateY(-2px);
+            opacity: 0.9;
         }
-        
-        /* scenario page */    
-        #scenarioscreen {
-            text-align: center;
+
+        /* =========================
+           SCENARIO SCREEN
+        ========================= */
+
+        #scenarioScreen {
+            align-items: center;
             justify-content: center;
-            place-items: center;
         }
 
-        .scenario-title {
+        .page-title {
             text-align: center;
-            margin: 0 px 32 px;
+            margin-bottom: 35px;
         }
 
-        .scenario-title h2 {
-          font-size: 42px;
-          margin-bottom: 10px;
+        .page-title h2 {
+            font-size: 36px;
+            margin-bottom: 10px;
         }
 
-        .scenario-title p {
-          color: #687481;
+        .page-title p {
+            color: #687481;
         }
 
         .scenario-grid {
@@ -117,70 +125,66 @@
             grid-template-columns: repeat(3, 1fr);
             gap: 20px;
         }
+
         .scenario-card {
-            background-color: #696261;
-            max-width: 850px;
-            width: 100%;
-            padding: 28px;
-            box-shadow: 0 10px 35px rgba (0,0, 0, 0.06);
-            transition: 1s;
+            background: white;
             border: 2px solid transparent;
             border-radius: 18px;
-            min-height: 200px;
+            padding: 28px;
+            min-height: 180px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+            transition: 0.2s;
         }
 
         .scenario-card:hover {
-        transform: translateY(-4px);
-        border-radius: 9px;
-        border-color: #17202a;
+            transform: translateY(-4px);
+            border-color: #17202a;
         }
-        
+
+        .scenario-icon {
+            font-size: 38px;
+            margin-bottom: 15px;
+        }
+
         .scenario-card h3 {
-          font-size: 24px;
-          color: #DB7465;
-          margin-bottom: 35px;
+            margin-bottom: 8px;
         }
 
         .scenario-card p {
-          font-size: 16px;
-          line-height: 1.7;
-          color: #666666
+            color: #687481;
+            line-height: 1.5;
+            margin-bottom: 20px;
         }
 
-        .scenario-logo {
-          font-size: 56px;
-          margin-bottom: 15px;
-        }
-
-       .scenario-button {
+        .scenario-button {
             width: 100%;
             border: none;
             background: #17202a;
             color: white;
-            padding: 8px;
-            border-radius: 14px;
-            border-width: 15px;
+            padding: 11px;
+            border-radius: 10px;
             font-weight: bold;
-           border-type: solid black;
         }
 
-        /* id page code */
+        /* =========================
+           ID CARD SCREEN
+        ========================= */
 
-        #idscreen {
-            text-align: center;
+        #idScreen {
+            align-items: center;
             justify-content: center;
-            place-items: center;
         }
 
         .id-wrapper {
-            max-width: 750px;
-            margin: 0 auto;
-            width: 80%;
+            max-width: 650px;
+            width: 100%;
+            margin: auto;
         }
+
         .id-card {
             background: white;
-            border-radius: 10px;
-            padding: 20px;
+            border-radius: 20px;
+            padding: 30px;
             box-shadow: 0 10px 35px rgba(0,0,0,0.08);
             margin-bottom: 25px;
         }
@@ -192,18 +196,18 @@
         }
 
         .id-header h2 {
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
 
         .id-header p {
-            color: #DB7465;
+            color: #687481;
         }
 
         .id-row {
             display: flex;
             justify-content: space-between;
-            padding: 12px;
-            border-bottom: 1px solid #544643;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
         }
 
         .id-label {
@@ -222,7 +226,9 @@
             line-height: 1.5;
         }
 
-        /* chat screen code*/
+        /* =========================
+           CHAT SCREEN
+        ========================= */
 
         #chatScreen {
             justify-content: center;
@@ -321,7 +327,9 @@
             border-bottom-right-radius: 5px;
         }
 
-        /* reply type code */
+        /* =========================
+           SUGGESTED REPLIES
+        ========================= */
 
         .suggestions {
             padding: 10px 15px;
@@ -344,7 +352,9 @@
             background: #eef1f3;
         }
 
-        /* action button code */
+        /* =========================
+           ACTION BUTTONS
+        ========================= */
 
         .actions {
             padding: 12px 15px;
@@ -367,7 +377,9 @@
             background: #dce1e5;
         }
 
-        /* input code */
+        /* =========================
+           INPUT
+        ========================= */
 
         .chat-input-area {
             padding: 12px 15px;
@@ -397,7 +409,9 @@
             font-weight: bold;
         }
 
-        /* showcase result code */
+        /* =========================
+           RESULT SCREEN
+        ========================= */
 
         #resultScreen {
             align-items: center;
@@ -430,7 +444,9 @@
             margin-bottom: 25px;
         }
 
-        /* respomsive code */
+        /* =========================
+           RESPONSIVE
+        ========================= */
 
         @media (max-width: 750px) {
 
@@ -1144,7 +1160,4 @@
     </script>
 
 </body>
-</html>
-        
-    </style>
 </html>
