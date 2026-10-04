@@ -2,10 +2,146 @@
 <html>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scam-ShieldAPP</title>
+    <title>Can You Outsmart the Scanner?</title>
     <style>
+        /* applying for all page */
         body {
-          
+          box-sizing: border-box;
+          margin:0;
+          padding: 0;
+          font-family: "Courier New", Courier, monospace;
+          background-color: #121212;
+          color: #E7E8EB;
+          min-height: 80 vh;
+          min-width: 95 vw;  
+        }
+
+        button {
+          font: inherit;
+          cursor: pointer;
+        }
+
+        .screen {
+            top-margin: 0 auto;
+            bottom-margin: 0 auto;
+            padding: 0 30px;
+            min-width: 100vw;
+            min-height: 100vh;
+        }
+
+        screen.active {
+            display: flex;  
+        }
+        .container {
+            max-width: 1200px; 
+            width: 100%;       
+            margin: 0 auto;   
+            padding: 0 30px;  
+            box-sizing: border-box; 
+        }
+
+        
+        /* home screen code */
+        #homescreen {
+            text-align: center;
+            justify-content: center;
+            place-items: center;
+        }
+
+        .home-card {
+            background-color: #696261;
+            max-width: 850px;
+            width: 100%;
+            padding: 0px 20px;
+            box-shadow: 0 10px 35px rgba (250,377, 993, 291);
+        }
+
+        .home-card h1 {
+          font-size: 24px;
+          color: #DB7465;
+          margin-bottom: 35px;
+        }
+
+        .home-card p {
+          font-size: 16px;
+          line-height: 1.5;
+          color: #666666
+        }
+
+        .logo {
+          font-size: 56px;
+          margin-bottom: 15px;
+        }
+
+        /* home button code */
+        .primary-button {
+          border: none;
+          background: #17202a;
+          color: grey;
+          padding: 15px 20px;
+          border-radius:  12px;
+          font-weight: bold;
+          font-size: 17px;
+          transition: 1.0s;
+        }
+
+        .primary-button:hover {
+          translate: 0 -2px;
+          opacity: 0.9;
+        }
+        
+        /* scenario page */    
+        #scenarioscreen {
+            text-align: center;
+            justify-content: center;
+            place-items: center;
+        }
+
+        .scenario-title {
+            text-align: center;
+            margin: 0 px 32 px;
+            
+            
+        }
+        .scenario-card {
+            background-color: #696261;
+            max-width: 850px;
+            width: 100%;
+            padding: 0px 20px;
+            box-shadow: 0 10px 35px rgba (250,377, 993, 291);
+        }
+
+        .scenario-card h1 {
+          font-size: 24px;
+          color: #DB7465;
+          margin-bottom: 35px;
+        }
+
+        .scenario-card p {
+          font-size: 16px;
+          line-height: 1.5;
+          color: #666666
+        }
+
+        .logo {
+          font-size: 56px;
+          margin-bottom: 15px;
+        }
+
+        .primary-button {
+          border: none;
+          background: #17202a;
+          color: grey;
+          padding: 15px 20px;
+          border-radius:  12px;
+          font-weight: bold;
+          font-size: 17px;
+          transition: 1.0s;
+        }
+
+        .primary-button:hover {
+          translate: 0 -2px;
+          opacity: 0.9;
         }
       
     </style>
