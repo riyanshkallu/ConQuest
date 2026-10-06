@@ -58,7 +58,8 @@ def require_round(round_id: str) -> store.Round:
 
 def list_scenarios(player: progress.Player) -> schemas.ScenarioListResponse:
     scenarios = list(load_scenarios().values())
-    cards = [schemas.ScenarioCard(id=s.id, title=s.title, channel=s.channel, difficulty=s.difficulty)
+    cards = [schemas.ScenarioCard(id=s.id, title=s.title, channel=s.channel,
+                                  difficulty=engine.round_difficulty(s.difficulty, player.level))
              for s in scenarios]
     weak = progress.weakest_category(player)
     pick = None
@@ -102,6 +103,7 @@ async def start_round(player: progress.Player, scenario_id: str, ai: AIProvider)
         is_scam=is_scam, id_card=card, objective=version["objective"],
         objective_is_payment=version.get("objective_is_payment", False),
         max_turns=settings.max_turns, par_turns=scenario.raw.get("par_turns", 6),
+        difficulty=engine.round_difficulty(scenario.difficulty, player.level),
     )
     rnd = store.Round(id=store.new_id("r"), player_id=player.id, scenario=scenario, state=state)
 
@@ -112,7 +114,7 @@ async def start_round(player: progress.Player, scenario_id: str, ai: AIProvider)
 
     return schemas.StartRoundResponse(
         round_id=rnd.id, scenario_id=scenario.id, channel=scenario.channel,
-        difficulty=scenario.difficulty, max_turns=state.max_turns,
+        difficulty=state.difficulty, max_turns=state.max_turns,
         contact=schemas.Contact(name=render(version["contact"]["name"], scenario, card),
                                 handle=render(version["contact"]["handle"], scenario, card)),
         id_card=_id_card_out(card, scenario),

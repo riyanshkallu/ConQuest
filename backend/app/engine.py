@@ -133,6 +133,7 @@ class RoundState:
     objective_is_payment: bool = False
     max_turns: int = 10
     par_turns: int = 6
+    difficulty: int = 2  # 1-5: how convincing the scammer is (and how plain the real contact is)
 
     suspicion: int = 0
     trust: int = 50
@@ -165,6 +166,14 @@ class RoundState:
 # ---------------------------------------------------------------------------
 # Round setup
 # ---------------------------------------------------------------------------
+
+MAX_DIFFICULTY = 5
+
+
+def round_difficulty(scenario_difficulty: int, player_level: int) -> int:
+    """The plan's "level sets default difficulty": +1 every 2 levels, from 1 to 5."""
+    return max(1, min(MAX_DIFFICULTY, scenario_difficulty + (player_level - 1) // 2))
+
 
 def assign_is_scam(history: list[bool], rng: random.Random, scam_ratio: float = 0.65) -> bool:
     """Pick scam or legit for a new round.
