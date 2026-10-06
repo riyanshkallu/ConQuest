@@ -507,6 +507,51 @@
             margin-top: 12px;
         }
 
+        /* loading screen code */
+
+        #loadingscreen {
+
+            align-items: center;
+            text-align: center;
+            justify-content: center;
+        }
+
+        .loading-card {
+            background: white;
+            border-radius: 26px;
+            padding: 23px 34 px;
+            margin: 0 auto;
+            max-width: 300px;
+            width: 110%;
+            box-shadow: 0 10px 35px rgba(20,20,20,0.08);
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #677e8a;
+            margin: 0 auto 18px;
+            border-radius: 10px;
+            animation: spin 0.9 sec linear infinite;
+            z-index: 9999;
+            border-top: 6px solid #3498db;
+            margin: 0 auto;
+        }
+
+        .loading card h2 {
+            margin-bottom: 10px;
+        }
+
+        .loading card p {
+            color: #97bfb9;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
         /* responsive code */
 
         @media (max-width: 750px) {
@@ -677,6 +722,17 @@
     </section>
 
 
+    <!--loading screen html -->
+
+    <section id="loadingScreen" class="screen">
+
+        <div class="loading card">
+            
+            <div class="spinner"></div>
+
+            <p>Getting ID ready shortly...</p>
+        </div>
+    </section>
     <!-- id card html -->
 
     <section id="idScreen" class="screen">
@@ -1025,6 +1081,7 @@
 
         async function selectScenario(scenarioId) {
 
+            showScreen("loading screen");
             try {
                 const round = await api("POST", "/round/start", {
                     player_id: playerId,
