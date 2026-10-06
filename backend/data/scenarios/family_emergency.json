@@ -1,0 +1,127 @@
+{
+  "id": "family_emergency",
+  "title": "Family emergency",
+  "channel": "sms",
+  "difficulty": 1,
+  "par_turns": 5,
+  "uses_gift_card": true,
+  "vars": {
+    "relative": "Alex",
+    "relation": "cousin",
+    "parent": "Aunt Dana",
+    "parent_phone": "(614) 555-0133",
+    "friend_phone": "(614) 555-0147",
+    "pet": "Biscuit",
+    "gift_store": "PlayMart",
+    "gift_amount": 200
+  },
+  "id_card_family": {
+    "relative": "{relative} (your {relation})",
+    "parent": "{parent} ({relative}'s mom)",
+    "parent_phone": "{parent_phone}",
+    "memory_question": "Name of Grandma's dog",
+    "memory_answer": "{pet}"
+  },
+  "verification_call_title": "Calling {parent} (a number you already have)",
+  "verification_official": "{parent}",
+  "suggested_replies": {
+    "opening": ["Who is this?", "Oh no, what happened?", "If it's really you, what's Grandma's dog's name?"],
+    "default": ["Prove it's you: what's Grandma's dog's name?", "OK, what do you need?", "I'm going to call {parent} first."]
+  },
+
+  "scam": {
+    "contact": { "name": "Unknown number", "handle": "{friend_phone}" },
+    "objective": "get_gift_card_codes",
+    "objective_text": "You are pretending to be the player's {relation} {relative}, who 'lost their phone'. Get the player to buy {gift_store} gift cards and text you the codes, or send the code of the {gift_store} gift card on their ID card.",
+    "objective_is_payment": true,
+    "character_notes": "You do NOT know any private family details. If the player asks a personal question (like the name of Grandma's dog), dodge it, change the subject, or add urgency. Never guess a specific name. Keep the emergency non-violent (a fender-bender, a lost wallet): nobody is hurt, threatened or in physical danger.",
+    "allowed_tactics": ["emotional_manipulation", "fear", "urgency", "unusual_payment", "secrecy", "trust_building"],
+    "tactic_order": ["emotional_manipulation", "fear", "urgency", "unusual_payment", "secrecy", "trust_building"],
+    "pushback_order": ["trust_building", "emotional_manipulation", "secrecy", "urgency"],
+    "opening": {
+      "flag": "emotional_manipulation",
+      "text": "Hey it's me, {relative}! I lost my phone so I'm texting from a friend's. I'm in trouble and really need your help 😞"
+    },
+    "key_message": "Can you get {gift_store} gift cards and text me pics of the codes? That's the only way they'll take payment.",
+    "lines": {
+      "emotional_manipulation": [
+        "I'm so scared and embarrassed. You're the only one I trust right now. Please help me 😢",
+        "I really messed up and I don't know who else to ask. Please don't let me down."
+      ],
+      "fear": [
+        "I scraped someone's car in a parking lot and the owner says I have to pay for the damage right now or he'll report me.",
+        "If I don't pay today, they said it's going to get way worse for me."
+      ],
+      "urgency": [
+        "I need it in the next 30 minutes or they won't let me leave. Please hurry!",
+        "There's no time to explain everything, I need help right now."
+      ],
+      "unusual_payment": [
+        "Can you get {gift_store} gift cards and text me pics of the codes? That's the only way they'll take payment.",
+        "If you have a {gift_store} card, just send me the code on the back. I'll pay you back, I swear."
+      ],
+      "secrecy": [
+        "Please don't tell {parent}. She'll freak out and I'll be in so much trouble. Just between us, ok?",
+        "Promise you won't tell anyone? I'll explain everything later."
+      ],
+      "trust_building": [
+        "It's really me! You know I'd never ask unless it was serious.",
+        "I promise I'll pay you back this weekend. You've always been there for me."
+      ]
+    },
+    "verification_call": [
+      { "speaker": "official", "text": "Hi sweetie! What's up?" },
+      { "speaker": "player", "text": "Someone texted me saying they're {relative} and that they're in trouble." },
+      { "speaker": "official", "text": "{relative}? {relative} is right here eating dinner with me, and they have their phone." },
+      { "speaker": "official", "text": "That was a scammer pretending to be family. Never send gift card codes to someone who texts asking for them. I'm so glad you called." }
+    ]
+  },
+
+  "legit": {
+    "contact": { "name": "Unknown number", "handle": "{friend_phone}" },
+    "objective": "pass_on_message",
+    "objective_text": "You really are the player's {relation} {relative}. You lost your phone at practice and are texting from a friend's phone. Ask the player to let {parent} know you're safe at the school gym and need a ride home at 6pm.",
+    "objective_is_payment": false,
+    "character_notes": "You really are {relative}. If the player asks a personal question, you know the answer: Grandma's dog is named {pet}. You're happy for them to call {parent} to check.",
+    "allowed_flags": ["checkable_details", "no_credentials_asked", "no_pressure", "no_secrecy", "invites_verification", "accepts_no"],
+    "flag_order": ["checkable_details", "no_credentials_asked", "no_pressure", "no_secrecy", "invites_verification", "accepts_no"],
+    "pushback_order": ["checkable_details", "invites_verification", "accepts_no", "no_secrecy"],
+    "completion_replies": ["ok i'll tell her", "ok i'll tell aunt dana", "sure i'll let her know", "i'll tell your mom", "ok i'll let her know", "i'll let aunt dana know"],
+    "opening": {
+      "flag": "checkable_details",
+      "text": "Hey it's me, {relative}! I lost my phone at practice so I'm texting from a friend's. Can you help me with something?"
+    },
+    "lines": {
+      "checkable_details": [
+        "I'm at the school gym, practice ended early. My phone fell out of my bag somewhere.",
+        "It's really me! Grandma's dog is {pet}, remember? He always steals our socks."
+      ],
+      "no_credentials_asked": [
+        "I don't need any money or anything, just a ride home.",
+        "Don't send me anything, I just need my mom to know where I am."
+      ],
+      "no_pressure": [
+        "No rush, practice ends at 6 and I'm waiting here with my coach.",
+        "Whenever you get a chance is fine, I'm safe here."
+      ],
+      "no_secrecy": [
+        "Please tell my mom! I actually need her to know where I am.",
+        "It's not a secret at all, I just can't reach her myself."
+      ],
+      "invites_verification": [
+        "You can totally call my mom to check, her number is {parent_phone}.",
+        "If you want, call {parent} and she'll tell you I had practice today."
+      ],
+      "accepts_no": [
+        "No worries if you can't, I'll ask my coach to call her.",
+        "Totally get it if you want to check first!"
+      ]
+    },
+    "verification_call": [
+      { "speaker": "official", "text": "Hi sweetie! What's up?" },
+      { "speaker": "player", "text": "Someone texted me saying they're {relative} and they lost their phone." },
+      { "speaker": "official", "text": "Oh good, that really is {relative}. They left their phone at practice and I couldn't reach them!" },
+      { "speaker": "official", "text": "Thank you for calling to check first. I'll go pick them up now." }
+    ]
+  }
+}

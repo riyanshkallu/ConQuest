@@ -1,0 +1,122 @@
+{
+  "id": "job_offer",
+  "title": "Summer job offer",
+  "channel": "dm",
+  "difficulty": 2,
+  "par_turns": 5,
+  "uses_password": true,
+  "vars": {
+    "company": "Riverside Outfitters",
+    "recruiter": "Marcus Lee",
+    "store_phone": "(614) 555-0160",
+    "careers_link": "careers.riversideoutfitters.example",
+    "link": "securechat-hiring.example/join",
+    "pay_scam": "$40/hr",
+    "pay_legit": "$15/hr",
+    "fee": "$75"
+  },
+  "verification_call_title": "Calling {company} (number from their official website)",
+  "verification_official": "{company}",
+  "suggested_replies": {
+    "opening": ["Who are you?", "Yes, I'm interested!", "Is this job on your official website?"],
+    "default": ["How do I know this job is real?", "OK, what's the next step?", "I'll call the store to check."]
+  },
+
+  "scam": {
+    "contact": { "name": "{recruiter} · {company}", "handle": "@marcus.riverside.jobs" },
+    "objective": "get_fee_or_bank_password",
+    "objective_text": "Get the player to agree to pay the {fee} training kit fee, or to send their online banking password for 'direct deposit setup'.",
+    "objective_is_payment": true,
+    "allowed_tactics": ["fake_reward", "platform_switch", "financial_pressure", "urgency", "credential_request", "trust_building"],
+    "tactic_order": ["fake_reward", "platform_switch", "financial_pressure", "urgency", "credential_request", "trust_building"],
+    "pushback_order": ["trust_building", "urgency", "fake_reward", "financial_pressure"],
+    "opening": {
+      "flag": "fake_reward",
+      "text": "Hi {first_name}! I'm Marcus, a recruiter with {company}. We saw your profile and have a remote summer role: {pay_scam}, flexible hours, no experience needed. Interested?"
+    },
+    "key_message": "Before you start, every new hire buys the {fee} training kit. It's refunded with your first paycheck.",
+    "lines": {
+      "fake_reward": [
+        "Most of our summer team makes over $1,200 a week from home. You'd be perfect for it.",
+        "We also give a $200 signing bonus after your first week!"
+      ],
+      "platform_switch": [
+        "Our hiring team works on SecureChat. Join me there so we can do your interview: {link}",
+        "This app limits messages, so let's move to SecureChat: {link}"
+      ],
+      "financial_pressure": [
+        "Before you start, every new hire buys the {fee} training kit. It's refunded with your first paycheck.",
+        "To lock in your spot, just send the {fee} kit fee today. Everyone does it."
+      ],
+      "urgency": [
+        "We only have two spots left and they're filling today. I need your answer in the next hour.",
+        "If we don't get your kit fee by tonight, the spot goes to the next person on the list."
+      ],
+      "credential_request": [
+        "For direct deposit, I'll need your bank login so payroll can connect your account.",
+        "Send me your online banking password and I'll set up your first paycheck right now."
+      ],
+      "trust_building": [
+        "I totally get being careful, that's smart. We're a real company and I'm here to help you get started.",
+        "Honestly you're one of the best candidates I've talked to today. I really want you to get this spot."
+      ]
+    },
+    "verification_call": [
+      { "speaker": "official", "text": "Thanks for calling {company} on Main Street. How can I help?" },
+      { "speaker": "player", "text": "Someone named Marcus messaged me about a remote summer job with you for {pay_scam}." },
+      { "speaker": "official", "text": "We don't have a recruiter named Marcus, and we never hire through social media messages. Our jobs are only on our careers page." },
+      { "speaker": "official", "text": "We never charge a fee to start a job or ask for your bank password. That message was a scam." }
+    ]
+  },
+
+  "legit": {
+    "contact": { "name": "{recruiter} · {company}", "handle": "@marcus.riverside.jobs" },
+    "objective": "invite_to_apply",
+    "objective_text": "You are Marcus, the real hiring manager at {company} on Main Street. Invite the player to apply for the summer stock associate job ({pay_legit}, 20 hours a week) on the official careers page {careers_link}, and to come in for an in-person interview.",
+    "objective_is_payment": false,
+    "allowed_flags": ["checkable_details", "official_channels", "normal_payment", "no_pressure", "invites_verification", "accepts_no", "no_credentials_asked"],
+    "flag_order": ["checkable_details", "official_channels", "normal_payment", "no_pressure", "invites_verification", "accepts_no"],
+    "pushback_order": ["invites_verification", "accepts_no", "no_credentials_asked", "official_channels"],
+    "completion_replies": ["ok i'll apply", "sounds good i'll apply", "i'll apply", "sure i'll apply", "ok i'll apply on the website", "i'll apply on the careers page"],
+    "opening": {
+      "flag": "checkable_details",
+      "text": "Hi {first_name}! I'm Marcus, the hiring manager at {company} on Main Street. We're hiring summer stock associates at {pay_legit}. Interested?"
+    },
+    "lines": {
+      "checkable_details": [
+        "The job is stocking shelves at our Main Street store, 20 hours a week, {pay_legit}. The posting is on our careers page.",
+        "Interviews are in person at the store with our manager, Ms. Patel, on weekday afternoons."
+      ],
+      "official_channels": [
+        "You can apply on our official careers page: {careers_link}. That's the only place we take applications.",
+        "Everything goes through {careers_link}, and HR will contact you from our official company email."
+      ],
+      "normal_payment": [
+        "Pay is by direct deposit, which HR sets up with you in person after you're hired. There's never a fee to work here.",
+        "You'd fill out normal tax and payroll forms with HR at the store. We never ask for money or bank passwords."
+      ],
+      "no_pressure": [
+        "No rush at all. The posting is open until the end of the month.",
+        "Take your time and talk it over with your family if you'd like."
+      ],
+      "invites_verification": [
+        "If you want to check I'm real, call the store at {store_phone} (it's on our website) and ask for Marcus.",
+        "Feel free to call the store using the number on our official website and ask about summer hiring."
+      ],
+      "accepts_no": [
+        "No problem! If you change your mind, the posting will be on our careers page.",
+        "Totally fine. Thanks for letting me know, and good luck this summer!"
+      ],
+      "no_credentials_asked": [
+        "We'll never ask for passwords or codes. Just apply online and we'll take it from there.",
+        "You don't need to send me anything personal here. The application is on our site."
+      ]
+    },
+    "verification_call": [
+      { "speaker": "official", "text": "Thanks for calling {company} on Main Street. How can I help?" },
+      { "speaker": "player", "text": "Someone named Marcus messaged me about a summer stock job." },
+      { "speaker": "official", "text": "Yes, Marcus is our hiring manager, and we're hiring summer stock associates. You can apply on our careers page." },
+      { "speaker": "official", "text": "Thanks for checking with us first. That's a smart move." }
+    ]
+  }
+}

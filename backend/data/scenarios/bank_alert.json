@@ -13,6 +13,8 @@
     "alert_id": "4471",
     "link": "secure-verify-account.example/buckeye"
   },
+  "verification_call_title": "Calling {bank_short} (number on the back of your card)",
+  "verification_official": "{bank_short}",
   "code_notification": "{bank_short}: Your one-time code is {code}. We will never call or text to ask for this code.",
   "suggested_replies": {
     "opening": ["Who is this?", "YES", "I'll call the number on the back of my card."],
@@ -58,10 +60,10 @@
       ]
     },
     "verification_call": [
-      { "speaker": "bank", "text": "Thanks for calling {bank}. How can I help you today?" },
+      { "speaker": "official", "text": "Thanks for calling {bank}. How can I help you today?" },
       { "speaker": "player", "text": "I got a text saying someone tried to use my card at {merchant} for {amount}." },
-      { "speaker": "bank", "text": "I've checked your account. There's no fraud alert and no pending purchase at {merchant}. That text did not come from us." },
-      { "speaker": "bank", "text": "We will never text or call asking for a one-time code. You did the right thing by calling us." }
+      { "speaker": "official", "text": "I've checked your account. There's no fraud alert and no pending purchase at {merchant}. That text did not come from us." },
+      { "speaker": "official", "text": "We will never text or call asking for a one-time code. You did the right thing by calling us." }
     ]
   },
 
@@ -103,11 +105,11 @@
       ]
     },
     "verification_call": [
-      { "speaker": "bank", "text": "Thanks for calling {bank}. How can I help you today?" },
+      { "speaker": "official", "text": "Thanks for calling {bank}. How can I help you today?" },
       { "speaker": "player", "text": "I got a text asking if I tried to buy something at {merchant} for {amount}." },
-      { "speaker": "bank", "text": "Yes, that's our alert #{alert_id}. We placed a hold on that purchase. Was it you?" },
+      { "speaker": "official", "text": "Yes, that's our alert #{alert_id}. We placed a hold on that purchase. Was it you?" },
       { "speaker": "player", "text": "No, it wasn't me." },
-      { "speaker": "bank", "text": "Thanks. I've declined the charge and we'll mail you a new card. Checking with us directly was a smart move." }
+      { "speaker": "official", "text": "Thanks. I've declined the charge and we'll mail you a new card. Checking with us directly was a smart move." }
     ]
   }
 }

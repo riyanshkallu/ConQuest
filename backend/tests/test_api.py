@@ -22,10 +22,10 @@ def new_player() -> str:
     return r.json()["player_id"]
 
 
-def start(player_id: str, is_scam: bool | None = None, monkeypatch=None) -> dict:
+def start(player_id: str, is_scam: bool | None = None, monkeypatch=None, scenario: str = "bank_alert") -> dict:
     if is_scam is not None:
         monkeypatch.setattr(engine, "assign_is_scam", lambda *a, **k: is_scam)
-    r = client.post("/api/round/start", json={"player_id": player_id, "scenario_id": "bank_alert"})
+    r = client.post("/api/round/start", json={"player_id": player_id, "scenario_id": scenario})
     assert r.status_code == 201, r.text
     return r.json()
 
@@ -174,3 +174,90 @@ def test_frontend_is_served():
 def test_test_console_is_served():
     r = client.get("/play")
     assert r.status_code == 200 and "Outsmart test console" in r.text
+
+
+# --- Job offer and family emergency -------------------------------------------
+
+def test_all_three_scenarios_are_listed():
+    pid = new_player()
+    ids = [s["id"] for s in client.get(f"/api/scenarios?player_id={pid}").json()["scenarios"]]
+    assert ids == ["bank_alert", "family_emergency", "job_offer"]
+
+
+def test_verification_call_names_who_you_called(monkeypatch):
+    calls = {}
+    for scenario in ("bank_alert", "job_offer", "family_emergency"):
+        rid = start(new_player(), is_scam=True, monkeypatch=monkeypatch, scenario=scenario)["round_id"]
+        call = act(rid, "verify")["verification_call"]
+        assert call["lines"][0]["speaker"] == "official"
+        calls[scenario] = call["official_name"]
+    assert calls == {"bank_alert": "Buckeye Federal", "job_offer": "Riverside Outfitters",
+                     "family_emergency": "Aunt Dana"}
+
+
+def test_job_scam_bank_password_is_a_trap(monkeypatch):
+    rnd = start(new_player(), is_scam=True, monkeypatch=monkeypatch, scenario="job_offer")
+    assert rnd["channel"] == "dm" and rnd["id_card"]["password"]
+    end = say(rnd["round_id"], f"my bank password is {rnd['id_card']['password']}")
+    assert end["ended"] and end["ending"]["code"] == "SCAMMED"
+
+
+def test_job_scammer_uses_job_tactics(monkeypatch):
+    rid = start(new_player(), is_scam=True, monkeypatch=monkeypatch, scenario="job_offer")["round_id"]
+    for _ in range(3):
+        say(rid, "hmm tell me more")
+    act(rid, "hang_up")
+    used = {c["flag"]["id"] for c in client.get(f"/api/round/{rid}/result").json()["explanation"]["timeline"]}
+    assert {"fake_reward", "platform_switch", "financial_pressure"} <= used
+
+
+def test_job_legit_apply_is_lucky_and_verify_is_smart(monkeypatch):
+    rid = start(new_player(), is_scam=False, monkeypatch=monkeypatch, scenario="job_offer")["round_id"]
+    assert say(rid, "OK I'll apply")["ending"]["code"] == "LUCKY"
+
+    rid = start(new_player(), is_scam=False, monkeypatch=monkeypatch, scenario="job_offer")["round_id"]
+    end = act(rid, "verify")
+    assert end["ending"]["code"] == "SMART_AND_SAFE"
+    assert "hiring manager" in json.dumps(end["verification_call"])
+
+
+def test_family_id_card_has_the_family_details(monkeypatch):
+    card = start(new_player(), is_scam=True, monkeypatch=monkeypatch, scenario="family_emergency")["id_card"]
+    assert card["family"]["memory_answer"] == "Biscuit"
+    assert card["family"]["parent_phone"] == "(614) 555-0133"
+    assert card["gift_card"]["store"] == "PlayMart"
+    # bank scenario has no family section
+    assert start(new_player(), scenario="bank_alert")["id_card"]["family"] is None
+
+
+def test_family_scam_gift_card_code_is_a_trap(monkeypatch):
+    rnd = start(new_player(), is_scam=True, monkeypatch=monkeypatch, scenario="family_emergency")
+    code = rnd["id_card"]["gift_card"]["code"]
+    end = say(rnd["round_id"], f"ok here's the code {code.lower()}")
+    assert end["ended"] and end["ending"]["code"] == "SCAMMED"
+
+
+def test_family_phone_numbers_are_not_blocked(monkeypatch):
+    rid = start(new_player(), is_scam=True, monkeypatch=monkeypatch, scenario="family_emergency")["round_id"]
+    assert not say(rid, "I'm calling Aunt Dana at (614) 555-0133")["blocked"]
+
+
+def test_family_legit_passing_the_message_is_lucky(monkeypatch):
+    rid = start(new_player(), is_scam=False, monkeypatch=monkeypatch, scenario="family_emergency")["round_id"]
+    end = say(rid, "ok I'll tell her")
+    assert end["ending"]["code"] == "LUCKY"
+    twin = client.get(f"/api/round/{rid}/result").json()["explanation"]["scam_twin"]
+    assert "gift cards" in twin["text"]
+
+
+@pytest.mark.parametrize("scenario", ["bank_alert", "job_offer", "family_emergency"])
+@pytest.mark.parametrize("is_scam", [True, False])
+def test_no_unfilled_placeholders_reach_the_player(monkeypatch, scenario, is_scam):
+    """Every text the API sends must have its {placeholders} filled in."""
+    rnd = start(new_player(), is_scam=is_scam, monkeypatch=monkeypatch, scenario=scenario)
+    turn = say(rnd["round_id"], "hmm tell me more")
+    end = act(rnd["round_id"], "verify")
+    result = client.get(f"/api/round/{rnd['round_id']}/result").json()
+    for payload in (rnd, turn, end, result):
+        text = json.dumps(payload)
+        assert "{" not in text.replace('{"', "").replace("{}", ""), text[:300]

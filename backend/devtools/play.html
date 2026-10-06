@@ -214,7 +214,10 @@ async function startRound() {
     const rows = [["Name", card.name], ["Email", card.email], ["Phone", card.phone], ["Bank", card.bank],
                   ["Card", card.card_number], ["Password", card.password],
                   ["Gift card", card.gift_card && `${card.gift_card.store} $${card.gift_card.amount}: ${card.gift_card.code}`],
-                  ["Gaming", card.gaming_account && `${card.gaming_account.game}: ${card.gaming_account.username}`]];
+                  ["Gaming", card.gaming_account && `${card.gaming_account.game}: ${card.gaming_account.username}`],
+                  ["Family", card.family && card.family.relative],
+                  ["Their parent", card.family && `${card.family.parent}, ${card.family.parent_phone}`],
+                  [card.family && card.family.memory_question, card.family && card.family.memory_answer]];
     $("idcard").replaceChildren(...rows.filter(([, v]) => v).flatMap(([k, v]) => [el("dt", "", k), el("dd", "", v)]));
 
     $("contact").replaceChildren(r.contact.name + " ", el("small", "", `${r.contact.handle} · ${r.channel}`));
