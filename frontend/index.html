@@ -509,7 +509,7 @@
 
         /* loading screen code */
 
-        #loadingscreen {
+        #loadingScreen {
 
             align-items: center;
             text-align: center;
@@ -519,7 +519,7 @@
         .loading-card {
             background: white;
             border-radius: 26px;
-            padding: 23px 34 px;
+            padding: 23px 34px;
             margin: 0 auto;
             max-width: 300px;
             width: 110%;
@@ -532,17 +532,17 @@
             border: 4px solid #677e8a;
             margin: 0 auto 18px;
             border-radius: 10px;
-            animation: spin 0.9 sec linear infinite;
+            animation: spin 0.9s linear infinite;
             z-index: 9999;
             border-top: 6px solid #3498db;
             margin: 0 auto;
         }
 
-        .loading card h2 {
+        .loading-card h2 {
             margin-bottom: 10px;
         }
 
-        .loading card p {
+        .loading-card p {
             color: #97bfb9;
         }
 
@@ -726,7 +726,7 @@
 
     <section id="loadingScreen" class="screen">
 
-        <div class="loading card">
+        <div class="loading-card">
             
             <div class="spinner"></div>
 
@@ -1081,7 +1081,7 @@
 
         async function selectScenario(scenarioId) {
 
-            showScreen("loading screen");
+            showScreen("loadingScreen");
             try {
                 const round = await api("POST", "/round/start", {
                     player_id: playerId,
@@ -1097,6 +1097,7 @@
                 showScreen("idScreen");
 
             } catch (error) {
+                showScreen("scenarioScreen");
                 alert("Could not start the round: " + error.message);
             }
         }
