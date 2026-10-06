@@ -18,6 +18,9 @@ class Settings(BaseSettings):
     # "mock" = canned AI lines, no keys needed. "live" = real AI calls.
     ai_provider: str = "mock"
 
+    # Empty = local SQLite file (backend/outsmart.db). On Render: the Supabase pooler connection string.
+    database_url: str = ""
+
     # Free-tier keys. Groq: console.groq.com, Gemini: aistudio.google.com
     groq_api_key: str = ""
     gemini_api_key: str = ""

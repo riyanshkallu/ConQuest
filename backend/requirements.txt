@@ -9,6 +9,10 @@ pydantic-settings>=2.3
 # AI calls: Groq and Gemini both accept OpenAI-style requests, so one SDK talks to both
 openai>=1.40
 
+# Database: SQLite locally and in tests, Supabase (Postgres) in production
+sqlalchemy>=2.0
+psycopg[binary]>=3.2
+
 # Tests
 pytest>=8.0
 httpx>=0.27

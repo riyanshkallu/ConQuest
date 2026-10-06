@@ -44,6 +44,22 @@ lines. Set `AI_PROVIDER=live` and add a free Groq and/or Gemini key to use real 
 Every push to `main` redeploys automatically. Rounds are kept in memory until the Supabase
 step, so a redeploy or restart clears them.
 
+**Save progress (Supabase, free):** without a database, Render's disk is wiped on every
+redeploy, and with it every player's XP and Scam Radar.
+
+1. On supabase.com, create a free project (name it `outsmart`). Save the database password it
+   asks for. Pick the region closest to your Render service's region.
+2. Click **Connect** and copy the **Session pooler** connection string. Render's free plan can't
+   reach the direct connection, which is IPv6-only. Replace `[YOUR-PASSWORD]` with your password.
+3. In Render, open the service, go to **Environment**, add `DATABASE_URL` with that string, and save.
+   Render redeploys.
+4. Check `/api/health`. It should say `"database": "ok"`. The app creates its four tables
+   (`players`, `radar`, `rounds`, `messages`) on first start, with row level security turned on so
+   Supabase's public web API can't read them.
+
+Free Supabase projects pause after 7 days with no activity. The keep-awake ping below also
+touches the database, which keeps it active.
+
 **Keep it awake:** free Render services sleep after 15 minutes with no visitors, and the first
 visit after that takes about a minute. On uptimerobot.com (free), add an HTTP monitor for
 `https://<your-url>/api/health` every 5 minutes. One always-on service uses about 744 of the 750
@@ -59,7 +75,8 @@ app/
   progress.py    XP, levels, streaks, Scam Radar, badges
   explain.py     Scam Autopsy / Legit Breakdown / flagged transcript from engine facts
   scenarios.py   Loads data/scenarios/*.json, builds the fictional ID card
-  store.py       Players and rounds (in memory for now, Supabase later)
+  store.py       Players (database + cache), rounds in progress (memory), finished-round logs
+  db.py          Database connection and the four tables (SQLite locally, Supabase in production)
   schemas.py     Pydantic request/response models, matching api.md
   flags.py       Fixed red/green flag lists, radar categories, tips
   config.py      Settings from environment variables / .env

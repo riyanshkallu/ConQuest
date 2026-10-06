@@ -18,3 +18,7 @@ services:
         sync: false
       - key: GEMINI_API_KEY
         sync: false
+      # Supabase "Session pooler" connection string (see backend/README.md). Without it the app
+      # uses a SQLite file, which Render wipes on every redeploy.
+      - key: DATABASE_URL
+        sync: false
