@@ -1,6 +1,7 @@
 """End-to-end API tests in mock mode: full rounds played over HTTP, like the frontend will."""
 
 import json
+import re
 
 import pytest
 from fastapi.testclient import TestClient
@@ -224,7 +225,7 @@ def test_job_legit_apply_is_lucky_and_verify_is_smart(monkeypatch):
 def test_family_id_card_has_the_family_details(monkeypatch):
     card = start(new_player(), is_scam=True, monkeypatch=monkeypatch, scenario="family_emergency")["id_card"]
     assert card["family"]["memory_answer"] == "Biscuit"
-    assert card["family"]["parent_phone"] == "(614) 555-0133"
+    assert re.fullmatch(r"\(614\) 555-01\d\d", card["family"]["parent_phone"])  # randomized, always fictional
     assert card["gift_card"]["store"] == "PlayMart"
     # bank scenario has no family section
     assert start(new_player(), scenario="bank_alert")["id_card"]["family"] is None

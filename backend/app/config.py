@@ -26,6 +26,10 @@ class Settings(BaseSettings):
     # the next is tried, then the pre-written fallback lines.
     analyzer_models: str = "groq:openai/gpt-oss-20b,gemini:gemini-3.5-flash-lite"
     character_models: str = "groq:qwen/qwen3.8-27b,groq:openai/gpt-oss-120b,gemini:gemini-3.5-flash-lite"
+    # Scenario Generator: one call per round start, so keep it quick.
+    # Gemini first: its quota is separate from the analyzer's Groq model.
+    generator_models: str = "gemini:gemini-3.5-flash-lite,groq:openai/gpt-oss-20b"
+    generator_timeout_seconds: float = 4.0
     ai_timeout_seconds: float = 8.0
 
     # Game tuning

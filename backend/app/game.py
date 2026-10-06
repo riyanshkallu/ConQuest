@@ -18,7 +18,7 @@ from .ai.base import AIProvider, TurnContext
 from .config import get_settings
 from .explain import build_result, ending_out
 from .flags import RED_FLAGS
-from .scenarios import Scenario, get_scenario, load_scenarios, new_id_card, render
+from .scenarios import Scenario, get_scenario, load_scenarios, make_variant, new_id_card, render
 
 _rng = random.Random()
 _LINK_RE = re.compile(r"\b[\w-]+(?:\.[\w-]+)*\.example(?:/[\w./?=&%-]*)?", re.IGNORECASE)
@@ -86,10 +86,12 @@ def radar(player: progress.Player) -> schemas.RadarResponse:
 # Rounds
 # ---------------------------------------------------------------------------
 
-def start_round(player: progress.Player, scenario_id: str) -> schemas.StartRoundResponse:
-    scenario = get_scenario(scenario_id)
-    if not scenario:
+async def start_round(player: progress.Player, scenario_id: str, ai: AIProvider) -> schemas.StartRoundResponse:
+    seed = get_scenario(scenario_id)
+    if not seed:
         raise GameError(404, "scenario_not_found", "No scenario with that id.")
+    # This round's own names and numbers (Scenario Generator). Falls back to the seed's names.
+    scenario = make_variant(seed, _rng, await ai.scenario_vars(seed))
     settings = get_settings()
     is_scam = engine.assign_is_scam(player.history, _rng, settings.scam_ratio)
     version = scenario.version(is_scam)

@@ -71,7 +71,7 @@ def mock_analysis(ctx: TurnContext) -> Analysis:
     text = ctx.player_text.lower()
     state = ctx.state
 
-    completion = [c.lower() for c in ctx.version.get("completion_replies", [])]
+    completion = [render(c, ctx.scenario, state.id_card).lower() for c in ctx.version.get("completion_replies", [])]
     if not state.is_scam and re.sub(r"[^a-z' ]", "", text).strip() in completion:
         return Analysis("full_compliance", 0, 10, reason="You answered the contact's question.")
 
@@ -152,3 +152,6 @@ class MockAI:
 
     async def character_move(self, ctx: TurnContext) -> CharacterMove:
         return mock_character_move(ctx)
+
+    async def scenario_vars(self, scenario) -> None:
+        return None  # hand-written names; numbers and phones are still randomized

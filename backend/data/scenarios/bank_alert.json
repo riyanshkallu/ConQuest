@@ -11,23 +11,73 @@
     "amount": "$486.20",
     "merchant": "TechZone Online",
     "alert_id": "4471",
-    "link": "secure-verify-account.example/buckeye"
+    "link": "secure-verify-account.example/buckeye",
+    "short_code": "72614"
+  },
+  "generate": {
+    "bank": {
+      "ai": "a fictional Ohio credit union or community bank, 2 to 4 words, like 'Maple Valley Credit Union'"
+    },
+    "bank_short": {
+      "ai": "the short name of that same bank as shown in a text alert, 1 or 2 words taken from its full name",
+      "part_of": "bank"
+    },
+    "merchant": {
+      "ai": "a fictional online electronics or sporting goods store, 2 or 3 words"
+    },
+    "amount": {
+      "money": [
+        80,
+        900
+      ]
+    },
+    "alert_id": {
+      "digits": 4
+    },
+    "short_code": {
+      "digits": 5
+    }
+  },
+  "derived_vars": {
+    "bank_slug": "slug:bank_short",
+    "link": "{bank_slug}-secure-verify.example/login"
   },
   "verification_call_title": "Calling {bank_short} (number on the back of your card)",
   "verification_official": "{bank_short}",
   "code_notification": "{bank_short}: Your one-time code is {code}. We will never call or text to ask for this code.",
   "suggested_replies": {
-    "opening": ["Who is this?", "YES", "I'll call the number on the back of my card."],
-    "after_code": ["Here's the code: {code}", "Why do you need a code?", "I'm going to call my bank directly."],
-    "default": ["How do I know this is really {bank_short}?", "OK, what do I need to do?", "I'll check in the official app first."]
+    "opening": [
+      "Who is this?",
+      "YES",
+      "I'll call the number on the back of my card."
+    ],
+    "after_code": [
+      "Here's the code: {code}",
+      "Why do you need a code?",
+      "I'm going to call my bank directly."
+    ],
+    "default": [
+      "How do I know this is really {bank_short}?",
+      "OK, what do I need to do?",
+      "I'll check in the official app first."
+    ]
   },
-
   "scam": {
-    "contact": { "name": "{bank_short}", "handle": "72614" },
+    "contact": {
+      "name": "{bank_short}",
+      "handle": "{short_code}"
+    },
     "objective": "obtain_verification_code",
     "objective_text": "Get the player to read back the one-time code that was just texted to them.",
     "objective_is_payment": false,
-    "allowed_tactics": ["authority", "urgency", "fear", "trust_building", "credential_request", "suspicious_link"],
+    "allowed_tactics": [
+      "authority",
+      "urgency",
+      "fear",
+      "trust_building",
+      "credential_request",
+      "suspicious_link"
+    ],
     "opening": {
       "flag": "authority",
       "text": "{bank_short} Fraud Alert: A {amount} purchase at {merchant} was attempted on your card ending {last4}. Was this you? Reply YES or NO."
@@ -60,20 +110,49 @@
       ]
     },
     "verification_call": [
-      { "speaker": "official", "text": "Thanks for calling {bank}. How can I help you today?" },
-      { "speaker": "player", "text": "I got a text saying someone tried to use my card at {merchant} for {amount}." },
-      { "speaker": "official", "text": "I've checked your account. There's no fraud alert and no pending purchase at {merchant}. That text did not come from us." },
-      { "speaker": "official", "text": "We will never text or call asking for a one-time code. You did the right thing by calling us." }
+      {
+        "speaker": "official",
+        "text": "Thanks for calling {bank}. How can I help you today?"
+      },
+      {
+        "speaker": "player",
+        "text": "I got a text saying someone tried to use my card at {merchant} for {amount}."
+      },
+      {
+        "speaker": "official",
+        "text": "I've checked your account. There's no fraud alert and no pending purchase at {merchant}. That text did not come from us."
+      },
+      {
+        "speaker": "official",
+        "text": "We will never text or call asking for a one-time code. You did the right thing by calling us."
+      }
     ]
   },
-
   "legit": {
-    "contact": { "name": "{bank_short}", "handle": "72614" },
+    "contact": {
+      "name": "{bank_short}",
+      "handle": "{short_code}"
+    },
     "objective": "confirm_charge",
     "objective_text": "Find out whether the player made the {amount} purchase at {merchant}. A YES or NO reply completes it.",
     "objective_is_payment": false,
-    "allowed_flags": ["checkable_details", "no_credentials_asked", "invites_verification", "no_pressure", "accepts_no", "official_channels"],
-    "completion_replies": ["yes", "no", "y", "n", "no it wasn't me", "no that wasn't me", "yes that was me"],
+    "allowed_flags": [
+      "checkable_details",
+      "no_credentials_asked",
+      "invites_verification",
+      "no_pressure",
+      "accepts_no",
+      "official_channels"
+    ],
+    "completion_replies": [
+      "yes",
+      "no",
+      "y",
+      "n",
+      "no it wasn't me",
+      "no that wasn't me",
+      "yes that was me"
+    ],
     "opening": {
       "flag": "checkable_details",
       "text": "{bank_short} Fraud Alert: Did you attempt a {amount} purchase at {merchant} on your card ending {last4}? Reply YES or NO."
@@ -105,11 +184,26 @@
       ]
     },
     "verification_call": [
-      { "speaker": "official", "text": "Thanks for calling {bank}. How can I help you today?" },
-      { "speaker": "player", "text": "I got a text asking if I tried to buy something at {merchant} for {amount}." },
-      { "speaker": "official", "text": "Yes, that's our alert #{alert_id}. We placed a hold on that purchase. Was it you?" },
-      { "speaker": "player", "text": "No, it wasn't me." },
-      { "speaker": "official", "text": "Thanks. I've declined the charge and we'll mail you a new card. Checking with us directly was a smart move." }
+      {
+        "speaker": "official",
+        "text": "Thanks for calling {bank}. How can I help you today?"
+      },
+      {
+        "speaker": "player",
+        "text": "I got a text asking if I tried to buy something at {merchant} for {amount}."
+      },
+      {
+        "speaker": "official",
+        "text": "Yes, that's our alert #{alert_id}. We placed a hold on that purchase. Was it you?"
+      },
+      {
+        "speaker": "player",
+        "text": "No, it wasn't me."
+      },
+      {
+        "speaker": "official",
+        "text": "Thanks. I've declined the charge and we'll mail you a new card. Checking with us directly was a smart move."
+      }
     ]
   }
 }

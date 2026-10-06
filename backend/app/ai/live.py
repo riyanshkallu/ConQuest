@@ -6,16 +6,18 @@ fails falls back to the mock logic (pre-written lines), so a round never gets st
 
 from __future__ import annotations
 
+import random
 import re
 from typing import Literal
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, RootModel, field_validator, model_validator
 
 from .. import engine
 from ..config import Settings
 from ..engine import Analysis
 from ..flags import GREEN_FLAGS, RED_FLAGS
-from . import prompts
+from ..scenarios import Scenario, ai_var_specs
+from . import generator, prompts
 from .base import CharacterMove, TurnContext
 from .llm import LLM, parse_models
 from .mock import mock_analysis, mock_character_move
@@ -74,11 +76,38 @@ def check_character(out: CharacterOut, ctx: TurnContext) -> str | None:
     return None
 
 
+class GeneratedVars(RootModel[dict[str, str]]):
+    """The Scenario Generator's reply: {"bank": "Maple Valley Credit Union", ...}."""
+
+    @model_validator(mode="before")
+    @classmethod
+    def unwrap(cls, data):
+        # Some models wrap the answer: {"invent_these": {"bank": ...}}. Use the inner object.
+        if isinstance(data, dict):
+            nested = [v for v in data.values() if isinstance(v, dict)]
+            if len(nested) == 1:
+                return nested[0]
+        return data
+
+
 class LiveAI:
     def __init__(self, settings: Settings):
         self.llm = LLM(settings)
         self.analyzer_models = parse_models(settings.analyzer_models)
         self.character_models = parse_models(settings.character_models)
+        self.generator_models = parse_models(settings.generator_models)
+        self.generator_timeout = settings.generator_timeout_seconds
+        self.rng = random.Random()
+
+    async def scenario_vars(self, scenario: Scenario) -> dict[str, str] | None:
+        if not ai_var_specs(scenario):
+            return None
+        out = await self.llm.json_call(
+            self.generator_models, generator.generator_system(), generator.generator_user(scenario, self.rng),
+            GeneratedVars, check=lambda o: generator.check_vars(o.root, scenario),
+            max_tokens=300, timeout=self.generator_timeout,
+        )
+        return {k: v.strip() for k, v in out.root.items()} if out else None
 
     async def analyze(self, ctx: TurnContext) -> Analysis:
         out = await self.llm.json_call(

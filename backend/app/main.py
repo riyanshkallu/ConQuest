@@ -81,7 +81,7 @@ async def list_scenarios(player_id: str):
 
 @app.post("/api/round/start", response_model=schemas.StartRoundResponse, status_code=201)
 async def start_round(body: schemas.StartRoundRequest):
-    return game.start_round(game.require_player(body.player_id), body.scenario_id)
+    return await game.start_round(game.require_player(body.player_id), body.scenario_id, get_ai())
 
 
 @app.post("/api/round/{round_id}/message", response_model=schemas.TurnResponse)
