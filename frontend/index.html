@@ -715,6 +715,48 @@
 
                 </div>
 
+
+                <div class="scenario-card">
+
+                    <div class="scenario-icon">🎮</div>
+
+                    <h3>Gaming Item Trade</h3>
+
+                    <p>
+                        A friend from your gaming server messages you
+                        about a rare in-game item.
+                    </p>
+
+                    <button
+                        class="scenario-button"
+                        data-scenario="gaming_trade"
+                        onclick="selectScenario('gaming_trade')">
+                        Play
+                    </button>
+
+                </div>
+
+
+                <div class="scenario-card">
+
+                    <div class="scenario-icon">💻</div>
+
+                    <h3>Tech Support Chat</h3>
+
+                    <p>
+                        A support chat opens about a problem with
+                        your laptop.
+                    </p>
+
+                    <button
+                        class="scenario-button"
+                        data-scenario="tech_support"
+                        onclick="selectScenario('tech_support')">
+                        Play
+                    </button>
+
+                </div>
+
             </div>
 
         </div>
@@ -1119,7 +1161,9 @@
                 ["Gaming account", card.gaming_account && card.gaming_account.game + ": " + card.gaming_account.username],
                 ["Family", card.family && card.family.relative],
                 ["Their parent", card.family && card.family.parent + ", " + card.family.parent_phone],
-                [card.family && card.family.memory_question, card.family && card.family.memory_answer]
+                [card.family && card.family.memory_question, card.family && card.family.memory_answer],
+                // Scenario-specific lines, e.g. your friend's handle or your support ticket
+                ...(card.extras || []).map(extra => [extra.label, extra.value])
             ];
 
             const container = document.getElementById("idRows");
