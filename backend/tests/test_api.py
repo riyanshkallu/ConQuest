@@ -262,3 +262,19 @@ def test_no_unfilled_placeholders_reach_the_player(monkeypatch, scenario, is_sca
     for payload in (rnd, turn, end, result):
         text = json.dumps(payload)
         assert "{" not in text.replace('{"', "").replace("{}", ""), text[:300]
+
+
+@pytest.mark.parametrize("decision,reason,expected", [
+    ("partial_compliance", "You asked what is needed, staying cautious.", "You went along with what they asked."),
+    ("partial_compliance", "You went along with their request.", "You went along with their request."),
+    ("challenge", "You stayed cautious and asked who they were.", "You stayed cautious and asked who they were."),
+])
+def test_mistake_notes_never_praise(decision, reason, expected):
+    """The engine decides what's a mistake; the analyzer's wording can't contradict it."""
+    from app import game
+    from app.engine import Analysis, PreCheck, RoundState
+    from tests.test_engine import make_card
+    state = RoundState(is_scam=True, id_card=make_card(), objective="x")
+    entry = {}
+    game._annotate(entry, Analysis(decision, reason=reason), PreCheck(traps=[], minor=[]), state)
+    assert entry["note"] == expected
