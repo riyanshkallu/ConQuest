@@ -72,6 +72,14 @@ visit after that takes about a minute. On uptimerobot.com (free), add an HTTP mo
 `https://<your-url>/api/health` every 5 minutes. One always-on service uses about 744 of the 750
 free hours a month, so don't run a second free Render service in the same account.
 
+**Playtest results** (Oct 13-14): after the playtest, run
+`.venv/Scripts/python scripts/playtest_report.py --since 2026-10-13 --until 2026-10-14 --quiz quiz.csv --out report.md`.
+It only reads the saved rounds in Supabase (it never changes them) and prints the numbers for
+the video and the written answers: scams avoided, real contacts handled, false alarms, verify
+rate, improvement from first to later rounds, and Scam Radar totals. `quiz.csv` holds the
+before/after quiz scores. Copy `scripts/quiz_template.csv` (`tester,age,before,after`, scores
+out of 6). Dates are in your local time.
+
 ## How it fits together
 
 ```
