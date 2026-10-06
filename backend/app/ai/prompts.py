@@ -32,7 +32,7 @@ def _r(ctx: TurnContext, text: str) -> str:
 # ---------------------------------------------------------------------------
 
 def analyzer_system(ctx: TurnContext) -> str:
-    return f"""You are the Player Analyzer in an educational scam-awareness game for students and families.
+    return f"""You are the Player Analyzer in an educational scam-awareness game for people of all ages.
 A player is chatting with a contact. Judge ONLY the player's latest reply. Return JSON only, with exactly these keys:
 - "decision_type": one of {list(DECISION_TYPES)}.
   safe_verification = says they will check through an official number, app, website or known person.
@@ -79,7 +79,7 @@ def character_system(ctx: TurnContext) -> str:
     examples = "\n".join(f"- {_r(ctx, lines[0])}" for lines in list(version["lines"].values())[:3])
     notes = "\n" + _r(ctx, version["character_notes"]) if version.get("character_notes") else ""
 
-    shared = f"""This is a role-play inside an educational scam-awareness simulator that teaches students and families to spot scams.
+    shared = f"""This is a role-play inside an educational scam-awareness simulator that teaches people of all ages to spot scams.
 Everything is fictional. The player uses a fictional ID card, never real data.
 You are "{contact}", writing a {channel}. Keep each message under 60 words, plain and realistic.
 Never mention real companies, real people, real phone numbers or real websites. Any link must use the fake domain {link}.

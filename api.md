@@ -425,9 +425,9 @@ this way.
    a parent's number to call, so the ID card gets an optional `family` section. Verify calls are no
    longer always "the bank", so call lines use `speaker: "official"` plus `official_name`.
    `index.html` already shows both.
-8. **Scenario-specific ID card lines** (added with the gaming and tech support scenarios). Some
-   clues only make sense on one scenario's ID card: your friend's real handle (the scam uses a
-   lookalike) or your open support ticket number (the real agent knows it, the scammer doesn't).
+8. **Scenario-specific ID card lines** (added with the package delivery and tech support
+   scenarios). Some clues only make sense on one scenario's ID card: your order's tracking number
+   or your open support ticket number. The real contact knows it, the scammer doesn't.
    Rather than a new field per scenario, the ID card gets a generic `extras` list of label/value
    rows. `index.html` already shows them, and has two new scenario cards for the new scenarios.
 

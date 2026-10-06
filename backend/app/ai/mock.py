@@ -17,13 +17,14 @@ VERIFY_WORDS = ("back of my card", "call my bank", "call the bank", "call the nu
                 "i'll call", "ill call", "log in myself", "check with", "call my mom",
                 "call my dad", "call my parent", "call your mom", "call aunt", "call the store",
                 "careers page", "official website", "trade market", "in-game", "voice chat",
-                "official site", "call support")
+                "official site", "call support", "app myself", "check the app first")
 CHALLENGE_WORDS = ("who is this", "who are you", "how do i know", "prove", "scam", "fake",
                    "suspicious", "not sharing", "won't", "wont", "not giving", "why do you need",
                    "no way", "don't trust", "dont trust", "never ask", "not sending",
                    "rush me", "rushing me", "pressuring me", "not falling", "nice try",
                    "what's the name of", "grandma's dog", "not paying", "not buying",
-                   "ticket number", "not installing", "won't install", "not clicking")
+                   "ticket number", "tracking number", "not installing", "won't install", "not clicking",
+                   "not paying")
 COMPLY_WORDS = ("yes", "ok", "okay", "sure", "here", "fine", "sent", "what do i do",
                 "what do i need", "go ahead", "alright")
 

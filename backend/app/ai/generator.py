@@ -31,7 +31,7 @@ _REAL_NAME_RES = [re.compile(r"\b" + re.escape(name) + r"\b", re.IGNORECASE) for
 
 
 def generator_system() -> str:
-    return """You invent fictional details for an educational scam-awareness game played by students and families in Ohio.
+    return """You invent fictional details for an educational scam-awareness game played by people of all ages in Ohio.
 Return JSON only, with exactly the keys you are given and a short string value for each.
 Rules:
 - Everything must be fictional. Never use a real bank, company, store, app, game, website or famous person.
