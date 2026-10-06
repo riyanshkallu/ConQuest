@@ -13,7 +13,51 @@
     "friend_phone": "(614) 555-0147",
     "pet": "Biscuit",
     "gift_store": "PlayMart",
-    "gift_amount": 200
+    "gift_amount": 200,
+    "aunt_name": "Dana",
+    "bank": "Buckeye Federal Credit Union"
+  },
+  "generate": {
+    "relative": {
+      "ai": "a gender-neutral first name for the player's cousin",
+      "person": true
+    },
+    "aunt_name": {
+      "ai": "a woman's first name for the cousin's mom",
+      "person": true
+    },
+    "pet": {
+      "ai": "a fun one-word name for Grandma's dog"
+    },
+    "gift_store": {
+      "ai": "a fictional Ohio store that sells gift cards, 1 or 2 words, like 'PlayMart'"
+    },
+    "gift_amount": {
+      "choice": [
+        50,
+        100,
+        200
+      ]
+    },
+    "parent_phone": {
+      "phone": true
+    },
+    "friend_phone": {
+      "phone": true
+    },
+    "bank": {
+      "ai": "a fictional Ohio credit union or community bank where the player keeps their account, 2 to 4 words",
+      "choice": [
+        "Buckeye Federal Credit Union",
+        "Maple Valley Credit Union",
+        "Lakeshore Hollow Credit Union",
+        "Tall Pines Community Bank",
+        "Cardinal Ridge Credit Union"
+      ]
+    }
+  },
+  "derived_vars": {
+    "parent": "Aunt {aunt_name}"
   },
   "id_card_family": {
     "relative": "{relative} (your {relation})",
@@ -25,19 +69,48 @@
   "verification_call_title": "Calling {parent} (a number you already have)",
   "verification_official": "{parent}",
   "suggested_replies": {
-    "opening": ["Who is this?", "Oh no, what happened?", "If it's really you, what's Grandma's dog's name?"],
-    "default": ["Prove it's you: what's Grandma's dog's name?", "OK, what do you need?", "I'm going to call {parent} first."]
+    "opening": [
+      "Who is this?",
+      "Oh no, what happened?",
+      "If it's really you, what's Grandma's dog's name?"
+    ],
+    "default": [
+      "Prove it's you: what's Grandma's dog's name?",
+      "OK, what do you need?",
+      "I'm going to call {parent} first."
+    ]
   },
-
   "scam": {
-    "contact": { "name": "Unknown number", "handle": "{friend_phone}" },
+    "contact": {
+      "name": "Unknown number",
+      "handle": "{friend_phone}"
+    },
     "objective": "get_gift_card_codes",
     "objective_text": "You are pretending to be the player's {relation} {relative}, who 'lost their phone'. Get the player to buy {gift_store} gift cards and text you the codes, or send the code of the {gift_store} gift card on their ID card.",
     "objective_is_payment": true,
     "character_notes": "You do NOT know any private family details. If the player asks a personal question (like the name of Grandma's dog), dodge it, change the subject, or add urgency. Never guess a specific name. Keep the emergency non-violent (a fender-bender, a lost wallet): nobody is hurt, threatened or in physical danger.",
-    "allowed_tactics": ["emotional_manipulation", "fear", "urgency", "unusual_payment", "secrecy", "trust_building"],
-    "tactic_order": ["emotional_manipulation", "fear", "urgency", "unusual_payment", "secrecy", "trust_building"],
-    "pushback_order": ["trust_building", "emotional_manipulation", "secrecy", "urgency"],
+    "allowed_tactics": [
+      "emotional_manipulation",
+      "fear",
+      "urgency",
+      "unusual_payment",
+      "secrecy",
+      "trust_building"
+    ],
+    "tactic_order": [
+      "emotional_manipulation",
+      "fear",
+      "urgency",
+      "unusual_payment",
+      "secrecy",
+      "trust_building"
+    ],
+    "pushback_order": [
+      "trust_building",
+      "emotional_manipulation",
+      "secrecy",
+      "urgency"
+    ],
     "opening": {
       "flag": "emotional_manipulation",
       "text": "Hey it's me, {relative}! I lost my phone so I'm texting from a friend's. I'm in trouble and really need your help 😞"
@@ -70,23 +143,63 @@
       ]
     },
     "verification_call": [
-      { "speaker": "official", "text": "Hi sweetie! What's up?" },
-      { "speaker": "player", "text": "Someone texted me saying they're {relative} and that they're in trouble." },
-      { "speaker": "official", "text": "{relative}? {relative} is right here eating dinner with me, and they have their phone." },
-      { "speaker": "official", "text": "That was a scammer pretending to be family. Never send gift card codes to someone who texts asking for them. I'm so glad you called." }
+      {
+        "speaker": "official",
+        "text": "Hi sweetie! What's up?"
+      },
+      {
+        "speaker": "player",
+        "text": "Someone texted me saying they're {relative} and that they're in trouble."
+      },
+      {
+        "speaker": "official",
+        "text": "{relative}? {relative} is right here eating dinner with me, and they have their phone."
+      },
+      {
+        "speaker": "official",
+        "text": "That was a scammer pretending to be family. Never send gift card codes to someone who texts asking for them. I'm so glad you called."
+      }
     ]
   },
-
   "legit": {
-    "contact": { "name": "Unknown number", "handle": "{friend_phone}" },
+    "contact": {
+      "name": "Unknown number",
+      "handle": "{friend_phone}"
+    },
     "objective": "pass_on_message",
     "objective_text": "You really are the player's {relation} {relative}. You lost your phone at practice and are texting from a friend's phone. Ask the player to let {parent} know you're safe at the school gym and need a ride home at 6pm.",
     "objective_is_payment": false,
     "character_notes": "You really are {relative}. If the player asks a personal question, you know the answer: Grandma's dog is named {pet}. You're happy for them to call {parent} to check.",
-    "allowed_flags": ["checkable_details", "no_credentials_asked", "no_pressure", "no_secrecy", "invites_verification", "accepts_no"],
-    "flag_order": ["checkable_details", "no_credentials_asked", "no_pressure", "no_secrecy", "invites_verification", "accepts_no"],
-    "pushback_order": ["checkable_details", "invites_verification", "accepts_no", "no_secrecy"],
-    "completion_replies": ["ok i'll tell her", "ok i'll tell aunt dana", "sure i'll let her know", "i'll tell your mom", "ok i'll let her know", "i'll let aunt dana know"],
+    "allowed_flags": [
+      "checkable_details",
+      "no_credentials_asked",
+      "no_pressure",
+      "no_secrecy",
+      "invites_verification",
+      "accepts_no"
+    ],
+    "flag_order": [
+      "checkable_details",
+      "no_credentials_asked",
+      "no_pressure",
+      "no_secrecy",
+      "invites_verification",
+      "accepts_no"
+    ],
+    "pushback_order": [
+      "checkable_details",
+      "invites_verification",
+      "accepts_no",
+      "no_secrecy"
+    ],
+    "completion_replies": [
+      "ok i'll tell her",
+      "ok i'll tell {parent}",
+      "sure i'll let her know",
+      "i'll tell your mom",
+      "ok i'll let her know",
+      "i'll let {parent} know"
+    ],
     "opening": {
       "flag": "checkable_details",
       "text": "Hey it's me, {relative}! I lost my phone at practice so I'm texting from a friend's. Can you help me with something?"
@@ -118,10 +231,22 @@
       ]
     },
     "verification_call": [
-      { "speaker": "official", "text": "Hi sweetie! What's up?" },
-      { "speaker": "player", "text": "Someone texted me saying they're {relative} and they lost their phone." },
-      { "speaker": "official", "text": "Oh good, that really is {relative}. They left their phone at practice and I couldn't reach them!" },
-      { "speaker": "official", "text": "Thank you for calling to check first. I'll go pick them up now." }
+      {
+        "speaker": "official",
+        "text": "Hi sweetie! What's up?"
+      },
+      {
+        "speaker": "player",
+        "text": "Someone texted me saying they're {relative} and they lost their phone."
+      },
+      {
+        "speaker": "official",
+        "text": "Oh good, that really is {relative}. They left their phone at practice and I couldn't reach them!"
+      },
+      {
+        "speaker": "official",
+        "text": "Thank you for calling to check first. I'll go pick them up now."
+      }
     ]
   }
 }

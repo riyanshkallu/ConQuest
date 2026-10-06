@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import random
+import re
 from dataclasses import dataclass
 from functools import lru_cache
 
@@ -44,6 +45,7 @@ def load_scenarios() -> dict[str, Scenario]:
     scenarios = {}
     for path in sorted(SCENARIO_DIR.glob("*.json")):
         raw = json.loads(path.read_text(encoding="utf-8"))
+        raw["vars"] = _with_derived(dict(raw.get("vars", {})), raw)  # seeds get derived vars too
         scenarios[raw["id"]] = Scenario(raw["id"], raw)
     return scenarios
 
@@ -70,10 +72,90 @@ def render(text: str, scenario: Scenario, card: IdCard) -> str:
 
 
 # ---------------------------------------------------------------------------
+# Per-round variations
+# ---------------------------------------------------------------------------
+# A scenario's "generate" section says which vars change each round:
+#   {"ai": "description"}         -> invented by the Scenario Generator (names, places)
+#   {"money": [low, high]}        -> random dollar amount, e.g. "$486.20"
+#   {"digits": n}                 -> random n-digit number (no leading zero)
+#   {"phone": true}               -> random fictional (614) 555-01xx number
+#   {"choice": [...]}             -> one of the listed values
+#   {"ai": ..., "choice": [...]}  -> AI invents it; the list is the fallback without AI
+# Then "derived_vars" are built from the others, in order:
+#   "slug:<var>"  -> lowercase letters/digits only ("Maple Valley" -> "maplevalley")
+#   "first:<var>" -> first word ("Marcus Lee" -> "Marcus")
+#   "short:<var>" -> bank name without "Credit Union", "Bank"... ("Maple Valley Credit Union" -> "Maple Valley")
+#   anything else is a template, e.g. "careers.{company_slug}.example"
+# The facts of the story never change, only these details.
+
+def ai_var_specs(scenario: Scenario) -> dict[str, str]:
+    """The vars the AI should invent, with their descriptions."""
+    return {k: spec["ai"] for k, spec in scenario.raw.get("generate", {}).items() if "ai" in spec}
+
+
+def person_vars(scenario: Scenario) -> list[str]:
+    """Vars that are people's first names (must not clash with the player's name)."""
+    return [k for k, spec in scenario.raw.get("generate", {}).items() if spec.get("person")]
+
+
+def make_variant(scenario: Scenario, rng: random.Random, ai_vars: dict[str, str] | None = None) -> Scenario:
+    """A copy of the scenario with this round's details. Both scam and legit versions share them."""
+    values = dict(scenario.raw.get("vars", {}))
+    used_phones: set[str] = set()
+    for key, spec in scenario.raw.get("generate", {}).items():
+        if "money" in spec:
+            low, high = spec["money"]
+            values[key] = f"${rng.randint(low * 100, high * 100) / 100:,.2f}"
+        elif "digits" in spec:
+            n = spec["digits"]
+            values[key] = str(rng.randint(10 ** (n - 1), 10 ** n - 1))
+        elif spec.get("phone"):
+            phone = f"(614) 555-01{rng.randint(0, 99):02d}"
+            while phone in used_phones:
+                phone = f"(614) 555-01{rng.randint(0, 99):02d}"
+            used_phones.add(phone)
+            values[key] = phone
+        elif "choice" in spec:
+            values[key] = rng.choice(spec["choice"])
+    values.update(ai_vars or {})
+    return Scenario(scenario.id, {**scenario.raw, "vars": _with_derived(values, scenario.raw)})
+
+
+_BANK_WORDS = {"credit", "union", "bank", "community", "savings", "federal", "mutual", "trust", "financial"}
+
+
+def _short_bank_name(bank: str) -> str:
+    """The name a bank uses in texts: "Maple Valley Credit Union" -> "Maple Valley"."""
+    words = bank.split()
+    if words[0].lower() in _BANK_WORDS:  # "Bank of Tall Pines" -> "Tall Pines"
+        words = [w for w in words if w.lower() not in _BANK_WORDS | {"of", "the"}] or words
+    short = []
+    for word in words:
+        if word.lower() in _BANK_WORDS:
+            break
+        short.append(word)
+    return " ".join(short) or words[0]
+
+
+def _with_derived(values: dict, raw: dict) -> dict:
+    for key, rule in raw.get("derived_vars", {}).items():
+        if rule.startswith("slug:"):
+            values[key] = re.sub(r"[^a-z0-9]", "", str(values[rule[5:]]).lower())
+        elif rule.startswith("first:"):
+            values[key] = str(values[rule[6:]]).split()[0]
+        elif rule.startswith("short:"):
+            values[key] = _short_bank_name(str(values[rule[6:]]))
+        else:
+            values[key] = rule.format_map(_Blank(values))
+    return values
+
+
+# ---------------------------------------------------------------------------
 # Fictional ID cards
 # ---------------------------------------------------------------------------
 
 _FIRST = ["Jordan", "Avery", "Riley", "Morgan", "Casey", "Taylor", "Jamie", "Quinn", "Drew", "Sam"]
+PLAYER_FIRST_NAMES = frozenset(_FIRST)
 _LAST = ["Rivera", "Patel", "Nguyen", "Brooks", "Kim", "Okafor", "Lopez", "Walsh", "Chen", "Hayes"]
 _PASSWORDS = ["Sunflower#27", "BlueTiger!88", "Maple$Road14", "Comet@2031"]
 

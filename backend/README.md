@@ -68,8 +68,15 @@ app/
     llm.py       Free-tier provider chain (Groq, then Gemini), JSON validation, retry
     live.py      Analyzer and Character on real models, with the character rules
     prompts.py   The prompts
+    generator.py Scenario Generator: fresh fictional names each round, safety-checked
 data/scenarios/  One JSON file per scam/legit scenario pair
 ```
+
+**Fresh details every round.** Each scenario file has a `generate` section listing what can
+change. At round start the AI invents new names (bank, store, recruiter, cousin, dog...) and the
+code randomizes numbers and fictional phone numbers. Every AI name is checked: no real banks or
+brands, no clash with the player's name, no digits or web addresses. If the check fails or the AI
+is slow (4s limit), the round uses the hand-written names, so it never blocks play.
 
 **Key rule:** the AI writes the conversation, but only `engine.py` decides who wins.
 

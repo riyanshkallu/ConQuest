@@ -79,6 +79,7 @@ class LLM:
         schema: type[T],
         check: Callable[[T], str | None] | None = None,
         max_tokens: int = 300,
+        timeout: float | None = None,
     ) -> T | None:
         """Return the first reply that parses into `schema` and passes `check`.
 
@@ -94,7 +95,7 @@ class LLM:
                 started = time.monotonic()
                 try:
                     resp = await client.chat.completions.create(
-                        **request_kwargs(model, system, user, max_tokens), timeout=self.timeout)
+                        **request_kwargs(model, system, user, max_tokens), timeout=timeout or self.timeout)
                 except openai.RateLimitError:
                     log.warning("%s:%s rate limited, cooling down", provider, model)
                     self._cooldown_until[model] = time.monotonic() + RATE_LIMIT_COOLDOWN_SECONDS
