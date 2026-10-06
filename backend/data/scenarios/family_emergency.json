@@ -14,7 +14,8 @@
     "pet": "Biscuit",
     "gift_store": "PlayMart",
     "gift_amount": 200,
-    "aunt_name": "Dana"
+    "aunt_name": "Dana",
+    "bank": "Buckeye Federal Credit Union"
   },
   "generate": {
     "relative": {
@@ -43,6 +44,16 @@
     },
     "friend_phone": {
       "phone": true
+    },
+    "bank": {
+      "ai": "a fictional Ohio credit union or community bank where the player keeps their account, 2 to 4 words",
+      "choice": [
+        "Buckeye Federal Credit Union",
+        "Maple Valley Credit Union",
+        "Lakeshore Hollow Credit Union",
+        "Tall Pines Community Bank",
+        "Cardinal Ridge Credit Union"
+      ]
     }
   },
   "derived_vars": {

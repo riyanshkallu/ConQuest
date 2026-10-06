@@ -80,9 +80,11 @@ def render(text: str, scenario: Scenario, card: IdCard) -> str:
 #   {"digits": n}                 -> random n-digit number (no leading zero)
 #   {"phone": true}               -> random fictional (614) 555-01xx number
 #   {"choice": [...]}             -> one of the listed values
+#   {"ai": ..., "choice": [...]}  -> AI invents it; the list is the fallback without AI
 # Then "derived_vars" are built from the others, in order:
 #   "slug:<var>"  -> lowercase letters/digits only ("Maple Valley" -> "maplevalley")
 #   "first:<var>" -> first word ("Marcus Lee" -> "Marcus")
+#   "short:<var>" -> bank name without "Credit Union", "Bank"... ("Maple Valley Credit Union" -> "Maple Valley")
 #   anything else is a template, e.g. "careers.{company_slug}.example"
 # The facts of the story never change, only these details.
 
@@ -119,12 +121,30 @@ def make_variant(scenario: Scenario, rng: random.Random, ai_vars: dict[str, str]
     return Scenario(scenario.id, {**scenario.raw, "vars": _with_derived(values, scenario.raw)})
 
 
+_BANK_WORDS = {"credit", "union", "bank", "community", "savings", "federal", "mutual", "trust", "financial"}
+
+
+def _short_bank_name(bank: str) -> str:
+    """The name a bank uses in texts: "Maple Valley Credit Union" -> "Maple Valley"."""
+    words = bank.split()
+    if words[0].lower() in _BANK_WORDS:  # "Bank of Tall Pines" -> "Tall Pines"
+        words = [w for w in words if w.lower() not in _BANK_WORDS | {"of", "the"}] or words
+    short = []
+    for word in words:
+        if word.lower() in _BANK_WORDS:
+            break
+        short.append(word)
+    return " ".join(short) or words[0]
+
+
 def _with_derived(values: dict, raw: dict) -> dict:
     for key, rule in raw.get("derived_vars", {}).items():
         if rule.startswith("slug:"):
             values[key] = re.sub(r"[^a-z0-9]", "", str(values[rule[5:]]).lower())
         elif rule.startswith("first:"):
             values[key] = str(values[rule[6:]]).split()[0]
+        elif rule.startswith("short:"):
+            values[key] = _short_bank_name(str(values[rule[6:]]))
         else:
             values[key] = rule.format_map(_Blank(values))
     return values

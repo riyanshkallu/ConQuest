@@ -192,7 +192,7 @@ def test_verification_call_names_who_you_called(monkeypatch):
         call = act(rid, "verify")["verification_call"]
         assert call["lines"][0]["speaker"] == "official"
         calls[scenario] = call["official_name"]
-    assert calls == {"bank_alert": "Buckeye Federal", "job_offer": "Riverside Outfitters",
+    assert calls == {"bank_alert": "Buckeye", "job_offer": "Riverside Outfitters",
                      "family_emergency": "Aunt Dana"}
 
 

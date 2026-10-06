@@ -35,7 +35,9 @@ def generator_system() -> str:
 Return JSON only, with exactly the keys you are given and a short string value for each.
 Rules:
 - Everything must be fictional. Never use a real bank, company, store, app, game, website or famous person.
-- Sound realistic and ordinary, like real local businesses and people in Ohio.
+- Sound realistic and ordinary, like local businesses and people in Ohio.
+- For businesses, use made-up place or nature words (like "Amber Ridge" or "Tall Pines"), never a real
+  city, county, region or lake name, so a name can't match a real local business.
 - Each value is under 40 characters, with no digits, no web addresses and no emojis.
 - Be creative: avoid the example values you are shown."""
 
@@ -43,25 +45,24 @@ Rules:
 def generator_user(scenario: Scenario, rng: random.Random) -> str:
     """Plain text, not JSON: models copy the shape of a JSON request into their answer."""
     specs = ai_var_specs(scenario)
-    generate = scenario.raw.get("generate", {})
     examples = scenario.raw.get("vars", {})
     lines = []
     for key, description in specs.items():
         # A random first letter per name, because models give the same answers every time.
-        hint = "" if generate[key].get("part_of") else f" (start it with the letter {rng.choice(LETTERS)})"
+        hint = f" (start it with the letter {rng.choice(LETTERS)})"
         if "full name" in description:
             hint = f" (first name starting with {rng.choice(LETTERS)}, last name starting with {rng.choice(LETTERS)})"
         lines.append(f"- {key}: {description}{hint}")
     avoid = ", ".join(str(examples[k]) for k in specs if k in examples)
     shape = json.dumps({key: "..." for key in specs})
-    return "\n".join(["Invent these:", *lines,
-                      f"Don't reuse these examples: {avoid}.",
-                      f"Reply with only this JSON: {shape}"])
+    rules = [f"Don't reuse these examples: {avoid}."]
+    if person_vars(scenario):
+        rules.append(f"Don't use these first names (players use them): {', '.join(sorted(PLAYER_FIRST_NAMES))}.")
+    return "\n".join(["Invent these:", *lines, *rules, f"Reply with only this JSON: {shape}"])
 
 
 def check_vars(values: dict, scenario: Scenario) -> str | None:
     """Returns a problem description, or None if every value is safe to use."""
-    specs = scenario.raw.get("generate", {})
     wanted = set(ai_var_specs(scenario))
     if set(values) != wanted:
         return f"wrong keys: {sorted(set(values) ^ wanted)}"
@@ -75,11 +76,6 @@ def check_vars(values: dict, scenario: Scenario) -> str | None:
         for pattern in _REAL_NAME_RES:
             if pattern.search(value):
                 return f"{key} uses a real name: {value!r}"
-        part_of = specs.get(key, {}).get("part_of")
-        if part_of:  # e.g. bank_short must come from bank
-            whole = values.get(part_of, "").lower()
-            if not all(word in whole for word in value.lower().split()):
-                return f"{key} {value!r} isn't part of {part_of} {whole!r}"
     people = [values[k].split()[0] for k in person_vars(scenario)]
     for first in people:
         if first in PLAYER_FIRST_NAMES:

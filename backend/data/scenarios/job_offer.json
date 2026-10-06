@@ -13,7 +13,8 @@
     "link": "securechat-hiring.example/join",
     "pay_scam": "$40/hr",
     "pay_legit": "$15/hr",
-    "fee": "$75"
+    "fee": "$75",
+    "bank": "Buckeye Federal Credit Union"
   },
   "generate": {
     "company": {
@@ -49,6 +50,16 @@
     },
     "store_phone": {
       "phone": true
+    },
+    "bank": {
+      "ai": "a fictional Ohio credit union or community bank where the player keeps their account, 2 to 4 words",
+      "choice": [
+        "Buckeye Federal Credit Union",
+        "Maple Valley Credit Union",
+        "Lakeshore Hollow Credit Union",
+        "Tall Pines Community Bank",
+        "Cardinal Ridge Credit Union"
+      ]
     }
   },
   "derived_vars": {

@@ -19,9 +19,10 @@ JOB = get_scenario("job_offer")
 FAMILY = get_scenario("family_emergency")
 
 GOOD = {
-    "bank_alert": {"bank": "Maple Valley Credit Union", "bank_short": "Maple Valley", "merchant": "Gadget Harbor"},
-    "job_offer": {"company": "Cedar Ridge Supply", "recruiter": "Priya Okonkwo"},
-    "family_emergency": {"relative": "Rowan", "aunt_name": "Marisol", "pet": "Pickles", "gift_store": "GameNest"},
+    "bank_alert": {"bank": "Maple Valley Credit Union", "merchant": "Gadget Harbor"},
+    "job_offer": {"company": "Cedar Ridge Supply", "recruiter": "Priya Okonkwo", "bank": "Oak Hollow Credit Union"},
+    "family_emergency": {"relative": "Rowan", "aunt_name": "Marisol", "pet": "Pickles", "gift_store": "GameNest",
+                         "bank": "Oak Hollow Credit Union"},
 }
 
 
@@ -89,12 +90,11 @@ def test_good_names_pass(scenario):
 
 
 @pytest.mark.parametrize("change,problem", [
-    ({"bank": "Huntington Community Bank", "bank_short": "Huntington"}, "real name"),
+    ({"bank": "Huntington Community Bank"}, "real name"),
     ({"merchant": "Best Buy Outlet"}, "real name"),
     ({"merchant": "Gadgets4U"}, "digits"),
     ({"merchant": "gadgetharbor.com"}, "web address"),
     ({"merchant": "A" * 41}, "too long"),
-    ({"bank_short": "Oak Hill"}, "isn't part of bank"),
 ])
 def test_bad_bank_names_are_rejected(change, problem):
     assert problem in check_vars({**GOOD["bank_alert"], **change}, BANK)
@@ -125,7 +125,7 @@ def test_live_generator_returns_checked_names():
 
 
 def test_live_generator_falls_back_when_names_are_unsafe():
-    bad = json.dumps({**GOOD["bank_alert"], "bank": "Chase Bank", "bank_short": "Chase"})
+    bad = json.dumps({**GOOD["bank_alert"], "bank": "Chase Bank"})
     ai = live_ai([bad, bad])  # bad twice: regenerated once, then give up
     assert asyncio.run(ai.scenario_vars(BANK)) is None
 
@@ -166,7 +166,35 @@ def test_generator_request_is_plain_text_with_a_letter_hint_per_name():
     from app.ai.generator import generator_user
     text = generator_user(FAMILY, random.Random(3))
     assert not text.lstrip().startswith("{")
-    assert text.count("start it with the letter") == 4
+    assert text.count("start it with the letter") == 5
     assert '"relative": "..."' in text
-    # bank_short must come from bank, so it gets no letter hint
     assert generator_user(BANK, random.Random(3)).count("start it with the letter") == 2
+    assert "Jordan" in text  # player names are listed so the AI avoids them
+    assert "Jordan" not in generator_user(BANK, random.Random(3))  # no people in the bank scenario
+
+
+@pytest.mark.parametrize("scenario", [JOB, FAMILY], ids=lambda s: s.id)
+def test_players_bank_varies_in_every_scenario(scenario):
+    # Without AI it comes from the fallback list...
+    banks = {make_variant(scenario, random.Random(seed)).raw["vars"]["bank"] for seed in range(30)}
+    assert len(banks) >= 4
+    # ...and with AI it's the invented one, which reaches the ID card.
+    store.clear()
+    player = progress.Player(id="p_bank")
+    store.save_player(player)
+    start = asyncio.run(game.start_round(player, scenario.id, NamesAI(GOOD)))
+    assert start.id_card.bank == "Oak Hollow Credit Union"
+
+
+@pytest.mark.parametrize("bank,short", [
+    ("Maple Valley Credit Union", "Maple Valley"),
+    ("Buckeye Federal Credit Union", "Buckeye"),
+    ("Riverstone Community Bank", "Riverstone"),
+    ("Timberline Savings Bank", "Timberline"),
+    ("Pinecrest Credit Dominion", "Pinecrest"),
+    ("Bank of Tall Pines", "Tall Pines"),
+    ("Community Bank", "Community"),
+])
+def test_short_bank_name_comes_from_the_full_name(bank, short):
+    v = make_variant(BANK, random.Random(1), {**GOOD["bank_alert"], "bank": bank}).raw["vars"]
+    assert v["bank_short"] == short

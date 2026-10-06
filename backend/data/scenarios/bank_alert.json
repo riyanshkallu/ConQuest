@@ -18,10 +18,6 @@
     "bank": {
       "ai": "a fictional Ohio credit union or community bank, 2 to 4 words, like 'Maple Valley Credit Union'"
     },
-    "bank_short": {
-      "ai": "the short name of that same bank as shown in a text alert, 1 or 2 words taken from its full name",
-      "part_of": "bank"
-    },
     "merchant": {
       "ai": "a fictional online electronics or sporting goods store, 2 or 3 words"
     },
@@ -39,6 +35,7 @@
     }
   },
   "derived_vars": {
+    "bank_short": "short:bank",
     "bank_slug": "slug:bank_short",
     "link": "{bank_slug}-secure-verify.example/login"
   },
