@@ -71,6 +71,28 @@ def analyzer_user(ctx: TurnContext) -> str:
 # AI Character
 # ---------------------------------------------------------------------------
 
+# What each difficulty means (the plan: higher levels remove the obvious tells, and real
+# contacts get less polished so players can't judge by writing style alone).
+SCAM_STYLE = {
+    1: "Make it fairly easy to spot: a couple of small spelling or grammar slips, pushy from the start, "
+       "and ask for what you want early.",
+    2: "Correct spelling, but pushy, and ask for what you want within your first two messages.",
+    3: "Sound professional. Build a little trust before you ask, and keep the pressure moderate.",
+    4: "Sound polished and calm, like the real organization. Be patient: give a believable reason "
+       "with specific (fictional) details before asking, and ask indirectly.",
+    5: "Be very convincing: perfect, professional wording that matches how the real organization writes, "
+       "patient, uses the player's details back to them, and only adds pressure late.",
+}
+LEGIT_STYLE = {
+    1: "Write clearly and politely, and point out how they can check you early on.",
+    2: "Write clearly and politely, and point out how they can check you early on.",
+    3: "Write normally. Keep messages fairly short.",
+    4: "Write like someone busy: short, plain messages. Only mention how to verify if they ask.",
+    5: "Write like someone busy: very short, informal messages, maybe a small typo. Don't volunteer "
+       "reassurances; answer questions honestly if asked.",
+}
+
+
 def character_system(ctx: TurnContext) -> str:
     version, state = ctx.version, ctx.state
     contact = _r(ctx, version["contact"]["name"])
@@ -96,7 +118,9 @@ Example lines in your voice:
 You play the SCAMMER. Your goal in the story: {_r(ctx, version['objective_text'])}
 Each message uses exactly one tactic from: {tactics}.
 Adapt to the player: if they pushed back or said they'd verify, switch to a different tactic instead of repeating yourself.
-If they are going along, move closer to your goal. Only ask for items on the fictional ID card
+If they are going along, move closer to your goal.
+Difficulty {state.difficulty} of 5: {SCAM_STYLE[state.difficulty]}
+Only ask for items on the fictional ID card
 (one-time code, card number, password, gift card code), and name them naturally ("your gift card"),
 never as "the ID card". Never ask for a Social Security number or real address.{code_note}
 Return JSON only: {{"message": "...", "tactic": "<one tactic>", "pressure": <0-100, how hard you are pushing>}}"""
@@ -110,6 +134,7 @@ Give specific details the player can check. Invite them to verify through a chan
 (a number they already have, the official app or website). Stay calm and polite if they refuse or want to call back.
 Never pressure them. Never ask for codes, passwords, PINs, payments or gift cards.
 If the player shares a code or password, tell them not to share it with anyone, including you.{code_note}
+Style: {LEGIT_STYLE[state.difficulty]} You are still always honest and never ask for secrets or money.
 Each message shows one green flag from: {flags}.
 Return JSON only: {{"message": "...", "green_flag": "<one green flag>"}}"""
 

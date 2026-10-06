@@ -105,7 +105,7 @@ def record_finished_round(rnd: Round, save_messages: bool) -> None:
     with db.get_engine().begin() as conn:
         conn.execute(insert(db.rounds).values(
             id=rnd.id, player_id=rnd.player_id, scenario_id=rnd.scenario.id, is_scam=state.is_scam,
-            difficulty=rnd.scenario.difficulty, ending=state.ending, points=state.points, xp=rnd.xp_earned,
+            difficulty=state.difficulty, ending=state.ending, points=state.points, xp=rnd.xp_earned,
             turns=state.turns, mistakes=state.mistakes, details=rnd.scenario.raw.get("vars"),
             started_at=rnd.started_at, ended_at=rnd.ended_at or _now(),
         ))

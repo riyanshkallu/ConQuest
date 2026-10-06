@@ -153,6 +153,9 @@ Response `200`:
 ```
 
 - `channel`: `"sms"`, `"dm"`, `"email"` or `"chat"`. Use it to style the chat screen.
+- `difficulty`: 1–5 **for this player**. It goes up as they level up (+1 every 2 levels). Higher means a
+  more convincing scammer and a plainer, less polished real contact. The round start response
+  returns the same number.
 - `train_your_weakness` is `null` until the player has finished at least one round.
 - Each scenario id is a *pair* (scam version and legit version). The server picks which
   version the player gets when the round starts.
