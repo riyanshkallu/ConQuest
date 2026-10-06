@@ -9,7 +9,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from . import game, schemas
+from . import game, schemas, store
 from .ai import get_ai
 from .config import BACKEND_DIR, get_settings
 
@@ -43,7 +43,9 @@ async def server_error(_: Request, exc: Exception):
 @app.get("/api/health")
 async def health():
     """Pinged by the keep-awake job so the free server doesn't fall asleep."""
-    return {"ok": True, "ai_provider": get_settings().ai_provider}
+    # Always 200 so Render doesn't restart the app over a database hiccup; the body says what's wrong.
+    database = "ok" if store.database_ok() else "unreachable"
+    return {"ok": database == "ok", "ai_provider": get_settings().ai_provider, "database": database}
 
 
 @app.post("/api/player", response_model=schemas.PlayerResponse, status_code=201)
@@ -59,6 +61,7 @@ async def update_settings(player_id: str, body: schemas.SettingsUpdate):
         player.hints = body.hints
     if body.save_conversations is not None:
         player.save_conversations = body.save_conversations
+    store.save_player(player)
     return schemas.Settings(hints=player.hints, save_conversations=player.save_conversations)
 
 
@@ -66,6 +69,7 @@ async def update_settings(player_id: str, body: schemas.SettingsUpdate):
 async def reset_player(player_id: str):
     player = game.require_player(player_id)
     player.reset()
+    store.save_player(player)
     return game.radar(player)
 
 

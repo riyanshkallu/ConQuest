@@ -11,7 +11,8 @@ from __future__ import annotations
 
 import random
 import re
-from datetime import date
+from dataclasses import asdict
+from datetime import date, datetime, timezone
 
 from . import engine, progress, schemas, store
 from .ai.base import AIProvider, TurnContext
@@ -249,8 +250,11 @@ def _finalize(rnd: store.Round) -> None:
     rnd.finalized = True
     player = store.get_player(rnd.player_id)
     rnd.xp_earned = engine.xp_for_round(rnd.state)
+    rnd.ended_at = datetime.now(timezone.utc)
     if player:
         rnd.new_badges = progress.update_after_round(player, rnd.state, date.today())
+        store.save_player(player)
+    store.record_finished_round(rnd, save_messages=player.save_conversations if player else False)
 
 
 def _context(rnd: store.Round, text: str, decision: str = "neutral", code_now: bool = False) -> TurnContext:
@@ -281,6 +285,7 @@ def _add_notification(rnd: store.Round, text: str) -> schemas.Message:
 
 def _annotate(entry: dict, analysis: engine.Analysis, pre: engine.PreCheck, state: engine.RoundState) -> None:
     """The note shown when the player taps their own message in the flagged transcript."""
+    entry["analysis"] = asdict(analysis)  # saved with the round for the playtest results
     if pre.traps:
         entry.update(note=f"You shared your {pre.traps[0]}. A real contact never needs it.", mistake=True)
     elif pre.minor:
