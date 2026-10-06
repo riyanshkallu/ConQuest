@@ -319,7 +319,9 @@ def _id_card_out(card: engine.IdCard, scenario: Scenario) -> schemas.IdCardOut:
     if "id_card_family" in scenario.raw:
         family = schemas.FamilyInfo(**{k: render(v, scenario, card)
                                        for k, v in scenario.raw["id_card_family"].items()})
+    extras = [schemas.IdCardExtra(label=render(e["label"], scenario, card), value=render(e["value"], scenario, card))
+              for e in scenario.raw.get("id_card_extras", [])]
     return schemas.IdCardOut(name=card.name, email=card.email, phone=card.phone, bank=card.bank,
                              card_number=card.card_number, card_last4=card.card_last4,
                              password=card.password, gift_card=gift, gaming_account=gaming,
-                             family=family)
+                             family=family, extras=extras)

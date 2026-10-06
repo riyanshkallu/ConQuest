@@ -185,7 +185,8 @@ Response `201`:
     "password": null,
     "gift_card": null,
     "gaming_account": null,
-    "family": null
+    "family": null,
+    "extras": []
   },
   "opening_message": { "sender": "contact", "text": "...", "links": [] },
   "suggested_replies": ["Who is this?", "YES", "I'll call the number on my card."]
@@ -198,6 +199,9 @@ Response `201`:
   about their family, so they can check who's really texting:
   `{ "relative": "Alex (your cousin)", "parent": "Aunt Dana (Alex's mom)", "parent_phone": "(614) 555-0133",
   "memory_question": "Name of Grandma's dog", "memory_answer": "Biscuit" }`.
+- `id_card.extras` (proposed, see decision 8): extra lines for a scenario, shown as more ID card rows
+  in order. Example (tech support): `[{ "label": "Your open support ticket", "value": "#48213: laptop won't charge" }]`.
+  Usually empty. Show them like the other rows.
 - The one-time verification code is **not** on the ID card. It arrives mid-game as a
   `notification` message (see below), like a real text from the bank.
 
@@ -399,6 +403,7 @@ this way.
 | 5 | One-time code arrives in both scam and legit rounds | agreed | waiting |
 | 6 | Settings and reset endpoints | agreed | waiting |
 | 7 | `id_card.family` and `verification_call.official_name` | agreed | waiting |
+| 8 | `id_card.extras` for scenario-specific ID card lines | agreed | waiting |
 
 1. **`trust` action ("It's legit").** The plan had no way to say "I believe you," so the
    LUCKY and SMART AND SAFE endings had no clear trigger. In a legit round, `trust` gives
@@ -420,6 +425,11 @@ this way.
    a parent's number to call, so the ID card gets an optional `family` section. Verify calls are no
    longer always "the bank", so call lines use `speaker: "official"` plus `official_name`.
    `index.html` already shows both.
+8. **Scenario-specific ID card lines** (added with the gaming and tech support scenarios). Some
+   clues only make sense on one scenario's ID card: your friend's real handle (the scam uses a
+   lookalike) or your open support ticket number (the real agent knows it, the scammer doesn't).
+   Rather than a new field per scenario, the ID card gets a generic `extras` list of label/value
+   rows. `index.html` already shows them, and has two new scenario cards for the new scenarios.
 
 ### Still open
 

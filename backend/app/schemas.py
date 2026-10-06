@@ -132,6 +132,12 @@ class FamilyInfo(BaseModel):
     memory_answer: str
 
 
+class IdCardExtra(BaseModel):
+    """A scenario-specific line on the ID card, e.g. {"label": "Your open support ticket", "value": "#48213"}."""
+    label: str
+    value: str
+
+
 class IdCardOut(BaseModel):
     name: str
     email: str
@@ -143,6 +149,7 @@ class IdCardOut(BaseModel):
     gift_card: GiftCard | None = None
     gaming_account: GamingAccount | None = None
     family: FamilyInfo | None = None
+    extras: list[IdCardExtra] = []
 
 
 class StartRoundRequest(BaseModel):
