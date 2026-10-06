@@ -179,10 +179,10 @@ def test_test_console_is_served():
 
 # --- Job offer and family emergency -------------------------------------------
 
-def test_all_three_scenarios_are_listed():
+def test_all_five_scenarios_are_listed():
     pid = new_player()
     ids = [s["id"] for s in client.get(f"/api/scenarios?player_id={pid}").json()["scenarios"]]
-    assert ids == ["bank_alert", "family_emergency", "job_offer"]
+    assert ids == ["bank_alert", "family_emergency", "gaming_trade", "job_offer", "tech_support"]
 
 
 def test_verification_call_names_who_you_called(monkeypatch):
@@ -251,7 +251,7 @@ def test_family_legit_passing_the_message_is_lucky(monkeypatch):
     assert "gift cards" in twin["text"]
 
 
-@pytest.mark.parametrize("scenario", ["bank_alert", "job_offer", "family_emergency"])
+@pytest.mark.parametrize("scenario", ["bank_alert", "job_offer", "family_emergency", "gaming_trade", "tech_support"])
 @pytest.mark.parametrize("is_scam", [True, False])
 def test_no_unfilled_placeholders_reach_the_player(monkeypatch, scenario, is_scam):
     """Every text the API sends must have its {placeholders} filled in."""
@@ -262,6 +262,50 @@ def test_no_unfilled_placeholders_reach_the_player(monkeypatch, scenario, is_sca
     for payload in (rnd, turn, end, result):
         text = json.dumps(payload)
         assert "{" not in text.replace('{"', "").replace("{}", ""), text[:300]
+
+
+# --- Gaming trade and tech support ---------------------------------------------
+
+def test_gaming_scam_comes_from_a_lookalike_of_your_friends_handle(monkeypatch):
+    scam = start(new_player(), is_scam=True, monkeypatch=monkeypatch, scenario="gaming_trade")
+    legit = start(new_player(), is_scam=False, monkeypatch=monkeypatch, scenario="gaming_trade")
+    friend_row = next(e["value"] for e in scam["id_card"]["extras"] if e["label"] == "Friend on your server")
+    real_handle = re.search(r"\(@(\w+)\)", friend_row).group(1)
+    assert legit["contact"]["handle"] == f"@{real_handle}"          # the real friend
+    assert scam["contact"]["handle"] == f"@{real_handle}.gg"        # a lookalike
+    assert scam["id_card"]["gaming_account"] and scam["id_card"]["password"]
+
+
+def test_gaming_scam_login_code_is_a_trap(monkeypatch):
+    rid = start(new_player(), is_scam=True, monkeypatch=monkeypatch, scenario="gaming_trade")["round_id"]
+    say(rid, "who is this")
+    turn = say(rid, "ok how do I get it")
+    code = re.search(r"code is (\d{6})", turn["notifications"][0]["text"]).group(1)
+    assert say(rid, f"here {code}")["ending"]["code"] == "SCAMMED"
+
+
+def test_gaming_legit_trade_completes(monkeypatch):
+    rid = start(new_player(), is_scam=False, monkeypatch=monkeypatch, scenario="gaming_trade")["round_id"]
+    assert say(rid, "deal")["ending"]["code"] == "LUCKY"
+
+
+def test_tech_support_ticket_is_on_the_id_card_and_legit_knows_it(monkeypatch):
+    rnd = start(new_player(), is_scam=False, monkeypatch=monkeypatch, scenario="tech_support")
+    ticket_row = next(e["value"] for e in rnd["id_card"]["extras"] if e["label"] == "Your open support ticket")
+    ticket = re.search(r"#(\d{5})", ticket_row).group(1)
+    assert f"#{ticket}" in rnd["opening_message"]["text"]          # the real agent knows your ticket
+    scam = start(new_player(), is_scam=True, monkeypatch=monkeypatch, scenario="tech_support")
+    assert "#" not in scam["opening_message"]["text"]              # the scammer doesn't
+
+
+def test_tech_support_scam_card_number_is_a_trap(monkeypatch):
+    rnd = start(new_player(), is_scam=True, monkeypatch=monkeypatch, scenario="tech_support")
+    end = say(rnd["round_id"], f"ok my card is {rnd['id_card']['card_number']}")
+    assert end["ending"]["code"] == "SCAMMED"
+
+
+def test_bank_scenario_has_no_extras():
+    assert start(new_player())["id_card"]["extras"] == []
 
 
 @pytest.mark.parametrize("decision,reason,expected", [

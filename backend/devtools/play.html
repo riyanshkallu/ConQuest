@@ -217,7 +217,8 @@ async function startRound() {
                   ["Gaming", card.gaming_account && `${card.gaming_account.game}: ${card.gaming_account.username}`],
                   ["Family", card.family && card.family.relative],
                   ["Their parent", card.family && `${card.family.parent}, ${card.family.parent_phone}`],
-                  [card.family && card.family.memory_question, card.family && card.family.memory_answer]];
+                  [card.family && card.family.memory_question, card.family && card.family.memory_answer],
+                  ...(card.extras || []).map((x) => [x.label, x.value])];
     $("idcard").replaceChildren(...rows.filter(([, v]) => v).flatMap(([k, v]) => [el("dt", "", k), el("dd", "", v)]));
 
     $("contact").replaceChildren(r.contact.name + " ", el("small", "", `${r.contact.handle} · ${r.channel}`));

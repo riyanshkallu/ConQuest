@@ -16,12 +16,14 @@ VERIFY_WORDS = ("back of my card", "call my bank", "call the bank", "call the nu
                 "official app", "check the app", "check in the app", "call you back",
                 "i'll call", "ill call", "log in myself", "check with", "call my mom",
                 "call my dad", "call my parent", "call your mom", "call aunt", "call the store",
-                "careers page", "official website")
+                "careers page", "official website", "trade market", "in-game", "voice chat",
+                "official site", "call support")
 CHALLENGE_WORDS = ("who is this", "who are you", "how do i know", "prove", "scam", "fake",
                    "suspicious", "not sharing", "won't", "wont", "not giving", "why do you need",
                    "no way", "don't trust", "dont trust", "never ask", "not sending",
                    "rush me", "rushing me", "pressuring me", "not falling", "nice try",
-                   "what's the name of", "grandma's dog", "not paying", "not buying")
+                   "what's the name of", "grandma's dog", "not paying", "not buying",
+                   "ticket number", "not installing", "won't install", "not clicking")
 COMPLY_WORDS = ("yes", "ok", "okay", "sure", "here", "fine", "sent", "what do i do",
                 "what do i need", "go ahead", "alright")
 
@@ -44,7 +46,7 @@ GREEN_WORDS = {
     "no_credentials_asked": ("didn't ask", "didnt ask", "no code", "never asked", "not asking"),
     "no_pressure": ("no rush", "not rushing", "take my time"),
     "checkable_details": ("in the app", "pending", "alert #", "alert number"),
-    "official_channels": ("official app", "official website", "careers page"),
+    "official_channels": ("official app", "official website", "careers page", "trade market", "ticket page"),
     "no_secrecy": ("tell your mom", "tell aunt", "not a secret"),
     "normal_payment": ("no fee", "direct deposit with hr", "in person"),
 }

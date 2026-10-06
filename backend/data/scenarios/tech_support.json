@@ -1,0 +1,139 @@
+{
+  "id": "tech_support",
+  "title": "Tech support chat",
+  "channel": "chat",
+  "difficulty": 2,
+  "par_turns": 5,
+  "vars": {
+    "company": "Brightleaf Computers",
+    "agent": "Morgan Hale",
+    "ticket": "48213",
+    "issue": "laptop won't charge",
+    "price": "$199",
+    "bank": "Buckeye Federal Credit Union"
+  },
+  "generate": {
+    "company": {"ai": "a fictional laptop and computer company, 2 words ending in 'Computers' or 'Tech', like 'Brightleaf Computers'"},
+    "agent": {"ai": "a fictional support agent's full name, first and last", "person": true},
+    "ticket": {"digits": 5},
+    "issue": {"choice": ["laptop won't charge", "laptop keeps freezing", "screen flickers", "keyboard keys stopped working"]},
+    "price": {"choice": ["$149", "$199", "$249", "$299"]},
+    "bank": {
+      "ai": "a fictional Ohio credit union or community bank where the player keeps their account, 2 to 4 words",
+      "choice": ["Buckeye Federal Credit Union", "Maple Valley Credit Union", "Lakeshore Hollow Credit Union",
+                 "Tall Pines Community Bank", "Cardinal Ridge Credit Union"]
+    }
+  },
+  "derived_vars": {
+    "agent_first": "first:agent",
+    "company_slug": "slug:company",
+    "support_link": "support.{company_slug}.example/tickets",
+    "link": "{company_slug}-secure-fix.example/download"
+  },
+  "id_card_extras": [
+    {"label": "Your laptop", "value": "{company}, under warranty"},
+    {"label": "Your open support ticket", "value": "#{ticket}: {issue}"}
+  ],
+  "verification_call_title": "Calling {company} Support (number from their official website)",
+  "verification_official": "{company} Support",
+  "suggested_replies": {
+    "opening": ["Who is this?", "Oh no, what do I do?", "What's my ticket number?"],
+    "default": ["How do I know you're really {company}?", "OK, what do I need to do?", "I'll call {company} from their official website."]
+  },
+
+  "scam": {
+    "contact": {"name": "{company} Support", "handle": "Live chat"},
+    "objective": "remote_access_and_payment",
+    "objective_text": "You are a fake {company} technician. Get the player to install your 'remote repair' app from your link, and to pay {price} for a 'security plan' with their card number.",
+    "objective_is_payment": true,
+    "character_notes": "You do NOT know the player's support ticket number or what's actually wrong with their laptop. If they ask, dodge it and go back to the 'viruses'.",
+    "allowed_tactics": ["authority", "fear", "urgency", "suspicious_link", "financial_pressure", "trust_building"],
+    "tactic_order": ["fear", "authority", "urgency", "suspicious_link", "financial_pressure", "trust_building"],
+    "pushback_order": ["trust_building", "authority", "fear", "urgency"],
+    "opening": {
+      "flag": "fear",
+      "text": "Hi {first_name}, this is {agent_first} from {company} Support. Our system detected 3 viruses on your laptop, and your saved passwords may be at risk. Do you have a minute?"
+    },
+    "key_message": "Download our remote repair tool here so I can fix it for you: {link}",
+    "lines": {
+      "authority": [
+        "I'm a certified {company} security technician. This alert came straight from our monitoring system.",
+        "Our security team flagged your laptop specifically. This is an official {company} warning."
+      ],
+      "fear": [
+        "Hackers may already be reading your saved passwords and photos.",
+        "If we don't remove the viruses now, your laptop could be locked for good."
+      ],
+      "urgency": [
+        "The infection is spreading every minute. We need to start the cleanup right away.",
+        "I can only hold this technician slot for 10 more minutes."
+      ],
+      "suspicious_link": [
+        "Download our remote repair tool here so I can fix it for you: {link}",
+        "Just install the repair app from {link} and read me the access code it shows."
+      ],
+      "financial_pressure": [
+        "The cleanup needs our Total Security Plan, {price} for the year. I can take your card number here.",
+        "Your warranty doesn't cover viruses, so it's a one-time {price} fee. What's your card number?"
+      ],
+      "trust_building": [
+        "I completely understand. I'd be careful too. That's exactly why we reached out first.",
+        "You're in good hands. I've fixed hundreds of laptops like yours today."
+      ]
+    },
+    "verification_call": [
+      {"speaker": "official", "text": "Thanks for calling {company} Support. How can I help?"},
+      {"speaker": "player", "text": "A support chat said my laptop has 3 viruses and asked me to install a repair app and pay {price}."},
+      {"speaker": "official", "text": "That wasn't us. We don't scan laptops remotely or pop up virus warnings, and we never ask you to install remote access apps."},
+      {"speaker": "official", "text": "Close that chat and don't install anything. If you already paid, call your bank."}
+    ]
+  },
+
+  "legit": {
+    "contact": {"name": "{company} Support", "handle": "Live chat"},
+    "objective": "warranty_fix",
+    "objective_text": "You really are {agent_first} from {company} Support, replying to the player's open ticket #{ticket} ({issue}). Offer a free fix under warranty, shipped to the address on file. Only ask them to confirm they still have the problem.",
+    "objective_is_payment": false,
+    "character_notes": "You know the player's ticket is #{ticket} about '{issue}', and their laptop is under warranty. Never ask for passwords, card numbers, payments or remote access.",
+    "allowed_flags": ["checkable_details", "no_credentials_asked", "normal_payment", "no_pressure", "official_channels", "accepts_no"],
+    "flag_order": ["checkable_details", "normal_payment", "no_credentials_asked", "official_channels", "no_pressure", "accepts_no"],
+    "pushback_order": ["checkable_details", "official_channels", "accepts_no", "no_credentials_asked"],
+    "completion_replies": ["ok ship it", "yes please send it", "sounds good send it", "yes that works", "yes ship the replacement"],
+    "opening": {
+      "flag": "checkable_details",
+      "text": "Hi {first_name}, this is {agent_first} from {company} Support, following up on your ticket #{ticket} ({issue}). Do you have a minute?"
+    },
+    "lines": {
+      "checkable_details": [
+        "Your ticket #{ticket} says: {issue}. Is that still happening?",
+        "I can see your laptop is still under warranty until next spring."
+      ],
+      "no_credentials_asked": [
+        "I don't need your password, and you don't need to install anything for this.",
+        "Nothing personal needed here. I already have your shipping address from the ticket."
+      ],
+      "normal_payment": [
+        "This is covered by your warranty, so there's no charge at all.",
+        "There's nothing to pay. We'll ship the replacement part for free."
+      ],
+      "no_pressure": [
+        "No rush. Reply whenever it's convenient, the ticket stays open.",
+        "Take your time, I'm here until 6pm today."
+      ],
+      "official_channels": [
+        "You can also see this update on your ticket at {support_link}.",
+        "Everything I've said is posted on your ticket page at {support_link}."
+      ],
+      "accepts_no": [
+        "No problem. If you'd rather call us, the number is on our official website.",
+        "That's fine, you can reply to the ticket email instead whenever you're ready."
+      ]
+    },
+    "verification_call": [
+      {"speaker": "official", "text": "Thanks for calling {company} Support. How can I help?"},
+      {"speaker": "player", "text": "Someone in a support chat says they're helping with my ticket #{ticket}."},
+      {"speaker": "official", "text": "Yes, I can see {agent_first} is handling ticket #{ticket}. They're sending you a free fix under warranty."},
+      {"speaker": "official", "text": "Calling to check was a smart move."}
+    ]
+  }
+}
