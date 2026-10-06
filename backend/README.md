@@ -28,7 +28,14 @@ lines. Set `AI_PROVIDER=live` and add a free Groq and/or Gemini key to use real 
 ```bash
 .venv/Scripts/python -m pytest              # engine, API and AI-validation tests, no keys needed
 .venv/Scripts/python scripts/try_models.py  # compare free models (needs keys)
+.venv/Scripts/python scripts/adversarial.py http://127.0.0.1:8000  # try to break a running server
 ```
+
+`adversarial.py` throws the plan's attack list at a running server (gibberish, prompt injection,
+insults, harmful requests, "I know you're a scammer", the code hidden in a sentence, real card
+numbers, double taps) and marks anything that broke with ✗. Rerun it after changing a prompt.
+It uses about 70 AI calls. Run the server with a throwaway database
+(`DATABASE_URL=sqlite:///test.db`) so attack rounds don't end up in your Supabase playtest data.
 
 ## Deploy (Render, free)
 
