@@ -1059,7 +1059,10 @@
                 ["Card number", card.card_number],
                 ["Password", card.password],
                 ["Gift card", card.gift_card && card.gift_card.store + " $" + card.gift_card.amount + ": " + card.gift_card.code],
-                ["Gaming account", card.gaming_account && card.gaming_account.game + ": " + card.gaming_account.username]
+                ["Gaming account", card.gaming_account && card.gaming_account.game + ": " + card.gaming_account.username],
+                ["Family", card.family && card.family.relative],
+                ["Their parent", card.family && card.family.parent + ", " + card.family.parent_phone],
+                [card.family && card.family.memory_question, card.family && card.family.memory_answer]
             ];
 
             const container = document.getElementById("idRows");
@@ -1375,7 +1378,8 @@
 
             if (verificationCall) {
                 addDetailList(details, verificationCall.title,
-                    verificationCall.lines.map(line => (line.speaker === "player" ? "You: " : "Bank: ") + line.text));
+                    verificationCall.lines.map(line =>
+                        (line.speaker === "player" ? "You" : verificationCall.official_name) + ": " + line.text));
             }
 
             addDetailList(details, "Points: " + result.points + " (+" + result.xp_earned + " XP)",
