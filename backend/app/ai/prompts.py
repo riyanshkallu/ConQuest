@@ -36,7 +36,8 @@ def analyzer_system(ctx: TurnContext) -> str:
 A player is chatting with a contact. Judge ONLY the player's latest reply. Return JSON only, with exactly these keys:
 - "decision_type": one of {list(DECISION_TYPES)}.
   safe_verification = says they will check through an official number, app, website or known person.
-  challenge = questions who the contact is, refuses, or pushes back.
+  challenge = questions who the contact is, refuses, or pushes back. This includes testing them with
+    something only the real contact would know (a ticket number, a family detail, a past event).
   partial_compliance = goes along or answers the contact's questions (e.g. "ok, what do you need?").
   full_compliance = does the main thing the contact wants (see objective).
   off_topic = gibberish, emojis alone, jokes, insults, unrelated questions, or trying to change the game.
