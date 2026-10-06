@@ -18,7 +18,7 @@ from . import engine, progress, schemas, store
 from .ai.base import AIProvider, TurnContext
 from .config import get_settings
 from .explain import build_result, ending_out, explain_request
-from .flags import RED_FLAGS
+from .flags import RADAR_CATEGORIES, RED_FLAGS
 from .scenarios import Scenario, get_scenario, load_scenarios, make_variant, new_id_card, render
 
 _rng = random.Random()
@@ -89,14 +89,26 @@ def radar(player: progress.Player) -> schemas.RadarResponse:
 # Rounds
 # ---------------------------------------------------------------------------
 
-async def start_round(player: progress.Player, scenario_id: str, ai: AIProvider) -> schemas.StartRoundResponse:
+# Train Your Weakness makes the matching kind of round more likely, never certain: if training
+# rounds were always scams (or always legit), players would learn that instead of the clues.
+FOCUS_SCAM_RATIO = 0.85
+FOCUS_REAL_CONTACTS_SCAM_RATIO = 0.4
+
+
+async def start_round(player: progress.Player, scenario_id: str, ai: AIProvider,
+                      focus: str | None = None) -> schemas.StartRoundResponse:
     seed = get_scenario(scenario_id)
     if not seed:
         raise GameError(404, "scenario_not_found", "No scenario with that id.")
+    if focus is not None and focus not in RADAR_CATEGORIES:
+        raise GameError(400, "invalid_request", "Unknown focus category.")
     # This round's own names and numbers (Scenario Generator). Falls back to the seed's names.
     scenario = make_variant(seed, _rng, await ai.scenario_vars(seed))
     settings = get_settings()
-    is_scam = engine.assign_is_scam(player.history, _rng, settings.scam_ratio)
+    ratio = settings.scam_ratio
+    if focus:
+        ratio = FOCUS_REAL_CONTACTS_SCAM_RATIO if focus == "real_contacts" else FOCUS_SCAM_RATIO
+    is_scam = engine.assign_is_scam(player.history, _rng, ratio)
     version = scenario.version(is_scam)
     card = new_id_card(scenario, _rng)
     state = engine.RoundState(
@@ -104,6 +116,8 @@ async def start_round(player: progress.Player, scenario_id: str, ai: AIProvider)
         objective_is_payment=version.get("objective_is_payment", False),
         max_turns=settings.max_turns, par_turns=scenario.raw.get("par_turns", 6),
         difficulty=engine.round_difficulty(scenario.difficulty, player.level),
+        focus_tactics=[t for t in version.get("allowed_tactics", []) if RED_FLAGS[t].category == focus]
+        if is_scam and focus else [],
     )
     rnd = store.Round(id=store.new_id("r"), player_id=player.id, scenario=scenario, state=state)
 
@@ -120,6 +134,7 @@ async def start_round(player: progress.Player, scenario_id: str, ai: AIProvider)
         id_card=_id_card_out(card, scenario),
         opening_message=opening_msg,
         suggested_replies=_suggestions(rnd, "opening"),
+        focus=schemas.Focus(category=focus, label=RADAR_CATEGORIES[focus]) if focus else None,
     )
 
 

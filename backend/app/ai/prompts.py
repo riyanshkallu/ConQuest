@@ -93,6 +93,14 @@ LEGIT_STYLE = {
 }
 
 
+def _focus_note(state) -> str:
+    """Train Your Weakness: lean on the tactics this player struggles with."""
+    if not state.focus_tactics:
+        return ""
+    return ("\n" + f"Training focus: this player struggles with {state.focus_tactics}. Lead with these "
+            "tactics and keep coming back to them, switching between them when the player pushes back.")
+
+
 def character_system(ctx: TurnContext) -> str:
     version, state = ctx.version, ctx.state
     contact = _r(ctx, version["contact"]["name"])
@@ -119,7 +127,7 @@ You play the SCAMMER. Your goal in the story: {_r(ctx, version['objective_text']
 Each message uses exactly one tactic from: {tactics}.
 Adapt to the player: if they pushed back or said they'd verify, switch to a different tactic instead of repeating yourself.
 If they are going along, move closer to your goal.
-Difficulty {state.difficulty} of 5: {SCAM_STYLE[state.difficulty]}
+Difficulty {state.difficulty} of 5: {SCAM_STYLE[state.difficulty]}{_focus_note(state)}
 Only ask for items on the fictional ID card
 (one-time code, card number, password, gift card code), and name them naturally ("your gift card"),
 never as "the ID card". Never ask for a Social Security number or real address.{code_note}
