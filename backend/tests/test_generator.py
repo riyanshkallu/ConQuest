@@ -45,6 +45,9 @@ class NamesAI:
     async def scenario_vars(self, scenario):
         return self.names.get(scenario.id)
 
+    async def explain(self, request):
+        return None
+
 
 # --- Per-round variants -----------------------------------------------------------
 
@@ -141,7 +144,8 @@ def test_round_uses_generated_names_everywhere(scenario_id):
     start = asyncio.run(game.start_round(player, scenario_id, NamesAI(GOOD)))
     rnd = store.get_round(start.round_id)
     end = asyncio.run(game.do_action(rnd, "verify", None, NamesAI(GOOD)))
-    text = json.dumps([start.model_dump(), end.model_dump(), game.get_result(rnd).model_dump()])
+    result = asyncio.run(game.get_result(rnd, NamesAI(GOOD)))
+    text = json.dumps([start.model_dump(), end.model_dump(), result.model_dump()])
 
     main_name = next(iter(names.values()))
     assert main_name in text

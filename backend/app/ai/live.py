@@ -17,8 +17,8 @@ from ..config import Settings
 from ..engine import Analysis
 from ..flags import GREEN_FLAGS, RED_FLAGS
 from ..scenarios import Scenario, ai_var_specs
-from . import generator, prompts
-from .base import CharacterMove, TurnContext
+from . import explainer, generator, prompts
+from .base import CharacterMove, ExplainerText, ExplainRequest, TurnContext
 from .llm import LLM, parse_models
 from .mock import mock_analysis, mock_character_move
 
@@ -97,6 +97,7 @@ class LiveAI:
         self.character_models = parse_models(settings.character_models)
         self.generator_models = parse_models(settings.generator_models)
         self.generator_timeout = settings.generator_timeout_seconds
+        self.explainer_models = parse_models(settings.explainer_models)
         self.rng = random.Random()
 
     async def scenario_vars(self, scenario: Scenario) -> dict[str, str] | None:
@@ -108,6 +109,13 @@ class LiveAI:
             max_tokens=300, timeout=self.generator_timeout,
         )
         return {k: v.strip() for k, v in out.root.items()} if out else None
+
+    async def explain(self, request: ExplainRequest) -> ExplainerText | None:
+        out = await self.llm.json_call(
+            self.explainer_models, explainer.explainer_system(), explainer.explainer_user(request),
+            explainer.ExplainerOut, check=lambda o: explainer.check_explanation(o, request), max_tokens=900,
+        )
+        return explainer.to_text(out, request) if out else None
 
     async def analyze(self, ctx: TurnContext) -> Analysis:
         out = await self.llm.json_call(

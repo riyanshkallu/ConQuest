@@ -100,7 +100,7 @@ async def do_action(round_id: str, body: schemas.ActionRequest):
 
 @app.get("/api/round/{round_id}/result", response_model=schemas.ResultResponse)
 async def get_result(round_id: str):
-    return game.get_result(game.require_round(round_id))
+    return await game.get_result(game.require_round(round_id), get_ai())
 
 
 def _one_at_a_time(rnd):

@@ -31,6 +31,7 @@ class Round:
     new_badges: list[str] = field(default_factory=list)
     finalized: bool = False
     code_sent: bool = False
+    result: object | None = None  # cached ResultResponse, so the Explainer runs once per round
     lock: asyncio.Lock = field(default_factory=asyncio.Lock, repr=False)
 
 
