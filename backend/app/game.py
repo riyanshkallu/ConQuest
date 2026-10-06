@@ -22,6 +22,7 @@ from .flags import RED_FLAGS
 from .scenarios import Scenario, get_scenario, load_scenarios, make_variant, new_id_card, render
 
 _rng = random.Random()
+_PRAISE_RE = re.compile(r"\b(cautious|careful|smart|good|great|correctly|well done|safe)\b", re.IGNORECASE)
 _LINK_RE = re.compile(r"\b[\w-]+(?:\.[\w-]+)*\.example(?:/[\w./?=&%-]*)?", re.IGNORECASE)
 
 
@@ -293,7 +294,12 @@ def _annotate(entry: dict, analysis: engine.Analysis, pre: engine.PreCheck, stat
     else:
         good = analysis.decision_type in ("challenge", "safe_verification")
         bad = analysis.mistake or (state.is_scam and analysis.decision_type.endswith("compliance"))
-        entry.update(note=analysis.reason or None, good=good, mistake=bad)
+        note = analysis.reason or None
+        if bad and note and _PRAISE_RE.search(note):
+            # The engine counts this as a mistake, so the note mustn't call it cautious.
+            # (In testing the analyzer said "...staying cautious" about going along with a scammer.)
+            note = "You went along with what they asked."
+        entry.update(note=note, good=good, mistake=bad)
 
 
 def _suggestions(rnd: store.Round, stage: str) -> list[str]:
