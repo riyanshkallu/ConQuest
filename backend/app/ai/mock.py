@@ -15,11 +15,13 @@ from .base import CharacterMove, TurnContext
 VERIFY_WORDS = ("back of my card", "call my bank", "call the bank", "call the number",
                 "official app", "check the app", "check in the app", "call you back",
                 "i'll call", "ill call", "log in myself", "check with", "call my mom",
-                "call my dad", "call my parent")
+                "call my dad", "call my parent", "call your mom", "call aunt", "call the store",
+                "careers page", "official website")
 CHALLENGE_WORDS = ("who is this", "who are you", "how do i know", "prove", "scam", "fake",
                    "suspicious", "not sharing", "won't", "wont", "not giving", "why do you need",
                    "no way", "don't trust", "dont trust", "never ask", "not sending",
-                   "rush me", "rushing me", "pressuring me", "not falling", "nice try")
+                   "rush me", "rushing me", "pressuring me", "not falling", "nice try",
+                   "what's the name of", "grandma's dog", "not paying", "not buying")
 COMPLY_WORDS = ("yes", "ok", "okay", "sure", "here", "fine", "sent", "what do i do",
                 "what do i need", "go ahead", "alright")
 
@@ -30,13 +32,21 @@ TACTIC_WORDS = {
     "credential_request": ("code", "password"),
     "suspicious_link": ("link",),
     "trust_building": ("too nice", "sweet talk", "flatter"),
+    "secrecy": ("secret", "don't tell", "not tell", "keep it from"),
+    "unusual_payment": ("gift card", "crypto", "wire"),
+    "financial_pressure": ("fee", "pay to", "paying for a job"),
+    "platform_switch": ("other app", "another app", "switch apps", "securechat"),
+    "fake_reward": ("too good", "too much money", "too much pay"),
+    "emotional_manipulation": ("guilt", "emotional", "making me feel"),
 }
 GREEN_WORDS = {
     "invites_verification": ("back of my card", "call the number", "call you"),
     "no_credentials_asked": ("didn't ask", "didnt ask", "no code", "never asked", "not asking"),
     "no_pressure": ("no rush", "not rushing", "take my time"),
     "checkable_details": ("in the app", "pending", "alert #", "alert number"),
-    "official_channels": ("official app", "official website"),
+    "official_channels": ("official app", "official website", "careers page"),
+    "no_secrecy": ("tell your mom", "tell aunt", "not a secret"),
+    "normal_payment": ("no fee", "direct deposit with hr", "in person"),
 }
 
 SCAM_ESCALATE = ["authority", "urgency", "credential_request", "fear", "suspicious_link", "trust_building"]
@@ -97,7 +107,8 @@ def mock_character_move(ctx: TurnContext) -> CharacterMove:
         if ctx.code_just_sent and "credential_request" in allowed:
             flag = "credential_request"
         else:
-            order = SCAM_ON_PUSHBACK if pushed_back else SCAM_ESCALATE
+            order = (version.get("pushback_order", SCAM_ON_PUSHBACK) if pushed_back
+                     else version.get("tactic_order", SCAM_ESCALATE))
             flag = _pick(order, allowed, state.tactics_used)
         pressure = min(95, 30 + 12 * state.turns + (15 if pushed_back else 0))
         used = state.tactics_used.count(flag)
@@ -106,7 +117,8 @@ def mock_character_move(ctx: TurnContext) -> CharacterMove:
         if ctx.code_just_sent and "no_credentials_asked" in allowed:
             flag = "no_credentials_asked"
         else:
-            order = LEGIT_ON_PUSHBACK if pushed_back else LEGIT_DEFAULT
+            order = (version.get("pushback_order", LEGIT_ON_PUSHBACK) if pushed_back
+                     else version.get("flag_order", LEGIT_DEFAULT))
             shown = [e.flag_id for e in state.timeline]
             flag = _pick(order, allowed, shown)
         pressure = 0
@@ -118,9 +130,16 @@ def mock_character_move(ctx: TurnContext) -> CharacterMove:
 
 
 def _pick(order: list[str], allowed: list[str], used: list[str]) -> str:
-    """First flag in preference order that wasn't just used and hasn't been used twice."""
-    candidates = [f for f in order if f in allowed] or allowed
+    """Next flag in preference order: a new one if any are left (so the conversation moves
+    forward), otherwise one that wasn't just used and hasn't been used twice.
+
+    Allowed flags missing from the order go at the end, so every allowed flag can be picked.
+    """
+    candidates = [f for f in order if f in allowed] + [f for f in allowed if f not in order]
     last = used[-1] if used else None
+    for f in candidates:
+        if f not in used:
+            return f
     for f in candidates:
         if f != last and used.count(f) < 2:
             return f

@@ -123,6 +123,15 @@ class GamingAccount(BaseModel):
     username: str
 
 
+class FamilyInfo(BaseModel):
+    """Family details the player knows, so they can check who they're talking to."""
+    relative: str
+    parent: str
+    parent_phone: str
+    memory_question: str
+    memory_answer: str
+
+
 class IdCardOut(BaseModel):
     name: str
     email: str
@@ -133,6 +142,7 @@ class IdCardOut(BaseModel):
     password: str | None = None
     gift_card: GiftCard | None = None
     gaming_account: GamingAccount | None = None
+    family: FamilyInfo | None = None
 
 
 class StartRoundRequest(BaseModel):
@@ -178,12 +188,13 @@ class TurnResponse(BaseModel):
 
 
 class CallLine(BaseModel):
-    speaker: Literal["bank", "player", "contact"]
+    speaker: Literal["official", "player"]  # "official" = the trusted party you called
     text: str
 
 
 class VerificationCall(BaseModel):
     title: str
+    official_name: str  # who "official" is: the bank, the store, a family member
     lines: list[CallLine]
 
 

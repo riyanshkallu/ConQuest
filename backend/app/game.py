@@ -110,7 +110,7 @@ def start_round(player: progress.Player, scenario_id: str) -> schemas.StartRound
         round_id=rnd.id, scenario_id=scenario.id, channel=scenario.channel,
         difficulty=scenario.difficulty, max_turns=state.max_turns,
         contact=schemas.Contact(name=render(version["contact"]["name"], scenario, card),
-                                handle=version["contact"]["handle"]),
+                                handle=render(version["contact"]["handle"], scenario, card)),
         id_card=_id_card_out(card, scenario),
         opening_message=opening_msg,
         suggested_replies=_suggestions(rnd, "opening"),
@@ -176,9 +176,11 @@ async def do_action(rnd: store.Round, action: str, link: str | None, ai: AIProvi
     if action == "verify":
         lines = [schemas.CallLine(speaker=l["speaker"], text=render(l["text"], rnd.scenario, state.id_card))
                  for l in version["verification_call"]]
-        bank = render("{bank_short}", rnd.scenario, state.id_card)
+        raw = rnd.scenario.raw
         resp.verification_call = schemas.VerificationCall(
-            title=f"Calling {bank} (number on the back of your card)", lines=lines)
+            title=render(raw["verification_call_title"], rnd.scenario, state.id_card),
+            official_name=render(raw["verification_official"], rnd.scenario, state.id_card),
+            lines=lines)
     return resp
 
 
@@ -301,6 +303,11 @@ def _id_card_out(card: engine.IdCard, scenario: Scenario) -> schemas.IdCardOut:
                                 amount=vars_.get("gift_amount", 200), code=card.gift_card_code)
     if card.gaming_username:
         gaming = schemas.GamingAccount(game=vars_.get("game", "Blockcraft"), username=card.gaming_username)
+    family = None
+    if "id_card_family" in scenario.raw:
+        family = schemas.FamilyInfo(**{k: render(v, scenario, card)
+                                       for k, v in scenario.raw["id_card_family"].items()})
     return schemas.IdCardOut(name=card.name, email=card.email, phone=card.phone, bank=card.bank,
                              card_number=card.card_number, card_last4=card.card_last4,
-                             password=card.password, gift_card=gift, gaming_account=gaming)
+                             password=card.password, gift_card=gift, gaming_account=gaming,
+                             family=family)

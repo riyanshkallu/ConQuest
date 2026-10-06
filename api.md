@@ -184,7 +184,8 @@ Response `201`:
     "card_last4": "4417",
     "password": null,
     "gift_card": null,
-    "gaming_account": null
+    "gaming_account": null,
+    "family": null
   },
   "opening_message": { "sender": "contact", "text": "...", "links": [] },
   "suggested_replies": ["Who is this?", "YES", "I'll call the number on my card."]
@@ -193,6 +194,10 @@ Response `201`:
 
 - `id_card.gift_card` (when present): `{ "store": "PlayMart", "amount": 200, "code": "PMRT-7Q4K-22XD" }`.
 - `id_card.gaming_account` (when present): `{ "game": "Blockcraft", "username": "jordan_builds" }`.
+- `id_card.family` (family emergency scenario; proposed, see decision 7): what the player knows
+  about their family, so they can check who's really texting:
+  `{ "relative": "Alex (your cousin)", "parent": "Aunt Dana (Alex's mom)", "parent_phone": "(614) 555-0133",
+  "memory_question": "Name of Grandma's dog", "memory_answer": "Biscuit" }`.
 - The one-time verification code is **not** on the ID card. It arrives mid-game as a
   `notification` message (see below), like a real text from the bank.
 
@@ -272,10 +277,11 @@ Response `200`: the same shape as the message response, plus two fields:
   "reply": null, "notifications": [], "suggested_replies": [], "hint": null,
   "verification_call": {
     "title": "Calling Buckeye Federal (number on the back of your card)",
+    "official_name": "Buckeye Federal",
     "lines": [
-      { "speaker": "bank", "text": "Thanks for calling Buckeye Federal. How can I help?" },
+      { "speaker": "official", "text": "Thanks for calling Buckeye Federal. How can I help?" },
       { "speaker": "player", "text": "I got a text saying my card was used for a $486 purchase." },
-      { "speaker": "bank", "text": "I don't see any fraud alert or pending purchase on your account. That text did not come from us." }
+      { "speaker": "official", "text": "I don't see any fraud alert or pending purchase on your account. That text did not come from us." }
     ]
   },
   "ended": true,
@@ -284,7 +290,9 @@ Response `200`: the same shape as the message response, plus two fields:
 ```
 
 - `player_message`: for `ask_proof`, the question the player "sent". Show it as a player bubble, then the `reply`.
-- `verification_call`: only for `verify`, otherwise `null`.
+- `verification_call`: only for `verify`, otherwise `null`. `speaker` is `"official"` (whoever the
+  player called: the bank, the store, a family member) or `"player"`. Show `official_name` as the
+  official's name, e.g. "Aunt Dana: Hi sweetie!".
 
 ### `GET /api/round/{round_id}/result`
 
@@ -386,6 +394,7 @@ this way.
 | 4 | `open_link` action for tapped links | agreed | waiting |
 | 5 | One-time code arrives in both scam and legit rounds | agreed | waiting |
 | 6 | Settings and reset endpoints | agreed | waiting |
+| 7 | `id_card.family` and `verification_call.official_name` | agreed | waiting |
 
 1. **`trust` action ("It's legit").** The plan had no way to say "I believe you," so the
    LUCKY and SMART AND SAFE endings had no clear trigger. In a legit round, `trust` gives
@@ -402,6 +411,11 @@ this way.
 5. **The one-time code** arrives as a `notification` on a set turn in *both* scam and legit
    rounds, so its arrival doesn't give away which kind of round it is.
 6. **Settings and reset endpoints** (above) were added for the Settings screen.
+7. **Family details and who you called** (added with the job and family scenarios). The family
+   emergency scenario needs the player to know a family detail ("What's Grandma's dog's name?") and
+   a parent's number to call, so the ID card gets an optional `family` section. Verify calls are no
+   longer always "the bank", so call lines use `speaker: "official"` plus `official_name`.
+   `index.html` already shows both.
 
 ### Still open
 
