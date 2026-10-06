@@ -155,6 +155,12 @@ class IdCardOut(BaseModel):
 class StartRoundRequest(BaseModel):
     player_id: str
     scenario_id: str
+    focus: str | None = None  # Train Your Weakness: a Scam Radar category, e.g. "urgency"
+
+
+class Focus(BaseModel):
+    category: str
+    label: str
 
 
 class StartRoundResponse(BaseModel):
@@ -167,6 +173,7 @@ class StartRoundResponse(BaseModel):
     id_card: IdCardOut
     opening_message: Message
     suggested_replies: list[str]
+    focus: Focus | None = None
 
 
 class SendMessageRequest(BaseModel):

@@ -114,7 +114,8 @@ def mock_character_move(ctx: TurnContext) -> CharacterMove:
         else:
             order = (version.get("pushback_order", SCAM_ON_PUSHBACK) if pushed_back
                      else version.get("tactic_order", SCAM_ESCALATE))
-            flag = _pick(order, allowed, state.tactics_used)
+            focus = [t for t in state.focus_tactics if t in allowed]
+            flag = _pick(focus + [t for t in order if t not in focus], allowed, state.tactics_used)
         pressure = min(95, 30 + 12 * state.turns + (15 if pushed_back else 0))
         used = state.tactics_used.count(flag)
     else:

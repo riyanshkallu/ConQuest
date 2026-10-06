@@ -168,6 +168,10 @@ Request:
 { "player_id": "p_7f3c9a1e2b4d", "scenario_id": "bank_alert" }
 ```
 
+Optional, for the **Train Your Weakness** card (proposed, see decision 9): also send
+`"focus": "<category>"` using `train_your_weakness.category` and `.scenario_id` from `/api/scenarios`.
+The scammer then leads with that weakness. A `"real_contacts"` focus makes a real contact more likely.
+
 Response `201`:
 
 ```json
@@ -192,7 +196,8 @@ Response `201`:
     "extras": []
   },
   "opening_message": { "sender": "contact", "text": "...", "links": [] },
-  "suggested_replies": ["Who is this?", "YES", "I'll call the number on my card."]
+  "suggested_replies": ["Who is this?", "YES", "I'll call the number on my card."],
+  "focus": null
 }
 ```
 
@@ -407,6 +412,7 @@ this way.
 | 6 | Settings and reset endpoints | agreed | waiting |
 | 7 | `id_card.family` and `verification_call.official_name` | agreed | waiting |
 | 8 | `id_card.extras` for scenario-specific ID card lines | agreed | waiting |
+| 9 | Optional `focus` on round start, for Train Your Weakness | agreed | waiting |
 
 1. **`trust` action ("It's legit").** The plan had no way to say "I believe you," so the
    LUCKY and SMART AND SAFE endings had no clear trigger. In a legit round, `trust` gives
@@ -433,6 +439,11 @@ this way.
    or your open support ticket number. The real contact knows it, the scammer doesn't.
    Rather than a new field per scenario, the ID card gets a generic `extras` list of label/value
    rows. `index.html` already shows them, and has two new scenario cards for the new scenarios.
+9. **Train Your Weakness focus.** The home screen's Train Your Weakness card should start its round
+   with `"focus": train_your_weakness.category`. The round response echoes it as
+   `"focus": {"category": "urgency", "label": "Urgency & fear"}`, so the chat screen can show
+   "Training: Urgency & fear". Without `focus`, nothing changes. The focus makes the matching kind
+   of round more likely but never certain, so players still have to read the messages.
 
 ### Still open
 

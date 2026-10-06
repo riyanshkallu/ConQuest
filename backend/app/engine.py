@@ -134,6 +134,7 @@ class RoundState:
     max_turns: int = 10
     par_turns: int = 6
     difficulty: int = 2  # 1-5: how convincing the scammer is (and how plain the real contact is)
+    focus_tactics: list[str] = field(default_factory=list)  # Train Your Weakness: tactics to lead with
 
     suspicion: int = 0
     trust: int = 50

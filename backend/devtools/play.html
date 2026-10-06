@@ -73,6 +73,7 @@
   <div class="panel row">
     <select id="scenario" aria-label="Scenario"></select>
     <button id="startBtn" class="primary">Start round</button>
+    <button id="trainBtn" title="Starts a round that leads with your weakest Scam Radar tactic">Train my weakness</button>
     <label class="meta"><input type="checkbox" id="hints"> hints</label>
     <span class="meta" id="playerInfo"></span>
   </div>
@@ -201,10 +202,21 @@ async function init() {
   } catch (err) { showError(err); }
 }
 
-async function startRound() {
+async function trainWeakness() {
   showError();
   try {
-    const r = await api("POST", "/round/start", { player_id: state.playerId, scenario_id: $("scenario").value });
+    const { train_your_weakness: pick } = await api("GET", `/scenarios?player_id=${state.playerId}`);
+    if (!pick) { showError("Play a round first: there's no Scam Radar data yet."); return; }
+    await startRound(pick.scenario_id, pick.category);
+  } catch (err) { showError(err); }
+}
+
+async function startRound(scenarioId, focus) {
+  showError();
+  try {
+    const body = { player_id: state.playerId, scenario_id: scenarioId || $("scenario").value };
+    if (focus) body.focus = focus;
+    const r = await api("POST", "/round/start", body);
     Object.assign(state, { roundId: r.round_id, ended: false });
     $("result").classList.add("hidden");
     $("game").classList.remove("hidden");
@@ -221,7 +233,8 @@ async function startRound() {
                   ...(card.extras || []).map((x) => [x.label, x.value])];
     $("idcard").replaceChildren(...rows.filter(([, v]) => v).flatMap(([k, v]) => [el("dt", "", k), el("dd", "", v)]));
 
-    $("contact").replaceChildren(r.contact.name + " ", el("small", "", `${r.contact.handle} · ${r.channel}`));
+    $("contact").replaceChildren(r.contact.name + " ", el("small", "", `${r.contact.handle} · ${r.channel}`),
+                                 r.focus ? el("small", "", ` · training: ${r.focus.label}`) : "");
     updateMeta({ turn: 0, max_turns: r.max_turns, hint: null });
     addBubble(r.opening_message);
     setChips(r.suggested_replies);
@@ -298,7 +311,7 @@ async function showResult() {
     end.append(tag, el("h2", "", res.ending.title), el("div", "", res.ending.message),
                el("p", "", "Biggest clue: " + res.biggest_clue));
     const again = el("button", "primary", "Play again");
-    again.onclick = startRound;
+    again.onclick = () => startRound();
     end.append(again);
     box.append(end);
 
@@ -356,7 +369,8 @@ async function showResult() {
 }
 
 // ---- Wire up -------------------------------------------------------------------
-$("startBtn").onclick = startRound;
+$("startBtn").onclick = () => startRound();
+$("trainBtn").onclick = trainWeakness;
 $("sendForm").onsubmit = (e) => { e.preventDefault(); send($("msg").value); };
 for (const b of document.querySelectorAll("[data-action]")) b.onclick = () => act(b.dataset.action);
 $("hints").onchange = async (e) => {
