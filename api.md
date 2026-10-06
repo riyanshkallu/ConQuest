@@ -349,8 +349,12 @@ Only after the round ended (otherwise `409 round_not_ended`).
   In legit rounds, `"noticed"` or `"missed"`.
 - `scam_twin` (only after `LUCKY`): the matching scam version's key message, to show side by side:
   `{ "contact_name": "Buckeye Federal Fraud Team", "text": "..." }`.
-- `transcript[].flag` is on contact messages. `note` is on player messages (what that reply did).
-  Every message in the transcript is tappable.
+- `transcript[].flag` is on contact messages. `note` is on player messages (what that reply did),
+  and, with live AI, also on flagged contact messages (what that specific message was doing).
+  Every message in the transcript is tappable: show the flag and the note when there is one.
+- With live AI, `timeline[].summary` and the contact notes are written by the Explainer about
+  this conversation. Without AI they're the generic flag explanations. The shape is the same
+  either way, and the ending, points, responses and best decision are always decided by the engine.
 
 ### `GET /api/player/{player_id}/radar`
 

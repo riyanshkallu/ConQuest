@@ -155,3 +155,6 @@ class MockAI:
 
     async def scenario_vars(self, scenario) -> None:
         return None  # hand-written names; numbers and phones are still randomized
+
+    async def explain(self, request) -> None:
+        return None  # the engine's own explanation text

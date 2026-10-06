@@ -30,6 +30,8 @@ class Settings(BaseSettings):
     # gpt-oss-120b first: it has its own quota and is otherwise only the character's backup.
     generator_models: str = "groq:openai/gpt-oss-120b,gemini:gemini-3.5-flash-lite,groq:openai/gpt-oss-20b"
     generator_timeout_seconds: float = 4.0
+    # Explainer: one call when a round ends. Writing quality matters, so the character's models.
+    explainer_models: str = "groq:qwen/qwen3.8-27b,groq:openai/gpt-oss-120b,gemini:gemini-3.5-flash-lite"
     ai_timeout_seconds: float = 8.0
 
     # Game tuning

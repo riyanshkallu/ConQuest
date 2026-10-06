@@ -1,8 +1,8 @@
 """Builds the end-of-round result: reveal, Scam Autopsy / Legit Breakdown, flagged transcript, tip.
 
-Everything here comes from engine facts, so it is always accurate. The AI Explainer
-(planned for Oct 8) will rewrite the summaries in friendlier words; if it fails, this
-version is shown as-is.
+Every fact here comes from the engine. The AI Explainer (ai/explainer.py) may supply
+conversation-specific wording for the timeline cards and the contact's flagged messages;
+whatever it doesn't supply uses the engine's own text below.
 """
 
 from __future__ import annotations
@@ -10,6 +10,7 @@ from __future__ import annotations
 from collections import Counter
 
 from . import engine, schemas
+from .ai.base import ExplainerText, ExplainRequest
 from .flags import ALL_FLAGS, GREEN_FLAGS, RADAR_CATEGORIES, RED_FLAGS, TIPS
 from .progress import BADGES
 from .scenarios import render
@@ -29,8 +30,24 @@ def ending_out(state: engine.RoundState) -> schemas.Ending:
                           is_scam=is_scam)
 
 
-def build_result(rnd: Round) -> schemas.ResultResponse:
+def explain_request(rnd: Round) -> ExplainRequest:
+    """The facts the Explainer may write about."""
     state = rnd.state
+    version = rnd.scenario.version(state.is_scam)
+    return ExplainRequest(
+        is_scam=state.is_scam,
+        ending_title=engine.ENDINGS[state.ending][0],
+        contact_name=render(version["contact"]["name"], rnd.scenario, state.id_card),
+        id_card=state.id_card,
+        messages=[{"index": i, "sender": m["sender"], "text": m["text"], "flag": m.get("flag")}
+                  for i, m in enumerate(rnd.transcript)],
+        flags=[card.flag.id for card in _timeline(state)],
+    )
+
+
+def build_result(rnd: Round, words: ExplainerText | None = None) -> schemas.ResultResponse:
+    state = rnd.state
+    words = words or ExplainerText()
     weakness = _biggest_weakness(state)
     tip_category = weakness or _first_category(state)
     tip_id, tip_text = TIPS[tip_category]
@@ -45,7 +62,8 @@ def build_result(rnd: Round) -> schemas.ResultResponse:
         xp_earned=rnd.xp_earned,
         explanation=schemas.Explanation(
             type="scam_autopsy" if state.is_scam else "legit_breakdown",
-            timeline=_timeline(state),
+            timeline=[card.model_copy(update={"summary": words.timeline.get(card.flag.id, card.summary)})
+                      for card in _timeline(state)],
             good_decisions=_good_decisions(rnd),
             mistakes=_mistakes(rnd),
             best_decision=_best_decision(rnd),
@@ -56,7 +74,7 @@ def build_result(rnd: Round) -> schemas.ResultResponse:
         transcript=[
             schemas.TranscriptEntry(
                 index=i, turn=m["turn"], sender=m["sender"], text=m["text"],
-                flag=engine.flag_dict(m.get("flag")), note=m.get("note"),
+                flag=engine.flag_dict(m.get("flag")), note=words.messages.get(i, m.get("note")),
             )
             for i, m in enumerate(rnd.transcript)
         ],

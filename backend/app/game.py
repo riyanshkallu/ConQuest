@@ -16,7 +16,7 @@ from datetime import date
 from . import engine, progress, schemas, store
 from .ai.base import AIProvider, TurnContext
 from .config import get_settings
-from .explain import build_result, ending_out
+from .explain import build_result, ending_out, explain_request
 from .flags import RED_FLAGS
 from .scenarios import Scenario, get_scenario, load_scenarios, make_variant, new_id_card, render
 
@@ -186,10 +186,15 @@ async def do_action(rnd: store.Round, action: str, link: str | None, ai: AIProvi
     return resp
 
 
-def get_result(rnd: store.Round) -> schemas.ResultResponse:
+async def get_result(rnd: store.Round, ai: AIProvider) -> schemas.ResultResponse:
     if not rnd.state.ended:
         raise GameError(409, "round_not_ended", "The round hasn't ended yet.")
-    return build_result(rnd)
+    if rnd.result is None:
+        async with rnd.lock:  # two quick requests still run the Explainer only once
+            if rnd.result is None:
+                words = await ai.explain(explain_request(rnd))
+                rnd.result = build_result(rnd, words)
+    return rnd.result
 
 
 # ---------------------------------------------------------------------------
