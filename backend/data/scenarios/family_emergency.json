@@ -167,7 +167,7 @@
       "handle": "{friend_phone}"
     },
     "objective": "pass_on_message",
-    "objective_text": "You really are the player's {relation} {relative}. You lost your phone at practice and are texting from a friend's phone. Ask the player to let {parent} know you're safe at the school gym and need a ride home at 6pm.",
+    "objective_text": "You really are the player's {relation} {relative}. You lost your phone at the gym and are texting from a friend's phone. Ask the player to let {parent} know you're safe and will be home late, since you can't reach her yourself.",
     "objective_is_payment": false,
     "character_notes": "You really are {relative}. If the player asks a personal question, you know the answer: Grandma's dog is named {pet}. You're happy for them to call {parent} to check.",
     "allowed_flags": [
@@ -202,19 +202,19 @@
     ],
     "opening": {
       "flag": "checkable_details",
-      "text": "Hey it's me, {relative}! I lost my phone at practice so I'm texting from a friend's. Can you help me with something?"
+      "text": "Hey it's me, {relative}! I lost my phone at the gym so I'm texting from a friend's. Can you help me with something?"
     },
     "lines": {
       "checkable_details": [
-        "I'm at the school gym, practice ended early. My phone fell out of my bag somewhere.",
+        "I'm at the gym on Elm Street. My phone must have fallen out of my bag in the locker room.",
         "It's really me! Grandma's dog is {pet}, remember? He always steals our socks."
       ],
       "no_credentials_asked": [
-        "I don't need any money or anything, just a ride home.",
+        "I don't need any money or anything, I just need {parent} to know I'm okay.",
         "Don't send me anything, I just need my mom to know where I am."
       ],
       "no_pressure": [
-        "No rush, practice ends at 6 and I'm waiting here with my coach.",
+        "No rush, I'm safe here and I'll be home in a couple of hours.",
         "Whenever you get a chance is fine, I'm safe here."
       ],
       "no_secrecy": [
@@ -223,10 +223,10 @@
       ],
       "invites_verification": [
         "You can totally call my mom to check, her number is {parent_phone}.",
-        "If you want, call {parent} and she'll tell you I had practice today."
+        "If you want, call {parent} and she'll tell you I'm at the gym today."
       ],
       "accepts_no": [
-        "No worries if you can't, I'll ask my coach to call her.",
+        "No worries if you can't, I'll ask the front desk to call her.",
         "Totally get it if you want to check first!"
       ]
     },
@@ -241,11 +241,11 @@
       },
       {
         "speaker": "official",
-        "text": "Oh good, that really is {relative}. They left their phone at practice and I couldn't reach them!"
+        "text": "Oh good, that really is {relative}. They lost their phone at the gym and I couldn't reach them!"
       },
       {
         "speaker": "official",
-        "text": "Thank you for calling to check first. I'll go pick them up now."
+        "text": "Thank you for calling to check first. I was starting to worry."
       }
     ]
   }

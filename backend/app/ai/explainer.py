@@ -27,8 +27,8 @@ class ExplainerOut(BaseModel):
 
 
 def explainer_system() -> str:
-    return """You are the Explainer in an educational scam-awareness game for students and families.
-A round just ended. Explain what happened in plain, friendly words a 13-year-old understands,
+    return """You are the Explainer in an educational scam-awareness game for people of all ages.
+A round just ended. Explain what happened in plain, friendly words anyone aged 13 and up understands,
 using ONLY the conversation you are given. The facts (the ending, which flags appeared, how the
 player responded) are already decided: never change them or add new ones.
 Rules:

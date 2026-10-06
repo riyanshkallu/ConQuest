@@ -1,6 +1,6 @@
 {
   "id": "job_offer",
-  "title": "Summer job offer",
+  "title": "Job offer",
   "channel": "dm",
   "difficulty": 2,
   "par_turns": 5,
@@ -14,15 +14,31 @@
     "pay_scam": "$40/hr",
     "pay_legit": "$15/hr",
     "fee": "$75",
-    "bank": "Buckeye Federal Credit Union"
+    "bank": "Buckeye Federal Credit Union",
+    "role_scam": "remote data entry role",
+    "role_legit": "sales associate"
   },
   "generate": {
     "company": {
-      "ai": "a fictional Ohio outdoor, hardware or clothing store, 2 or 3 words, like 'Riverside Outfitters'"
+      "ai": "a fictional Ohio business that hires local workers (a store, warehouse or service company), 2 or 3 words, like 'Riverside Outfitters'"
     },
     "recruiter": {
       "ai": "a fictional person's full name, first and last",
       "person": true
+    },
+    "role_scam": {
+      "choice": [
+        "remote data entry role",
+        "remote customer support role",
+        "work-from-home assistant role"
+      ]
+    },
+    "role_legit": {
+      "choice": [
+        "sales associate",
+        "warehouse associate",
+        "customer service rep"
+      ]
     },
     "pay_scam": {
       "choice": [
@@ -34,10 +50,10 @@
     },
     "pay_legit": {
       "choice": [
-        "$13/hr",
-        "$14/hr",
-        "$15/hr",
-        "$16/hr"
+        "$17/hr",
+        "$18/hr",
+        "$19/hr",
+        "$21/hr"
       ]
     },
     "fee": {
@@ -115,12 +131,12 @@
     ],
     "opening": {
       "flag": "fake_reward",
-      "text": "Hi {first_name}! I'm {recruiter_first}, a recruiter with {company}. We saw your profile and have a remote summer role: {pay_scam}, flexible hours, no experience needed. Interested?"
+      "text": "Hi {first_name}! I'm {recruiter_first}, a recruiter with {company}. We saw your profile and have a {role_scam}: {pay_scam}, flexible hours, no experience needed. Interested?"
     },
     "key_message": "Before you start, every new hire buys the {fee} training kit. It's refunded with your first paycheck.",
     "lines": {
       "fake_reward": [
-        "Most of our summer team makes over $1,200 a week from home. You'd be perfect for it.",
+        "Most of our remote team makes over $1,500 a week from home. You'd be perfect for it.",
         "We also give a $200 signing bonus after your first week!"
       ],
       "platform_switch": [
@@ -151,7 +167,7 @@
       },
       {
         "speaker": "player",
-        "text": "Someone named {recruiter_first} messaged me about a remote summer job with you for {pay_scam}."
+        "text": "Someone named {recruiter_first} messaged me about a {role_scam} with you for {pay_scam}."
       },
       {
         "speaker": "official",
@@ -169,7 +185,7 @@
       "handle": "{handle}"
     },
     "objective": "invite_to_apply",
-    "objective_text": "You are {recruiter_first}, the real hiring manager at {company} on Main Street. Invite the player to apply for the summer stock associate job ({pay_legit}, 20 hours a week) on the official careers page {careers_link}, and to come in for an in-person interview.",
+    "objective_text": "You are {recruiter_first}, the real hiring manager at {company} on Main Street. Invite the player to apply for the {role_legit} job ({pay_legit}, full-time or part-time) on the official careers page {careers_link}, and to come in for an in-person interview.",
     "objective_is_payment": false,
     "allowed_flags": [
       "checkable_details",
@@ -204,11 +220,11 @@
     ],
     "opening": {
       "flag": "checkable_details",
-      "text": "Hi {first_name}! I'm {recruiter_first}, the hiring manager at {company} on Main Street. We're hiring summer stock associates at {pay_legit}. Interested?"
+      "text": "Hi {first_name}! I'm {recruiter_first}, the hiring manager at {company} on Main Street. We're hiring {role_legit}s at {pay_legit}. Interested?"
     },
     "lines": {
       "checkable_details": [
-        "The job is stocking shelves at our Main Street store, 20 hours a week, {pay_legit}. The posting is on our careers page.",
+        "The {role_legit} job is at our Main Street location, full-time or part-time, {pay_legit}. The posting is on our careers page.",
         "Interviews are in person at the store with our manager, Ms. Patel, on weekday afternoons."
       ],
       "official_channels": [
@@ -225,11 +241,11 @@
       ],
       "invites_verification": [
         "If you want to check I'm real, call the store at {store_phone} (it's on our website) and ask for {recruiter_first}.",
-        "Feel free to call the store using the number on our official website and ask about summer hiring."
+        "Feel free to call the store using the number on our official website and ask about the {role_legit} job."
       ],
       "accepts_no": [
         "No problem! If you change your mind, the posting will be on our careers page.",
-        "Totally fine. Thanks for letting me know, and good luck this summer!"
+        "Totally fine. Thanks for letting me know, and good luck with your job search!"
       ],
       "no_credentials_asked": [
         "We'll never ask for passwords or codes. Just apply online and we'll take it from there.",
@@ -243,11 +259,11 @@
       },
       {
         "speaker": "player",
-        "text": "Someone named {recruiter_first} messaged me about a summer stock job."
+        "text": "Someone named {recruiter_first} messaged me about a {role_legit} job."
       },
       {
         "speaker": "official",
-        "text": "Yes, {recruiter_first} is our hiring manager, and we're hiring summer stock associates. You can apply on our careers page."
+        "text": "Yes, {recruiter_first} is our hiring manager, and we're hiring {role_legit}s. You can apply on our careers page."
       },
       {
         "speaker": "official",

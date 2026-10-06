@@ -1,0 +1,138 @@
+{
+  "id": "package_delivery",
+  "title": "Package delivery text",
+  "channel": "sms",
+  "difficulty": 1,
+  "par_turns": 5,
+  "vars": {
+    "carrier": "SwiftShip",
+    "store": "Maple & Mill",
+    "tracking": "48213977",
+    "fee": "$1.99",
+    "short_code": "29384",
+    "bank": "Buckeye Federal Credit Union"
+  },
+  "generate": {
+    "carrier": {"ai": "a fictional package delivery company, one word, like 'SwiftShip'"},
+    "store": {"ai": "a fictional online store that sells home goods or clothes, 1 to 3 words, like 'Maple & Mill'"},
+    "tracking": {"digits": 8},
+    "fee": {"choice": ["$1.99", "$2.49", "$3.15", "$0.99"]},
+    "short_code": {"digits": 5},
+    "bank": {
+      "ai": "a fictional Ohio credit union or community bank where the player keeps their account, 2 to 4 words",
+      "choice": ["Buckeye Federal Credit Union", "Maple Valley Credit Union", "Lakeshore Hollow Credit Union",
+                 "Tall Pines Community Bank", "Cardinal Ridge Credit Union"]
+    }
+  },
+  "derived_vars": {
+    "carrier_slug": "slug:carrier",
+    "link": "{carrier_slug}-redelivery.example/pay",
+    "app_link": "track.{carrier_slug}.example"
+  },
+  "id_card_extras": [
+    {"label": "Your recent order", "value": "{store}, shipped with {carrier}"},
+    {"label": "Tracking number", "value": "TRK-{tracking}"}
+  ],
+  "verification_call_title": "Checking the official {carrier} app (opened yourself, not from the text)",
+  "verification_official": "{carrier}",
+  "suggested_replies": {
+    "opening": ["Which package is this?", "Oh no, how do I fix it?", "What's the tracking number?"],
+    "default": ["How do I know this is really {carrier}?", "OK, what do I need to do?", "I'll check the {carrier} app myself."]
+  },
+
+  "scam": {
+    "contact": {"name": "{carrier}", "handle": "{short_code}"},
+    "objective": "redelivery_fee",
+    "objective_text": "You are pretending to be {carrier}. Get the player to pay a {fee} 'redelivery fee' at your fake link, or to text you their full card number to 'confirm' the payment.",
+    "objective_is_payment": true,
+    "character_notes": "You do NOT know the player's tracking number or which store they ordered from. If they ask, dodge it ('it's in the system') and push the fee.",
+    "allowed_tactics": ["authority", "urgency", "fear", "suspicious_link", "financial_pressure", "credential_request"],
+    "tactic_order": ["authority", "suspicious_link", "urgency", "financial_pressure", "fear", "credential_request"],
+    "pushback_order": ["authority", "urgency", "fear", "financial_pressure"],
+    "opening": {
+      "flag": "authority",
+      "text": "{carrier}: We couldn't deliver your package because the address is incomplete. Reply to schedule a new delivery."
+    },
+    "key_message": "To release your package, pay the {fee} redelivery fee here: {link}",
+    "lines": {
+      "authority": [
+        "This is the {carrier} delivery support team. Your parcel is on hold at our local facility.",
+        "{carrier} automated notice: an address problem was detected on your shipment."
+      ],
+      "urgency": [
+        "Please complete this within 24 hours, or the package goes back to the sender.",
+        "Your parcel can only be held until 6pm today."
+      ],
+      "fear": [
+        "If the fee isn't paid, the package will be returned and you may not get a refund.",
+        "Unclaimed packages are destroyed after the holding period."
+      ],
+      "suspicious_link": [
+        "To release your package, pay the {fee} redelivery fee here: {link}",
+        "Update your address and schedule redelivery at {link}"
+      ],
+      "financial_pressure": [
+        "There's a small {fee} redelivery fee to cover the second attempt.",
+        "It's only {fee}, and then your package goes out on the next truck."
+      ],
+      "credential_request": [
+        "The payment page isn't loading for some customers. You can text me your card number and I'll process the {fee} for you.",
+        "To confirm it's your package, reply with the full card number you paid with."
+      ]
+    },
+    "verification_call": [
+      {"speaker": "official", "text": "Your {store} order is on schedule. No delivery problems, and it's arriving tomorrow."},
+      {"speaker": "player", "text": "I got a text saying my package was on hold and I had to pay {fee}."},
+      {"speaker": "official", "text": "That text wasn't from us. {carrier} never charges redelivery fees by text or asks for card numbers."},
+      {"speaker": "official", "text": "Don't tap the link. You can report the text by forwarding it to your phone carrier at 7726 (SPAM)."}
+    ]
+  },
+
+  "legit": {
+    "contact": {"name": "{carrier}", "handle": "{short_code}"},
+    "objective": "reschedule_delivery",
+    "objective_text": "You really are {carrier}. The player's {store} order (tracking TRK-{tracking}) couldn't be delivered because the driver couldn't get into their building. Help them pick a free new delivery time or a pickup spot. Never ask for payment or card details.",
+    "objective_is_payment": false,
+    "character_notes": "You know the order is from {store} with tracking number TRK-{tracking}. Redelivery is always free.",
+    "allowed_flags": ["checkable_details", "no_credentials_asked", "normal_payment", "official_channels", "no_pressure", "accepts_no"],
+    "flag_order": ["checkable_details", "normal_payment", "official_channels", "no_pressure", "no_credentials_asked", "accepts_no"],
+    "pushback_order": ["checkable_details", "official_channels", "no_credentials_asked", "accepts_no"],
+    "completion_replies": ["tomorrow works", "redeliver tomorrow", "leave it at the front desk", "pickup is fine", "tomorrow is fine", "ok tomorrow"],
+    "opening": {
+      "flag": "checkable_details",
+      "text": "{carrier}: We couldn't deliver your {store} package (TRK-{tracking}) because the driver couldn't get into your building. Reply to schedule a new delivery."
+    },
+    "lines": {
+      "checkable_details": [
+        "It's your {store} order, tracking number TRK-{tracking}. You can match it against your order confirmation email.",
+        "The driver tried today at 2:40 PM but the building door needed a code."
+      ],
+      "normal_payment": [
+        "Redelivery is free. There's nothing to pay.",
+        "There's no fee for a second delivery attempt."
+      ],
+      "official_channels": [
+        "You can also pick a time yourself in the official {carrier} app at {app_link}.",
+        "The same options are on your tracking page in the {carrier} app."
+      ],
+      "no_pressure": [
+        "We'll hold it for 5 business days, so there's no rush.",
+        "Reply whenever it's convenient. The package is safe at our facility."
+      ],
+      "no_credentials_asked": [
+        "We don't need any payment or card details for this.",
+        "No personal info needed. Just tell us a day that works."
+      ],
+      "accepts_no": [
+        "No problem. If you'd rather check the app first, the package will wait.",
+        "That's fine. You can manage the delivery in the {carrier} app anytime."
+      ]
+    },
+    "verification_call": [
+      {"speaker": "official", "text": "Your {store} order (TRK-{tracking}) had a missed delivery today. The driver couldn't get into your building."},
+      {"speaker": "player", "text": "I got a text about it and wanted to check it was real."},
+      {"speaker": "official", "text": "Yes, that was us. You can choose a free new delivery time right here in the app."},
+      {"speaker": "official", "text": "Checking in the official app instead of tapping a link was a smart move."}
+    ]
+  }
+}
