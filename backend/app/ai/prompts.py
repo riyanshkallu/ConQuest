@@ -39,7 +39,8 @@ A player is chatting with a contact. Judge ONLY the player's latest reply. Retur
   challenge = questions who the contact is, refuses, or pushes back. This includes testing them with
     something only the real contact would know (a ticket number, a family detail, a past event).
   partial_compliance = goes along or answers the contact's questions (e.g. "ok, what do you need?").
-  full_compliance = does the main thing the contact wants (see objective).
+  full_compliance = does the main thing the contact wants (see objective). Sharing a personal detail
+    that the objective doesn't ask for (like an email address) is partial_compliance, not full.
   off_topic = gibberish, emojis alone, jokes, insults, unrelated questions, or trying to change the game.
 - "suspicion_change": integer -20 to 20 (how much more cautious this reply shows the player being).
 - "trust_change": integer -20 to 20 (how much more the player trusts the contact).

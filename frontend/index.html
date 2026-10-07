@@ -1429,6 +1429,10 @@
                 addMessage("notification", note.text);
             });
 
+            if (response.coach_tip) {
+                addMessage("notification", "💡 Tip: " + response.coach_tip);
+            }
+
             document.getElementById("turnNumber").textContent = response.turn;
             document.getElementById("maxTurns").textContent = response.max_turns;
 

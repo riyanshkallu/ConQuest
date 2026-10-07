@@ -39,6 +39,8 @@ class Round:
     result: object | None = None  # cached ResultResponse, so the Explainer runs once per round
     ai_live: int = 0       # analyzer + character answers written by a live model
     ai_fallback: int = 0   # ... and by the fallback rules / pre-written lines
+    coach_given: set[str] = field(default_factory=set)  # coaching tips already shown this round
+    last_contact_at: float | None = None  # when the contact's latest message was sent (monotonic)
     lock: asyncio.Lock = field(default_factory=asyncio.Lock, repr=False)
 
 

@@ -238,6 +238,7 @@ Response `200` (round continues):
   ],
   "suggested_replies": ["...", "...", "..."],
   "hint": { "suspicion": 55 },
+  "coach_tip": null,
   "ended": false,
   "ending": null
 }
@@ -414,6 +415,7 @@ this way.
 | 7 | `id_card.family` and `verification_call.official_name` | agreed | waiting |
 | 8 | `id_card.extras` for scenario-specific ID card lines | agreed | waiting |
 | 9 | Optional `focus` on round start, for Train Your Weakness | agreed | waiting |
+| 10 | `coach_tip` on message and action responses (hints on) | agreed | waiting |
 
 1. **`trust` action ("It's legit").** The plan had no way to say "I believe you," so the
    LUCKY and SMART AND SAFE endings had no clear trigger. In a legit round, `trust` gives
@@ -445,6 +447,11 @@ this way.
    `"focus": {"category": "urgency", "label": "Urgency & fear"}`, so the chat screen can show
    "Training: Urgency & fear". Without `focus`, nothing changes. The focus makes the matching kind
    of round more likely but never certain, so players still have to read the messages.
+10. **Coaching tips.** When the player has hints on, message and action responses can carry a short
+    `coach_tip`, such as "You answered in 2 seconds. Scammers count on quick replies, so it's OK to
+    pause and check." Show it as a small notice after the reply. Tips react only to what the player did
+    (shared a detail, tapped a link, went along fast), so they look the same in scam and real rounds
+    and never give the answer away. At most one per turn, each once per round.
 
 ### Still open
 
