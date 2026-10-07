@@ -84,3 +84,11 @@ def test_dates_are_local_days():
     assert end - start > timedelta(hours=23)
     local_evening = datetime(2026, 10, 14, 21, 0).astimezone(timezone.utc)
     assert start <= local_evening <= end
+
+
+def test_ai_live_share_is_reported(monkeypatch):
+    play(new_tester(), "verify", True, monkeypatch)
+    rounds = report.load_rounds(db.get_engine(), None, None)
+    rounds[0]["ai_live"], rounds[0]["ai_fallback"] = 9, 1  # mock mode is all fallback; pretend
+    s = report.summarize(rounds, {}, [])
+    assert "The AI answered **90%** of turns live; 1 turn used the pre-written backup lines." in report.to_markdown(s, None, None)

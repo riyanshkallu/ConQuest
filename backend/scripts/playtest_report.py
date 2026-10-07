@@ -59,8 +59,13 @@ def load_rounds(engine: Engine, since: date | None, until: date | None) -> list[
                 saved.add(row.round_id)
                 if row.text == VERIFY_NOTE:
                     verified.add(row.round_id)
+        ai = {}
+        if ids:
+            ai = {row.round_id: (row.live, row.fallback)
+                  for row in conn.execute(select(db.round_ai).where(db.round_ai.c.round_id.in_(ids)))}
     for r in rounds:
         r["verified"] = r["id"] in verified if r["id"] in saved else None  # None = conversation not saved
+        r["ai_live"], r["ai_fallback"] = ai.get(r["id"], (0, 0))
     return rounds
 
 
@@ -139,6 +144,8 @@ def summarize(rounds: list[dict], radar: dict[str, list[int]], quiz: list[dict])
         "late_points": round(statistics.mean(r["points"] for r in late), 1) if late else None,
         "learning_sample": len({r["player_id"] for r in early}),
         "radar": {RADAR_CATEGORIES[c]: (e, res, pct(res, e)) for c, (e, res) in radar.items() if e},
+        "ai_live": sum(r.get("ai_live", 0) for r in rounds),
+        "ai_fallback": sum(r.get("ai_fallback", 0) for r in rounds),
     }
     if quiz:
         summary["quiz"] = {
@@ -185,6 +192,10 @@ def to_markdown(s: dict, since: date | None, until: date | None) -> str:
         lines.append(f"- Good outcomes went from **{s['early_good']}** in testers' first rounds to "
                      f"**{s['late_good']}** in their later rounds; average points {s['early_points']} → "
                      f"{s['late_points']} ({count(s['learning_sample'], 'tester')} with 2+ rounds).")
+    ai_total = s["ai_live"] + s["ai_fallback"]
+    if ai_total:
+        lines.append(f"- The AI answered **{pct(s['ai_live'], ai_total)}** of turns live; "
+                     f"{count(s['ai_fallback'], 'turn')} used the pre-written backup lines.")
     if s["verified_sample"]:
         lines.append(f"- Testers verified independently in {s['verified']} of rounds "
                      f"(of {s['verified_sample']} rounds with saved conversations).")

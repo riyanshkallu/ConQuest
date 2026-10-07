@@ -62,6 +62,15 @@ rounds = Table(
     Column("ended_at", DateTime(timezone=True), nullable=False),
 )
 
+# How many of the round's AI answers came from a live model vs the fallback lines.
+# Its own table (not new columns on rounds) so existing Supabase tables need no change.
+round_ai = Table(
+    "round_ai", metadata,
+    Column("round_id", String(20), ForeignKey("rounds.id", ondelete="CASCADE"), primary_key=True),
+    Column("live", Integer, nullable=False),
+    Column("fallback", Integer, nullable=False),
+)
+
 messages = Table(
     "messages", metadata,
     Column("id", Integer, primary_key=True, autoincrement=True),

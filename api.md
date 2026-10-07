@@ -41,6 +41,7 @@ Every non-2xx response has this body:
 | 409 | `round_busy` | Another request for this round is still running |
 | 409 | `round_ended` | Message/action sent after the round ended |
 | 409 | `round_not_ended` | `/result` requested before the round ended |
+| 429 | `rate_limited` | Too many new players from one device/network, or too many rounds from one player, in an hour (protects the free AI quota). Show the message; the `Retry-After` header says how many seconds to wait |
 | 500 | `server_error` | Bug on our side. Show "Something went wrong, try again." |
 
 ### Message

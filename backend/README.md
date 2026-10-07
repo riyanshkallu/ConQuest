@@ -112,6 +112,23 @@ is slow (4s limit), the round uses the hand-written names, so it never blocks pl
 
 **Key rule:** the AI writes the conversation, but only `engine.py` decides who wins.
 
+## Reliability
+
+- **Rate limits** (`app/ratelimit.py`) protect the free AI quota: 30 new players per IP per hour,
+  30 rounds per player per hour, 200 rounds per IP per hour (a whole class shares one school IP).
+  Over the limit returns `429 rate_limited` with `Retry-After`. Change them in `.env`
+  (`PLAYERS_PER_IP_PER_HOUR`, `ROUNDS_PER_PLAYER_PER_HOUR`, `ROUNDS_PER_IP_PER_HOUR`).
+- **Time budgets** cap each AI role across every model and retry (analyzer 6s, character 10s,
+  generator 5s, explainer 12s). If every provider is slow at once, the turn uses the pre-written
+  lines instead of making the player wait.
+- **Warm-up**: in live mode the server opens its AI connections at startup and every 4 minutes
+  (listing models costs no tokens), so the first round after a quiet spell starts in about 0.5-1s
+  instead of 1.5-2s.
+- **AI health**: `/api/health` shows `ai_turns`, how many answers came from a live model vs the
+  fallback lines since startup, per role. If `fallback` climbs, a free-tier limit is probably being
+  hit. Each finished round's counts are saved in the `round_ai` table, and the playtest report
+  prints the live share.
+
 ## Free-tier notes
 
 Models were picked on 2026-09-30 with `scripts/try_models.py` (every model: valid JSON on

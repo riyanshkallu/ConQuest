@@ -15,6 +15,7 @@ from dataclasses import asdict
 from datetime import date, datetime, timezone
 
 from . import engine, progress, schemas, store
+from .ai import stats
 from .ai.base import AIProvider, TurnContext
 from .config import get_settings
 from .explain import build_result, ending_out, explain_request
@@ -27,9 +28,9 @@ _LINK_RE = re.compile(r"\b[\w-]+(?:\.[\w-]+)*\.example(?:/[\w./?=&%-]*)?", re.IG
 
 
 class GameError(Exception):
-    def __init__(self, status: int, code: str, message: str):
+    def __init__(self, status: int, code: str, message: str, headers: dict | None = None):
         super().__init__(message)
-        self.status, self.code, self.message = status, code, message
+        self.status, self.code, self.message, self.headers = status, code, message, headers
 
 
 # ---------------------------------------------------------------------------
@@ -103,7 +104,9 @@ async def start_round(player: progress.Player, scenario_id: str, ai: AIProvider,
     if focus is not None and focus not in RADAR_CATEGORIES:
         raise GameError(400, "invalid_request", "Unknown focus category.")
     # This round's own names and numbers (Scenario Generator). Falls back to the seed's names.
-    scenario = make_variant(seed, _rng, await ai.scenario_vars(seed))
+    ai_vars = await ai.scenario_vars(seed)
+    stats.record("generator", ai_vars is not None)
+    scenario = make_variant(seed, _rng, ai_vars)
     settings = get_settings()
     ratio = settings.scam_ratio
     if focus:
@@ -155,6 +158,7 @@ async def send_message(rnd: store.Round, text: str, ai: AIProvider) -> schemas.T
 
     ctx = _context(rnd, text)
     analysis = await ai.analyze(ctx)
+    _count_ai(rnd, "analyzer", analysis.live)
     ending = engine.apply_analysis(state, analysis, pre)
     _annotate(entry, analysis, pre, state)
     if ending:
@@ -212,6 +216,7 @@ async def get_result(rnd: store.Round, ai: AIProvider) -> schemas.ResultResponse
         async with rnd.lock:  # two quick requests still run the Explainer only once
             if rnd.result is None:
                 words = await ai.explain(explain_request(rnd))
+                stats.record("explainer", words is not None)
                 rnd.result = build_result(rnd, words)
     return rnd.result
 
@@ -228,6 +233,15 @@ _ACTION_TEXT = {
 }
 
 
+def _count_ai(rnd: store.Round, role: str, live: bool) -> None:
+    """Live vs fallback, for /api/health and the round's log."""
+    stats.record(role, live)
+    if live:
+        rnd.ai_live += 1
+    else:
+        rnd.ai_fallback += 1
+
+
 def _require_active(rnd: store.Round) -> None:
     if rnd.state.ended:
         raise GameError(409, "round_ended", "This round has already ended.")
@@ -240,6 +254,7 @@ async def _character_turn(rnd: store.Round, ai: AIProvider, decision: str, cls):
 
     ctx = _context(rnd, "", decision, code_now)
     move = await ai.character_move(ctx)
+    _count_ai(rnd, "character", move.live)
     engine.record_character_move(state, move.flag, move.pressure)
     reply = _add_contact_message(rnd, move.message, move.flag)
 

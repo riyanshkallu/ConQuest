@@ -14,6 +14,7 @@ class CharacterMove:
     message: str
     flag: str | None  # red tactic (scam) or green flag (legit) this message shows
     pressure: int = 0
+    live: bool = False  # True when a live AI model wrote this (not a pre-written line)
 
 
 @dataclass

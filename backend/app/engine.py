@@ -109,6 +109,7 @@ class Analysis:
     flag_noticed: str | None = None
     mistake: bool = False
     reason: str = ""
+    live: bool = False  # True when a live AI model wrote this (not the fallback rules)
 
 
 @dataclass
