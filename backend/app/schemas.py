@@ -152,10 +152,18 @@ class IdCardOut(BaseModel):
     extras: list[IdCardExtra] = []
 
 
+class DemoOptions(BaseModel):
+    """For recording the video. Needs the server's DEMO_KEY."""
+    key: str
+    force: Literal["scam", "legit"]
+    seed: int | None = None  # same seed = same bank, amount and card in both rounds
+
+
 class StartRoundRequest(BaseModel):
     player_id: str
-    scenario_id: str
+    scenario_id: str  # or "random" for Surprise me
     focus: str | None = None  # Train Your Weakness: a Scam Radar category, e.g. "urgency"
+    demo: DemoOptions | None = None
 
 
 class Focus(BaseModel):

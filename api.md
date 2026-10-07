@@ -416,6 +416,7 @@ this way.
 | 8 | `id_card.extras` for scenario-specific ID card lines | agreed | waiting |
 | 9 | Optional `focus` on round start, for Train Your Weakness | agreed | waiting |
 | 10 | `coach_tip` on message and action responses (hints on) | agreed | waiting |
+| 11 | `"scenario_id": "random"` for a Surprise Me card | agreed | waiting |
 
 1. **`trust` action ("It's legit").** The plan had no way to say "I believe you," so the
    LUCKY and SMART AND SAFE endings had no clear trigger. In a legit round, `trust` gives
@@ -452,6 +453,8 @@ this way.
     pause and check." Show it as a small notice after the reply. Tips react only to what the player did
     (shared a detail, tapped a link, went along fast), so they look the same in scam and real rounds
     and never give the answer away. At most one per turn, each once per round.
+11. **Surprise Me.** Starting a round with `"scenario_id": "random"` picks any scenario except the one
+    the player just played. The response has the real `scenario_id`. `index.html` has a 🎲 Surprise Me card.
 
 ### Still open
 

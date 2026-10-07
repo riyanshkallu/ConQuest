@@ -9,6 +9,7 @@ Never put is_scam, tactics, flags or pressure in a response before the round end
 
 from __future__ import annotations
 
+import hmac
 import random
 import re
 import time
@@ -86,6 +87,18 @@ def list_scenarios(player: progress.Player) -> schemas.ScenarioListResponse:
     return schemas.ScenarioListResponse(scenarios=cards, train_your_weakness=pick)
 
 
+def _surprise_pick(player: progress.Player) -> str:
+    """Surprise me: any scenario except the one the player just played."""
+    ids = sorted(load_scenarios())
+    last = store.last_scenario_id(player.id)
+    return _rng.choice([i for i in ids if i != last] or ids)
+
+
+def _check_demo_key(given: str, expected: str) -> None:
+    if not expected or not hmac.compare_digest(given.encode(), expected.encode()):
+        raise GameError(403, "forbidden", "Demo mode is off, or the demo key is wrong.")
+
+
 def _scenario_for_category(scenarios: list[Scenario], category: str) -> Scenario:
     """A scenario whose scam version uses a tactic from the weak category."""
     matches = [s for s in scenarios
@@ -112,23 +125,36 @@ FOCUS_REAL_CONTACTS_SCAM_RATIO = 0.4
 
 
 async def start_round(player: progress.Player, scenario_id: str, ai: AIProvider,
-                      focus: str | None = None) -> schemas.StartRoundResponse:
+                      focus: str | None = None, demo: schemas.DemoOptions | None = None) -> schemas.StartRoundResponse:
+    settings = get_settings()
+    if demo is not None:
+        _check_demo_key(demo.key, settings.demo_key)
+    if scenario_id == "random":
+        scenario_id = _surprise_pick(player)
     seed = get_scenario(scenario_id)
     if not seed:
         raise GameError(404, "scenario_not_found", "No scenario with that id.")
     if focus is not None and focus not in RADAR_CATEGORIES:
         raise GameError(400, "invalid_request", "Unknown focus category.")
-    # This round's own names and numbers (Scenario Generator). Falls back to the seed's names.
-    ai_vars = await ai.scenario_vars(seed)
-    stats.record("generator", ai_vars is not None)
-    scenario = make_variant(seed, _rng, ai_vars)
-    settings = get_settings()
+
+    # A demo seed makes the round repeatable: same names, amounts and card for scam and legit.
+    rng = random.Random(demo.seed) if demo and demo.seed is not None else _rng
+    if demo and demo.seed is not None:
+        ai_vars = None  # hand-written names, so two recorded rounds match
+    else:
+        # This round's own names and numbers (Scenario Generator). Falls back to the seed's names.
+        ai_vars = await ai.scenario_vars(seed)
+        stats.record("generator", ai_vars is not None)
+    scenario = make_variant(seed, rng, ai_vars)
     ratio = settings.scam_ratio
     if focus:
         ratio = FOCUS_REAL_CONTACTS_SCAM_RATIO if focus == "real_contacts" else FOCUS_SCAM_RATIO
-    is_scam = engine.assign_is_scam(player.history, _rng, ratio)
+    if demo:
+        is_scam = demo.force == "scam"
+    else:
+        is_scam = engine.assign_is_scam(player.history, _rng, ratio)
     version = scenario.version(is_scam)
-    card = new_id_card(scenario, _rng)
+    card = new_id_card(scenario, rng)
     state = engine.RoundState(
         is_scam=is_scam, id_card=card, objective=version["objective"],
         objective_is_payment=version.get("objective_is_payment", False),
@@ -137,7 +163,8 @@ async def start_round(player: progress.Player, scenario_id: str, ai: AIProvider,
         focus_tactics=[t for t in version.get("allowed_tactics", []) if RED_FLAGS[t].category == focus]
         if is_scam and focus else [],
     )
-    rnd = store.Round(id=store.new_id("r"), player_id=player.id, scenario=scenario, state=state)
+    rnd = store.Round(id=store.new_id("r"), player_id=player.id, scenario=scenario, state=state,
+                      demo=demo is not None)
 
     opening = version["opening"]
     engine.record_character_move(state, opening.get("flag"))

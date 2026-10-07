@@ -194,11 +194,13 @@ async function init() {
     }
     $("playerInfo").textContent = "player " + state.playerId;
     const { scenarios } = await api("GET", `/scenarios?player_id=${state.playerId}`);
+    const surprise = el("option", "", "🎲 Surprise me (random scenario)");
+    surprise.value = "random";
     $("scenario").replaceChildren(...scenarios.map((s) => {
       const o = el("option", "", `${s.title} (${s.channel}, difficulty ${s.difficulty})`);
       o.value = s.id;
       return o;
-    }));
+    }), surprise);
   } catch (err) { showError(err); }
 }
 

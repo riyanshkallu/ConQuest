@@ -49,6 +49,10 @@ class Settings(BaseSettings):
     rounds_per_player_per_hour: int = 30
     rounds_per_ip_per_hour: int = 200
 
+    # Demo mode for recording the video: a secret key that lets a round be forced scam or legit.
+    # Empty = demo mode off. Set it only in Render's Environment, never in the repo.
+    demo_key: str = ""
+
     # Game tuning
     max_turns: int = 10
     scam_ratio: float = 0.65
