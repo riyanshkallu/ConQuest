@@ -102,10 +102,26 @@ def radar_rows(player: Player) -> list[dict]:
     return rows
 
 
+def weakness_score(encountered: int, resisted: int) -> float:
+    """How well the player handles a category, allowing for how little data there may be.
+
+    Adds one imaginary win and one imaginary loss (a Beta(1,1) prior, the plan's Bayesian idea),
+    so "resisted 1 of 1" scores 0.67 rather than a perfect 1.0, and the score settles on the
+    real rate as rounds add up.
+    """
+    return (resisted + 1) / (encountered + 2)
+
+
 def weakest_category(player: Player) -> dict | None:
-    """The radar row with the lowest percent, for the Train Your Weakness card."""
-    rows = [r for r in radar_rows(player) if r["percent"] is not None]
-    return min(rows, key=lambda r: r["percent"]) if rows else None
+    """The radar row the player is weakest at, for the Train Your Weakness card.
+
+    Ranked by weakness_score; on a tie, the category seen more often (more evidence) wins.
+    The row keeps its real percent for display.
+    """
+    rows = [r for r in radar_rows(player) if r["encountered"]]
+    if not rows:
+        return None
+    return min(rows, key=lambda r: (weakness_score(r["encountered"], r["resisted"]), -r["encountered"]))
 
 
 def badge_list(player: Player) -> list[dict]:

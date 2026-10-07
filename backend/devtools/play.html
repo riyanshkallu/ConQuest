@@ -288,6 +288,7 @@ async function openLink(link) {
 function handleTurn(r) {
   if (r.reply) addBubble(r.reply);
   for (const n of r.notifications || []) addBubble(n);
+  if (r.coach_tip) addBubble({ sender: "notification", text: "💡 Tip: " + r.coach_tip, links: [] });
   updateMeta(r);
   setChips(r.suggested_replies);
   state.ended = r.ended;

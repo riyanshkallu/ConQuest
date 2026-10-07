@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import random
 import re
+import time
 from dataclasses import asdict
 from datetime import date, datetime, timezone
 
@@ -25,6 +26,20 @@ from .scenarios import Scenario, get_scenario, load_scenarios, make_variant, new
 _rng = random.Random()
 _PRAISE_RE = re.compile(r"\b(cautious|careful|smart|good|great|correctly|well done|safe)\b", re.IGNORECASE)
 _LINK_RE = re.compile(r"\b[\w-]+(?:\.[\w-]+)*\.example(?:/[\w./?=&%-]*)?", re.IGNORECASE)
+
+
+_now = time.monotonic  # replaced in tests
+
+# Coaching tips (hints on). They react only to what the player did, never to what the contact
+# did, so the same tip shows in scam and real rounds and can't give the answer away.
+SLOW_DOWN_SECONDS = 5.0
+COACH_TIPS = {
+    "code": "Never share a one-time code or password, even with someone who seems real.",
+    "personal": "Think twice before sharing personal details with someone who contacted you first.",
+    "link": "Links in surprise messages can lead to fake sites. Open the official app or website yourself instead.",
+    "slow_down": "You answered in {seconds}. Scammers count on quick replies, so it's OK to pause and check.",
+    "ask_first": "Before you go along, you can ask how to check who you're talking to.",
+}
 
 
 class GameError(Exception):
@@ -150,6 +165,7 @@ async def send_message(rnd: store.Round, text: str, ai: AIProvider) -> schemas.T
         return schemas.TurnResponse(blocked=True, blocked_reason=reason,
                                     turn=state.turns, max_turns=state.max_turns)
 
+    seconds = _now() - rnd.last_contact_at if rnd.last_contact_at is not None else None
     pre = engine.begin_turn(state, text)
     entry = _add_player_message(rnd, text)
     if state.ended:  # typed a trap item in a scam round
@@ -163,7 +179,10 @@ async def send_message(rnd: store.Round, text: str, ai: AIProvider) -> schemas.T
     _annotate(entry, analysis, pre, state)
     if ending:
         return _ended_response(rnd, schemas.TurnResponse)
-    return await _character_turn(rnd, ai, analysis.decision_type, schemas.TurnResponse)
+    tip = _coach(rnd, pre, analysis, seconds)
+    resp = await _character_turn(rnd, ai, analysis.decision_type, schemas.TurnResponse)
+    resp.coach_tip = tip
+    return resp
 
 
 async def do_action(rnd: store.Round, action: str, link: str | None, ai: AIProvider) -> schemas.ActionResponse:
@@ -176,7 +195,8 @@ async def do_action(rnd: store.Round, action: str, link: str | None, ai: AIProvi
         if link not in sent_links:
             raise GameError(400, "invalid_request", "That link isn't in this conversation.")
         engine.open_link(state, link)
-        return schemas.ActionResponse(turn=state.turns, max_turns=state.max_turns, hint=_hint(rnd))
+        return schemas.ActionResponse(turn=state.turns, max_turns=state.max_turns, hint=_hint(rnd),
+                                      coach_tip=_give_tip(rnd, "link"))
 
     if action == "ask_proof":
         contact = render(version["contact"]["name"], rnd.scenario, state.id_card)
@@ -299,6 +319,7 @@ def _context(rnd: store.Round, text: str, decision: str = "neutral", code_now: b
 
 
 def _add_contact_message(rnd: store.Round, text: str, flag: str | None) -> schemas.Message:
+    rnd.last_contact_at = _now()
     links = _LINK_RE.findall(text)
     rnd.transcript.append({"turn": rnd.state.turns, "sender": "contact", "text": text,
                            "links": links, "flag": flag})
@@ -338,6 +359,40 @@ def _suggestions(rnd: store.Round, stage: str) -> list[str]:
     options = rnd.scenario.raw.get("suggested_replies", {})
     replies = options.get(stage) or options.get("default", [])
     return [render(r, rnd.scenario, rnd.state.id_card) for r in replies]
+
+
+def _coach(rnd: store.Round, pre: engine.PreCheck, analysis: engine.Analysis, seconds: float | None) -> str | None:
+    """One coaching tip for this reply, if hints are on. At most one per turn, each once per round."""
+    went_along = analysis.decision_type in ("partial_compliance", "full_compliance")
+    candidates = []
+    if pre.traps:
+        candidates.append(("code", {}))
+    if pre.minor:
+        candidates.append(("personal", {}))
+    if went_along and seconds is not None and seconds < SLOW_DOWN_SECONDS:
+        n = max(1, round(seconds))
+        candidates.append(("slow_down", {"seconds": f"{n} second" + ("" if n == 1 else "s")}))
+    if went_along and rnd.state.turns <= 2 and not _pushed_back_before(rnd):
+        candidates.append(("ask_first", {}))
+    for kind, values in candidates:
+        tip = _give_tip(rnd, kind, **values)
+        if tip:
+            return tip
+    return None
+
+
+def _give_tip(rnd: store.Round, kind: str, **values) -> str | None:
+    player = store.get_player(rnd.player_id)
+    if not (player and player.hints) or kind in rnd.coach_given:
+        return None
+    rnd.coach_given.add(kind)
+    return COACH_TIPS[kind].format(**values)
+
+
+def _pushed_back_before(rnd: store.Round) -> bool:
+    """Has the player already questioned the contact or said they'd check this round?"""
+    return any(m.get("analysis", {}).get("decision_type") in ("challenge", "safe_verification")
+               for m in rnd.transcript if m["sender"] == "player")
 
 
 def _hint(rnd: store.Round) -> schemas.Hint | None:

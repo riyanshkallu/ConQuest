@@ -197,6 +197,7 @@ class TurnResponse(BaseModel):
     notifications: list[Message] = []
     suggested_replies: list[str] = []
     hint: Hint | None = None
+    coach_tip: str | None = None  # only when hints are on; based on what the player did
     ended: bool = False
     ending: Ending | None = None
 
