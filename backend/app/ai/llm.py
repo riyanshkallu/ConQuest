@@ -8,6 +8,7 @@ wait on it every turn.
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import re
@@ -28,6 +29,8 @@ PROVIDERS = {
     "gemini": ("https://generativelanguage.googleapis.com/v1beta/openai/", "gemini_api_key"),
 }
 RATE_LIMIT_COOLDOWN_SECONDS = 20
+MIN_ATTEMPT_SECONDS = 0.5  # not worth starting a model call with less time than this left
+WARM_UP_TIMEOUT_SECONDS = 5
 
 
 def parse_models(spec: str) -> list[tuple[str, str]]:
@@ -71,6 +74,18 @@ class LLM:
                 self.clients[name] = AsyncOpenAI(api_key=key, base_url=url, max_retries=0)
         self._cooldown_until: dict[str, float] = {}
 
+    async def warm_up(self) -> int:
+        """Open a connection to each provider without spending tokens (lists the models), so the
+        first round after a quiet spell doesn't pay for a fresh connection. Returns how many answered."""
+        ok = 0
+        for name, client in self.clients.items():
+            try:
+                await asyncio.wait_for(client.models.list(), timeout=WARM_UP_TIMEOUT_SECONDS)
+                ok += 1
+            except Exception as exc:  # warm-up must never break anything
+                log.info("warm-up for %s failed: %s", name, exc)
+        return ok
+
     async def json_call(
         self,
         models: list[tuple[str, str]],
@@ -80,12 +95,16 @@ class LLM:
         check: Callable[[T], str | None] | None = None,
         max_tokens: int = 300,
         timeout: float | None = None,
+        budget: float | None = None,
     ) -> T | None:
         """Return the first reply that parses into `schema` and passes `check`.
 
         API errors move on to the next model. A reply that fails validation is
         regenerated once; if that also fails, return None (the caller uses a fallback).
+        `budget` caps the whole call, across every model and retry, so a player never
+        waits long even if every provider is slow: when it runs out, return None.
         """
+        deadline = time.monotonic() + budget if budget else None
         for provider, model in models:
             client = self.clients.get(provider)
             # Free-tier limits are per model, so one model hitting its limit doesn't block the others.
@@ -93,9 +112,16 @@ class LLM:
                 continue
             for attempt in (1, 2):
                 started = time.monotonic()
+                call_timeout = timeout or self.timeout
+                if deadline is not None:
+                    remaining = deadline - started
+                    if remaining < MIN_ATTEMPT_SECONDS:
+                        log.warning("out of time after trying %s:%s; using the fallback", provider, model)
+                        return None
+                    call_timeout = min(call_timeout, remaining)
                 try:
                     resp = await client.chat.completions.create(
-                        **request_kwargs(model, system, user, max_tokens), timeout=timeout or self.timeout)
+                        **request_kwargs(model, system, user, max_tokens), timeout=call_timeout)
                 except openai.RateLimitError:
                     log.warning("%s:%s rate limited, cooling down", provider, model)
                     self._cooldown_until[model] = time.monotonic() + RATE_LIMIT_COOLDOWN_SECONDS

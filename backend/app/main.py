@@ -4,27 +4,51 @@ Run from backend/:  .venv/Scripts/python -m uvicorn app.main:app --reload
 Then open http://127.0.0.1:8000 (game) or http://127.0.0.1:8000/docs (API docs).
 """
 
+import asyncio
+import math
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from . import game, schemas, store
-from .ai import get_ai
+from .ai import get_ai, stats
 from .config import BACKEND_DIR, get_settings
+from .ratelimit import limiter
 
-app = FastAPI(title="Outsmart API", description="See api.md in the repo for the full contract.")
+WARM_EVERY_SECONDS = 240
+
+
+async def _keep_warm(llm) -> None:
+    """Keep the AI connections open so a round after a quiet spell starts fast."""
+    while True:
+        await llm.warm_up()
+        await asyncio.sleep(WARM_EVERY_SECONDS)
+
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    ai = get_ai()
+    task = asyncio.create_task(_keep_warm(ai.llm)) if hasattr(ai, "llm") else None  # live mode only
+    yield
+    if task:
+        task.cancel()
+
+
+app = FastAPI(title="Outsmart API", description="See api.md in the repo for the full contract.", lifespan=lifespan)
 
 
 # --- Errors in the api.md shape --------------------------------------------
 
-def _error(status: int, code: str, message: str) -> JSONResponse:
-    return JSONResponse(status_code=status, content={"error": {"code": code, "message": message}})
+def _error(status: int, code: str, message: str, headers: dict | None = None) -> JSONResponse:
+    return JSONResponse(status_code=status, content={"error": {"code": code, "message": message}}, headers=headers)
 
 
 @app.exception_handler(game.GameError)
 async def game_error(_: Request, exc: game.GameError):
-    return _error(exc.status, exc.code, exc.message)
+    return _error(exc.status, exc.code, exc.message, exc.headers)
 
 
 @app.exception_handler(RequestValidationError)
@@ -45,11 +69,13 @@ async def health():
     """Pinged by the keep-awake job so the free server doesn't fall asleep."""
     # Always 200 so Render doesn't restart the app over a database hiccup; the body says what's wrong.
     database = "ok" if store.database_ok() else "unreachable"
-    return {"ok": database == "ok", "ai_provider": get_settings().ai_provider, "database": database}
+    return {"ok": database == "ok", "ai_provider": get_settings().ai_provider, "database": database,
+            "ai_turns": stats.snapshot()}
 
 
 @app.post("/api/player", response_model=schemas.PlayerResponse, status_code=201)
-async def create_player(body: schemas.CreatePlayerRequest | None = None):
+async def create_player(request: Request, body: schemas.CreatePlayerRequest | None = None):
+    _limit(f"player:ip:{client_ip(request)}", get_settings().players_per_ip_per_hour)
     player = game.create_player(body.display_name if body else None)
     return _player_out(player)
 
@@ -84,7 +110,10 @@ async def list_scenarios(player_id: str):
 
 
 @app.post("/api/round/start", response_model=schemas.StartRoundResponse, status_code=201)
-async def start_round(body: schemas.StartRoundRequest):
+async def start_round(request: Request, body: schemas.StartRoundRequest):
+    settings = get_settings()
+    _limit(f"round:ip:{client_ip(request)}", settings.rounds_per_ip_per_hour)
+    _limit(f"round:player:{body.player_id}", settings.rounds_per_player_per_hour)
     return await game.start_round(game.require_player(body.player_id), body.scenario_id, get_ai(), body.focus)
 
 
@@ -105,6 +134,24 @@ async def do_action(round_id: str, body: schemas.ActionRequest):
 @app.get("/api/round/{round_id}/result", response_model=schemas.ResultResponse)
 async def get_result(round_id: str):
     return await game.get_result(game.require_round(round_id), get_ai())
+
+
+def client_ip(request: Request) -> str:
+    """The caller's IP. On Render it's the last X-Forwarded-For entry, which Render's proxy adds;
+    earlier entries can be faked by the client."""
+    forwarded = request.headers.get("x-forwarded-for")
+    if forwarded:
+        return forwarded.split(",")[-1].strip()
+    return request.client.host if request.client else "unknown"
+
+
+def _limit(key: str, per_hour: int) -> None:
+    retry_after = limiter.hit(key, per_hour, 3600)
+    if retry_after is not None:
+        wait = math.ceil(retry_after)
+        raise game.GameError(429, "rate_limited",
+                             f"Too many in a short time. Try again in {math.ceil(wait / 60)} minute(s).",
+                             headers={"Retry-After": str(wait)})
 
 
 def _one_at_a_time(rnd):

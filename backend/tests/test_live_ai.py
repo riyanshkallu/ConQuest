@@ -161,3 +161,54 @@ def test_gpt_oss_models_get_low_reasoning_effort():
     from app.ai.llm import request_kwargs
     assert request_kwargs("openai/gpt-oss-20b", "s", "u", 100)["extra_body"] == {"reasoning_effort": "low"}
     assert "extra_body" not in request_kwargs("qwen/qwen3.8-27b", "s", "u", 100)
+
+
+# --- Time budget and warm-up ---------------------------------------------------
+
+class SlowClient(FakeClient):
+    """Every call takes `delay` seconds (or times out at the given timeout, like the real SDK)."""
+
+    def __init__(self, delay):
+        super().__init__([])
+        self.delay = delay
+
+    async def _create(self, **kwargs):
+        self.calls += 1
+        await asyncio.sleep(min(self.delay, kwargs["timeout"]))
+        if self.delay > kwargs["timeout"]:
+            raise openai.APITimeoutError(request=httpx.Request("POST", "https://example.invalid"))
+        return SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content=good_scam_reply()))])
+
+
+def test_budget_caps_the_whole_call_when_every_model_is_slow():
+    import time as _time
+    slow = SlowClient(delay=5)
+    llm = llm_with(groq=slow, gemini=SlowClient(delay=5))
+    started = _time.monotonic()
+    out = asyncio.run(llm.json_call([("groq", "a"), ("groq", "b"), ("gemini", "c")], "s", "u", CharacterOut,
+                                    timeout=1.0, budget=1.5))
+    assert out is None
+    assert _time.monotonic() - started < 2.5  # not 3 models x 1s each
+
+
+def test_budget_still_allows_a_normal_answer():
+    llm = llm_with(groq=SlowClient(delay=0.05))
+    assert asyncio.run(llm.json_call([("groq", "a")], "s", "u", CharacterOut, budget=2)) is not None
+
+
+def test_warm_up_lists_models_and_ignores_failures():
+    class ListClient:
+        def __init__(self, fail):
+            self.fail, self.listed = fail, 0
+            self.models = SimpleNamespace(list=self._list)
+
+        async def _list(self):
+            self.listed += 1
+            if self.fail:
+                raise RuntimeError("provider down")
+            return []
+
+    good, bad = ListClient(fail=False), ListClient(fail=True)
+    llm = llm_with(groq=good, gemini=bad)
+    assert asyncio.run(llm.warm_up()) == 1
+    assert good.listed == 1 and bad.listed == 1

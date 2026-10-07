@@ -37,6 +37,8 @@ class Round:
     finalized: bool = False
     code_sent: bool = False
     result: object | None = None  # cached ResultResponse, so the Explainer runs once per round
+    ai_live: int = 0       # analyzer + character answers written by a live model
+    ai_fallback: int = 0   # ... and by the fallback rules / pre-written lines
     lock: asyncio.Lock = field(default_factory=asyncio.Lock, repr=False)
 
 
@@ -109,6 +111,7 @@ def record_finished_round(rnd: Round, save_messages: bool) -> None:
             turns=state.turns, mistakes=state.mistakes, details=rnd.scenario.raw.get("vars"),
             started_at=rnd.started_at, ended_at=rnd.ended_at or _now(),
         ))
+        conn.execute(insert(db.round_ai).values(round_id=rnd.id, live=rnd.ai_live, fallback=rnd.ai_fallback))
         if save_messages and rnd.transcript:
             conn.execute(insert(db.messages), [
                 {"round_id": rnd.id, "idx": i, "turn": m["turn"], "sender": m["sender"], "text": m["text"],

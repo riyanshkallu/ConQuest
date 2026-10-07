@@ -97,6 +97,8 @@ class LiveAI:
         self.character_models = parse_models(settings.character_models)
         self.generator_models = parse_models(settings.generator_models)
         self.generator_timeout = settings.generator_timeout_seconds
+        self.budgets = {"analyzer": settings.analyzer_budget_seconds, "character": settings.character_budget_seconds,
+                        "explainer": settings.explainer_budget_seconds, "generator": settings.generator_budget_seconds}
         self.explainer_models = parse_models(settings.explainer_models)
         self.rng = random.Random()
 
@@ -106,7 +108,7 @@ class LiveAI:
         out = await self.llm.json_call(
             self.generator_models, generator.generator_system(), generator.generator_user(scenario, self.rng),
             GeneratedVars, check=lambda o: generator.check_vars(o.root, scenario),
-            max_tokens=300, timeout=self.generator_timeout,
+            max_tokens=300, timeout=self.generator_timeout, budget=self.budgets["generator"],
         )
         return {k: v.strip() for k, v in out.root.items()} if out else None
 
@@ -114,13 +116,14 @@ class LiveAI:
         out = await self.llm.json_call(
             self.explainer_models, explainer.explainer_system(), explainer.explainer_user(request),
             explainer.ExplainerOut, check=lambda o: explainer.check_explanation(o, request), max_tokens=900,
+            budget=self.budgets["explainer"],
         )
         return explainer.to_text(out, request) if out else None
 
     async def analyze(self, ctx: TurnContext) -> Analysis:
         out = await self.llm.json_call(
             self.analyzer_models, prompts.analyzer_system(ctx), prompts.analyzer_user(ctx),
-            AnalyzerOut, max_tokens=300,
+            AnalyzerOut, max_tokens=300, budget=self.budgets["analyzer"],
         )
         if out is None:
             return mock_analysis(ctx)
@@ -132,14 +135,16 @@ class LiveAI:
             flag_noticed=out.flag_noticed if out.flag_noticed in GREEN_FLAGS else None,
             mistake=out.mistake,
             reason=out.reason.strip(),
+            live=True,
         )
 
     async def character_move(self, ctx: TurnContext) -> CharacterMove:
         out = await self.llm.json_call(
             self.character_models, prompts.character_system(ctx), prompts.character_user(ctx),
             CharacterOut, check=lambda o: check_character(o, ctx), max_tokens=400,
+            budget=self.budgets["character"],
         )
         if out is None:
             return mock_character_move(ctx)
         flag = out.tactic if ctx.state.is_scam else out.green_flag
-        return CharacterMove(message=out.message.strip(), flag=flag, pressure=out.pressure)
+        return CharacterMove(message=out.message.strip(), flag=flag, pressure=out.pressure, live=True)
