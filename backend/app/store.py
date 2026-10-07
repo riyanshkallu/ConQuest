@@ -40,6 +40,7 @@ class Round:
     ai_live: int = 0       # analyzer + character answers written by a live model
     ai_fallback: int = 0   # ... and by the fallback rules / pre-written lines
     coach_given: set[str] = field(default_factory=set)  # coaching tips already shown this round
+    demo: bool = False  # recorded for the video; left out of the playtest report
     last_contact_at: float | None = None  # when the contact's latest message was sent (monotonic)
     lock: asyncio.Lock = field(default_factory=asyncio.Lock, repr=False)
 
@@ -103,6 +104,12 @@ def get_round(round_id: str) -> Round | None:
     return _rounds.get(round_id)
 
 
+def last_scenario_id(player_id: str) -> str | None:
+    """The scenario of the player's most recent round on this server (for Surprise me)."""
+    rounds = [r for r in _rounds.values() if r.player_id == player_id]
+    return max(rounds, key=lambda r: r.started_at).scenario.id if rounds else None
+
+
 def record_finished_round(rnd: Round, save_messages: bool) -> None:
     """Save a finished round's summary, plus its messages if the player allows it."""
     state = rnd.state
@@ -110,7 +117,8 @@ def record_finished_round(rnd: Round, save_messages: bool) -> None:
         conn.execute(insert(db.rounds).values(
             id=rnd.id, player_id=rnd.player_id, scenario_id=rnd.scenario.id, is_scam=state.is_scam,
             difficulty=state.difficulty, ending=state.ending, points=state.points, xp=rnd.xp_earned,
-            turns=state.turns, mistakes=state.mistakes, details=rnd.scenario.raw.get("vars"),
+            turns=state.turns, mistakes=state.mistakes,
+            details={**rnd.scenario.raw.get("vars", {}), **({"demo": True} if rnd.demo else {})},
             started_at=rnd.started_at, ended_at=rnd.ended_at or _now(),
         ))
         conn.execute(insert(db.round_ai).values(round_id=rnd.id, live=rnd.ai_live, fallback=rnd.ai_fallback))

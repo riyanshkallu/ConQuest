@@ -757,6 +757,27 @@
 
                 </div>
 
+
+                <div class="scenario-card">
+
+                    <div class="scenario-icon">🎲</div>
+
+                    <h3>Surprise Me</h3>
+
+                    <p>
+                        A random scenario. You won't know what
+                        kind of message is coming.
+                    </p>
+
+                    <button
+                        class="scenario-button"
+                        data-scenario="random"
+                        onclick="selectScenario('random')">
+                        Play
+                    </button>
+
+                </div>
+
             </div>
 
         </div>
@@ -1110,7 +1131,8 @@
             document
                 .querySelectorAll("[data-scenario]")
                 .forEach(button => {
-                    const ready = available.includes(button.dataset.scenario);
+                    // "random" (Surprise Me) isn't in the list but is always playable
+                    const ready = button.dataset.scenario === "random" || available.includes(button.dataset.scenario);
                     button.disabled = !ready;
                     button.textContent = ready ? "Play" : "Coming soon";
                 });
@@ -1125,10 +1147,22 @@
 
             showScreen("loadingScreen");
             try {
-                const round = await api("POST", "/round/start", {
+                const body = {
                     player_id: playerId,
                     scenario_id: scenarioId
-                });
+                };
+
+                // Demo mode for recording the video: ?demo=KEY&force=scam|legit&seed=7
+                const params = new URLSearchParams(window.location.search);
+                if (params.get("demo")) {
+                    body.demo = {
+                        key: params.get("demo"),
+                        force: params.get("force") === "legit" ? "legit" : "scam",
+                        seed: params.get("seed") ? Number(params.get("seed")) : null
+                    };
+                }
+
+                const round = await api("POST", "/round/start", body);
 
                 roundId = round.round_id;
                 openingRound = round;

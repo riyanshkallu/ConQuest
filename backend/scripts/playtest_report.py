@@ -49,7 +49,8 @@ def load_rounds(engine: Engine, since: date | None, until: date | None) -> list[
     if until:
         query = query.where(db.rounds.c.ended_at <= _local(until, time.max))
     with engine.connect() as conn:
-        rounds = [dict(r) for r in conn.execute(query).mappings()]
+        rounds = [dict(r) for r in conn.execute(query).mappings()
+                  if not (r["details"] or {}).get("demo")]  # demo rounds were recorded for the video
         ids = [r["id"] for r in rounds]
         verified = set()
         saved = set()

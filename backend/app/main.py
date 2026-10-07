@@ -114,7 +114,7 @@ async def start_round(request: Request, body: schemas.StartRoundRequest):
     settings = get_settings()
     _limit(f"round:ip:{client_ip(request)}", settings.rounds_per_ip_per_hour)
     _limit(f"round:player:{body.player_id}", settings.rounds_per_player_per_hour)
-    return await game.start_round(game.require_player(body.player_id), body.scenario_id, get_ai(), body.focus)
+    return await game.start_round(game.require_player(body.player_id), body.scenario_id, get_ai(), body.focus, body.demo)
 
 
 @app.post("/api/round/{round_id}/message", response_model=schemas.TurnResponse)

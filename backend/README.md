@@ -112,6 +112,19 @@ is slow (4s limit), the round uses the hand-written names, so it never blocks pl
 
 **Key rule:** the AI writes the conversation, but only `engine.py` decides who wins.
 
+## Recording the demo video
+
+Demo mode lets you choose scam or legit for a round, so you can record the plan's "same first
+message, completely different conversation" shot.
+
+1. In Render, go to **Environment** and add `DEMO_KEY` with any secret word (for example a long
+   random string). Never put it in the repo. Without it, demo mode is off.
+2. Open the game with the key in the address:
+   `https://outsmart-scam-game.onrender.com/?demo=YOURKEY&force=scam&seed=7`, record the scam round,
+   then open it again with `force=legit&seed=7` for the real one. The same `seed` gives the same
+   bank, amount and card ending, so the two opening texts match.
+3. Demo rounds are saved but left out of the playtest report.
+
 ## Reliability
 
 - **Rate limits** (`app/ratelimit.py`) protect the free AI quota: 30 new players per IP per hour,
