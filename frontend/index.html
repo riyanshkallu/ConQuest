@@ -259,6 +259,83 @@
             line-height: 1.5;
         }
 
+        /*id button code*/
+
+        .id-button{
+            border: 1px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.3);
+            color: white;
+            border-radius: 15px;
+            padding: 10px 10px;  
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .id-button:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .chat-id-panel {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 340px;
+            height: 100%;
+            background: white;
+            z-index: 10;
+            padding: 20px;
+            box-shadow: -8px 0 25px rgba(0,0,0,0.15);
+            overflow-y: auto;
+            transform: translateX(100%);
+            transition: transform 0.2s ease;
+            word-break: break-word;
+        }
+
+        .chat-id-panel.open {
+            transform: translateX(0);
+        }
+
+        .chat-id-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .chat-id-panel-header h2 {
+            font-size: 25px;
+        }
+
+        .id-close-button {
+            border: none;
+            background: #e8ecef;
+            width: 25px;
+            height: 25px;
+            border-radius: 13px;
+            font-weight: bold;
+        }
+
+        .chat-id-description {
+            color: #687481;
+            font-size: 17px;
+            line-height: 2.0;
+            margin-bottom: 10px;
+        }
+
+
+        .chat-id-panel .id-row {
+            display:flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 10px 0;
+            margin: 0 auto;
+            border-bottom: 1px solid #e6c5c5;
+        }
+
+
+        .id-value {
+            word-break: break-word;
+        }
         /* chat screen code */
 
         #chatScreen {
@@ -273,7 +350,7 @@
             max-height: 850px;
             background: white;
             border-radius: 22px;
-            overflow: hidden;
+            position: relative;
             box-shadow: 0 10px 35px rgba(0,0,0,0.1);
             display: flex;
             flex-direction: column;
@@ -557,7 +634,7 @@
             }
             .breakdown-card h2 {
                 margin-top: 0;
-                margin-bottom: 0;
+                margin-bottom: 10px;
             }
             .breakdown-card p {
                 line-height: 1.6;
@@ -643,6 +720,9 @@
 
         @media (max-width: 450px) {
 
+            .chat-id-panel {
+                width: 90%;
+            }
             .screen {
                 padding: 15px;
             }
@@ -959,9 +1039,33 @@
                     Turn <span id="turnNumber">0</span> of <span id="maxTurns">10</span>
                 </div>
 
+            <button 
+                class="id-button"
+                onclick="toggleChatIDCard()">
+                ID CARD DETAILS
+            </button>
+
             </header>
 
+            <div id="chatIdPanel" class="chat-id-panel">
 
+                <div class="chat-id-panel-header">
+                    <h2>ID CARD</h2>
+
+                    <button
+                        class="id-close-button"
+                        onclick="toggleChatIDCard()">
+                        X
+                    </button>
+                </div>
+
+                <p class="chat-id-description">
+                    This information can be used to assist you in the conversation.
+                </p>
+
+                <div id="chatIdRows"></div>
+            </div>
+            
             <div
                 id="chatMessages"
                 class="chat-messages">
@@ -1296,6 +1400,51 @@
                 });
         }
 
+        function fillChatIDCard(card) {
+
+             const rows = [
+                ["Name", card.name],
+                ["Email", card.email],
+                ["Phone", card.phone],
+                ["Bank", card.bank],
+                ["Card number", card.card_number],
+                ["Password", card.password],
+                ["Gift card", card.gift_card && card.gift_card.store + " $" + card.gift_card.amount + ": " + card.gift_card.code],
+                ["Gaming account", card.gaming_account && card.gaming_account.game + ": " + card.gaming_account.username],
+                ["Family", card.family && card.family.relative],
+                ["Their parent", card.family && card.family.parent + ", " + card.family.parent_phone],
+                [card.family && card.family.memory_question, card.family && card.family.memory_answer],
+                // Scenario-specific lines, e.g. your friend's handle or your support ticket
+                ...(card.extras || []).map(extra => [extra.label, extra.value])
+            ];
+
+            const container = document.getElementById("chatIdRows");
+            container.innerHTML = "";
+
+            rows
+                .filter(row => row[1])
+                .forEach(([label, value]) => {
+                    const row = document.createElement("div");
+                    row.className = "id-row";
+
+                    const labelSpan = document.createElement("span");
+                    labelSpan.className = "id-label";
+                    labelSpan.textContent = label;
+
+                    const valueSpan = document.createElement("span");
+                    valueSpan.className = "id-value";
+                    valueSpan.textContent = value;
+
+                    row.append(labelSpan, valueSpan);
+                    container.appendChild(row);
+                });
+        }
+
+        function toggleChatIDCard() {
+            const panel = document.getElementById("chatIdPanel");
+            panel.classList.toggle("open");
+        }
+
 
         /* start chat */
 
@@ -1303,6 +1452,8 @@
 
             const round = openingRound;
 
+            document.getElementById("chatIdPanel").classList.remove("open");
+        
             document.getElementById("contactName").textContent = round.contact.name;
             document.getElementById("contactStatus").textContent =
                 (CHANNEL_NAMES[round.channel] || round.channel) + " · " + round.contact.handle;
@@ -1320,6 +1471,7 @@
             );
 
             setSuggestions(round.suggested_replies);
+            fillChatIDCard(round.id_card);
             setBusy(false);
             showScreen("chatScreen");
         }
