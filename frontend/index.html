@@ -93,6 +93,47 @@
             opacity: 0.9;
         }
 
+        #user-level {
+            color: #f59e0b;
+        }
+
+        #next-level-xp {
+            color: #10b981;
+            font-family: monospace;
+        }
+
+        #user-streak {
+            color: #ef4444;
+        }
+
+        current-xp {
+            color: #10b981;
+            font-family: monospace;
+        }
+
+
+    .default-tier {color: #f4f6f8; font-weight: 10;}
+        
+    .bronze-tier { color: #cd7f32; }
+
+    /* 2nd tier */
+    .silver-tier { color: #94a3b8; font-weight: 500; }
+
+    
+    /* 3rd tier (Levels 20-29) */
+
+    .gold-tier { 
+      color: #eab308; 
+      font-weight: bold;
+      text-shadow: 0 0 5px rgba(234, 179, 8, 0.4); 
+    }
+
+/* 4th: tier : Diamond (Levels 30+) */
+    .diamond-tier { 
+        color: #00ffff; 
+        font-weight: bold;
+        text-shadow: 0 0 10px rgba(0, 255, 255, 0.7); 
+
         /* scenariopagecode */
 
         #scenarioScreen {
@@ -620,6 +661,11 @@
 
             <h1>Can You Outsmart the Scammer?</h1>
 
+            <div class="player-stats">
+                <p>Level: <span id="user-level">Loading...</span></p>
+                <p>Streak: <span id="user-streak">0</span>days</p>
+                <p>XP: <span id="current-xp">0</span></p>
+                <p>XP: <span id="next-level-xp">0</span></p>
             <p>
                 You're about to enter realistic conversations where you
                 must figure out what's legitimate and what's a scam.
@@ -1038,9 +1084,7 @@
         const BAD_ENDINGS = ["SCAMMED", "FALSE_ALARM"];
 
 
-        /* -------------------------
-           API HELPER
-        ------------------------- */
+        /* api helper- */
 
         async function api(method, path, body) {
 
@@ -1061,9 +1105,7 @@
         }
 
 
-        /* -------------------------
-           PLAYER ID (saved in the browser)
-        ------------------------- */
+        /* player id */
 
         function loadPlayerId() {
             try {
@@ -1101,9 +1143,7 @@
         }
 
 
-        /* -------------------------
-           SCREEN NAVIGATION
-        ------------------------- */
+        /* screen navigation */
 
         function showScreen(screenId) {
 
@@ -1119,9 +1159,7 @@
         }
 
 
-        /* -------------------------
-           SCENARIO LIST
-        ------------------------- */
+        /* scenario list */
 
         async function loadScenarios() {
 
@@ -1139,9 +1177,7 @@
         }
 
 
-        /* -------------------------
-           SCENARIO SELECTION
-        ------------------------- */
+        /* select scenario */
 
         async function selectScenario(scenarioId) {
 
@@ -1179,9 +1215,7 @@
         }
 
 
-        /* -------------------------
-           ID CARD
-        ------------------------- */
+        /* id card */
 
         function fillIdCard(card) {
 
@@ -1224,9 +1258,7 @@
         }
 
 
-        /* -------------------------
-           START CHAT
-        ------------------------- */
+        /* start chat */
 
         function startChat() {
 
@@ -1254,9 +1286,7 @@
         }
 
 
-        /* -------------------------
-           ADD MESSAGE
-        ------------------------- */
+        /* add message */
 
         function addMessage(sender, text, links) {
 
@@ -1289,7 +1319,13 @@
                 const linkButton = document.createElement("button");
                 linkButton.className = "link";
                 linkButton.textContent = link;
-                linkButton.onclick = () => openLink(link);
+                linkButton.onclick = () => 
+                    if (link.startsWith('http://') || link.startsWith('https://')) {
+                    openLink(link);
+                    else {
+                    console.warn("You have been blocked due to non-http/http link click;", link);
+                
+                
                 bubble.append(linkButton);
 
                 rest = rest.slice(at + link.length);
@@ -1307,10 +1343,38 @@
             return message;
         }
 
+    async function loadPlayerProfile(playerId) {
+      const url = `/player/${playerId}/radar`;
 
-        /* -------------------------
-           WAITING FOR THE SERVER
-        ------------------------- */
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`API error: ${response.status}`);
+    
+        const data = await response.json();
+
+    const { level, xp, xp_for_next_level, streak_days } = data;
+
+    document.getElementById('user-streak').textContent = streak_days;
+    document.getElementById('current-xp').textContent = xp;
+    document.getElementById('next-level-xp').textContent = xp_for_next_level;
+
+          
+        const levelElement =  document.getElementbyID('user-level');
+        levelElement.textContent; = level;
+
+        levelElement.className = '';
+
+        if (level >= 100) {
+            levelElement.classList.add('diamond-tier');
+        } else if (level >= 75) {
+            levelElement.classList.add('gold-tier');
+        } else if (level >= 50) {
+            levelElement.classList.add('silver-tier');
+        } else if (level >= 25) {
+             levelElement.classList.add('bronze-tier')
+        } else:
+            levelElement.classList.add('default-tier')
+        /* wait for server */
 
         function setBusy(isBusy) {
 
@@ -1336,9 +1400,7 @@
         }
 
 
-        /* -------------------------
-           SEND PLAYER MESSAGE
-        ------------------------- */
+        /* send player message */
 
         async function sendMessage() {
 
@@ -1375,9 +1437,7 @@
         }
 
 
-        /* -------------------------
-           SUGGESTED REPLY
-        ------------------------- */
+        /* suggested reply */
 
         function setSuggestions(replies) {
 
@@ -1403,9 +1463,7 @@
         }
 
 
-        /* -------------------------
-           ACTION BUTTONS
-        ------------------------- */
+        /* action buttons */
 
         async function useAction(action) {
 
@@ -1449,9 +1507,7 @@
         }
 
 
-        /* -------------------------
-           AFTER EACH TURN
-        ------------------------- */
+        /* after turn */
 
         function handleTurn(response) {
 
@@ -1481,9 +1537,7 @@
         }
 
 
-        /* -------------------------
-           END ROUND
-        ------------------------- */
+        /* if end round */
 
         async function finishRound() {
 
@@ -1576,9 +1630,7 @@
         }
 
 
-        /* -------------------------
-           ENTER KEY
-        ------------------------- */
+        /* enter key */
 
         document
             .getElementById("messageInput")
@@ -1593,9 +1645,7 @@
             });
 
 
-        /* -------------------------
-           START UP
-        ------------------------- */
+        /* start up */
 
         async function init() {
 
