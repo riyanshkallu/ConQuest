@@ -106,7 +106,7 @@
             color: #ef4444;
         }
 
-        current-xp {
+        #current-xp {
             color: #10b981;
             font-family: monospace;
         }
@@ -133,7 +133,7 @@
         color: #00ffff; 
         font-weight: bold;
         text-shadow: 0 0 10px rgba(0, 255, 255, 0.7); 
-
+    }
         /* scenariopagecode */
 
         #scenarioScreen {
@@ -666,6 +666,7 @@
                 <p>Streak: <span id="user-streak">0</span>days</p>
                 <p>XP: <span id="current-xp">0</span></p>
                 <p>XP: <span id="next-level-xp">0</span></p>
+            </div>
             <p>
                 You're about to enter realistic conversations where you
                 must figure out what's legitimate and what's a scam.
@@ -1319,11 +1320,13 @@
                 const linkButton = document.createElement("button");
                 linkButton.className = "link";
                 linkButton.textContent = link;
-                linkButton.onclick = () => 
+                linkButton.onclick = () => {
                     if (link.startsWith('http://') || link.startsWith('https://')) {
                     openLink(link);
-                    else {
+                    } else {
                     console.warn("You have been blocked due to non-http/http link click;", link);
+                }
+            };
                 
                 
                 bubble.append(linkButton);
@@ -1359,8 +1362,8 @@
     document.getElementById('next-level-xp').textContent = xp_for_next_level;
 
           
-        const levelElement =  document.getElementbyID('user-level');
-        levelElement.textContent; = level;
+        const levelElement =  document.getElementById('user-level');
+        levelElement.textContent = level;
 
         levelElement.className = '';
 
@@ -1372,8 +1375,13 @@
             levelElement.classList.add('silver-tier');
         } else if (level >= 25) {
              levelElement.classList.add('bronze-tier')
-        } else:
+        } else {
             levelElement.classList.add('default-tier')
+        }
+      } catch(error){
+          console.error("Could not load player profile:", error);
+      }
+    }
         /* wait for server */
 
         function setBusy(isBusy) {
@@ -1651,6 +1659,7 @@
 
             try {
                 await setUpPlayer();
+                await loadPlayerProfile(playerId);
                 await loadScenarios();
             } catch (error) {
                 console.error("Can't reach the backend:", error);
