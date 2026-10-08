@@ -548,6 +548,23 @@
             margin-top: 12px;
         }
 
+         .breakdown-card {
+                background: #ffffff;
+                border-radius: 16px;
+                padding: 20px;
+                margin: 16px 0;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            }
+            .breakdown-card h2 {
+                margin-top: 0;
+                margin-bottom: 0;
+            }
+            .breakdown-card p {
+                line-height: 1.6;
+                margin-bottom: 10px;
+                margin-top: 0px;
+            }
+
         /* loading screen code */
 
         #loadingScreen {
@@ -646,21 +663,7 @@
                 font-size: 11px;
             }
 
-            .breakdown-card {
-                background: #ffffff;
-                border-radius: 16px;
-                padding: 20px;
-                margin: 16px 0;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            }
-            .breakdown-card h3 {
-                margin-top:0;
-                margin-bottom: 0;
-            }
-            .breakdown-card p {
-                line-height: 1.6;
-                margin: 10px 0;
-            }
+           
         }
     </style>
 </head>
@@ -1679,12 +1682,12 @@
             const ending = result.ending || "";
             const explanation = result.explanation || {};
 
-            const title = document.getElementbyId("breakdownTitle");
-            const content = document.getElementbyId("breakdownContent");
+            const title = document.getElementById("breakdownTitle");
+            const content = document.getElementById("breakdownContent");
 
             content.innerHTML = "";
 
-             if (["SCAMMED", "ALMOST_SCAMMED", "OUTSMARTED", "ESCAPED"].includes(ending)) {
+             if (["SCAMMED", "ALMOST_SCAMMED", "OUTSMARTED", "ESCAPED"].includes(ending.code)) {
                 title.textContent = "Scam Autopsy";
             } else {
                 title.textContent = "Legit Breakdown";
