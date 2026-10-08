@@ -743,8 +743,32 @@
             .action-button {
                 font-size: 11px;
             }
+            .verification-container {
+                max-width: 635px;
+                margin: 20px auto;
+            }
 
-           
+            .verification-subtitle {
+                color: #687481;
+                line-height: 2.0;
+            }
+
+            .verification-lines {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                margin: 20px;
+            }
+            .verification-lines.official {
+                align-self: flex-start;
+                max-width: 85%;
+            }
+
+            .verification-line.player {
+                align-self: flex-end;
+                max-width: 85%;
+                background: #dceafe;
+            }
         }
     </style>
 </head>
@@ -1036,9 +1060,22 @@
 
                 </div>
 
+                <section id="verificationScreen" class="screen">
+                    <div class="container verification container">
+                        <h1 id="verificationTitle">Verification Call</h1>
+
+                        <p class="verification-subtitle"> You have contacted an organization via the trusted number.</p>
+
+                        <div id="verificationLines" class="verification-lines"></div>
+
+                        <button
+                            class="primary-button"
+                            onclick="returnFromVerification()"> Return to Game </button>
+
                 <div class="turn-counter">
                     Turn <span id="turnNumber">0</span> of <span id="maxTurns">10</span>
                 </div>
+                </section>
 
             <button 
                 class="id-button"
@@ -1691,6 +1728,43 @@
             }
         }
 
+        function showVerificationCall(call) {
+            if(!call) {
+                addMessage("notification", "No verification call was returned.");
+                return;
+            }
+        document.getElementById("verificationTitle").textContent = call.title || "Verification Call";
+
+            const container = document.getElementById("verificationLines");
+            container.innerHTML = "";
+
+            (call lines || []).forEach(line => {
+                const bubble = document.createElement("div");
+                bubble.className = "verification-line "+ (line.speaker === "player" ? "player" : "official");
+
+            const speaker = document.createElement("strong");
+                speaker.textContent =
+                    line.speaker === "player" ? "You" : (call.official_name || "Official");
+
+                const message = document.createElement("p);
+                    message.textContent = line.text;
+
+                bubble.append(speaker, message);
+                container.appendChild(bubble);
+            });
+
+            showScreen("verificationScreen");
+        }
+
+        function returnFromVerification() {
+            if(window.verificationRoundEnded) {
+               window.verificationRoundEnded = false;
+               finishRound();
+        } else {
+            showScreen("chatscreen");
+        }
+        
+        
         async function openLink(link) {
 
             if (busy || roundOver) {
@@ -1729,6 +1803,14 @@
 
             roundOver = response.ended;
             setBusy(false);
+
+            if (response.verification_call) {
+                verificationCall = response.verification_call;
+                showVerificationCall(verificationCall);
+
+                window.verificationRoundEnd = response.ended;
+                return;
+            }
 
             if (response.ended) {
                 setTimeout(finishRound, 1200);  // let the player read the last message first
