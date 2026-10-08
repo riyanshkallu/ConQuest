@@ -645,6 +645,22 @@
             .action-button {
                 font-size: 11px;
             }
+
+            .breakdown-card {
+                background: #ffffff;
+                border-radius: 16px;
+                padding: 20px;
+                margin: 16px 0;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            }
+            .breakdown-card h3 {
+                margin-top:0;
+                margin-bottom: 0;
+            }
+            .breakdown-card p {
+                line-height: 1.6;
+                margin: 10px 0;
+            }
         }
     </style>
 </head>
@@ -888,6 +904,25 @@
 
     </section>
 
+    <!--breakdown screen-->
+
+     <section id="breakdownScreen" class="screen">
+
+        <div class="screen-container">
+
+            <h1 id="breakdownTitle">Breakdown</h1>
+
+            <div id="breakdownContent"></div>
+
+            <button class="primary-button" onclick="showScreen('resultScreen')">
+
+                Back to Result
+                
+            </button>
+
+            
+         </div>
+     </section>
 
     <!-- chatting code -->
 
@@ -1633,7 +1668,101 @@
                 }
 
             });
+        /* breakdown screen */
 
+        function showBreakdown(result) {
+        if (!result) {
+            console.error("No result data available.");
+            return;
+        }
+
+            const ending = result.ending || "";
+            const explanation = result.explanation || {};
+
+            const title = document.getElementbyId("breakdownTitle");
+            const content = document.getElementbyId("breakdownContent");
+
+            content.innerHTML = "";
+
+             if (["SCAMMED", "ALMOST_SCAMMED", "OUTSMARTED", "ESCAPED"].includes(ending)) {
+                title.textContent = "Scam Autopsy";
+            } else {
+                title.textContent = "Legit Breakdown";
+            }
+
+    // Biggest clue
+            if (result.biggest_clue) {
+                addBreakdownCard(
+                    content,
+                    "🔎 Biggest Clue",
+                    result.biggest_clue
+            );
+        }
+
+    // Best decision
+            if (explanation.best_decision) {
+                addBreakdownCard(
+                    content,
+                    "⭐ Best Decision",
+                    explanation.best_decision
+                );
+            }
+
+    // Mistakes
+    if (explanation.mistakes && explanation.mistakes.length) {
+        addBreakdownCard(
+            content,
+            "⚠️ Mistakes",
+            explanation.mistakes
+        );
+    }
+
+    // Timeline
+    if (explanation.timeline && explanation.timeline.length) {
+        addBreakdownCard(
+            content,
+            "🧠 What Happened",
+            explanation.timeline
+        );
+    }
+
+    showScreen("breakdownScreen");
+}
+        function addBreakdownCard(container, heading, content) {
+    const card = document.createElement("div");
+    card.className = "breakdown-card";
+
+    const title = document.createElement("h2");
+    title.textContent = heading;
+
+    const body = document.createElement("div");
+
+    if (Array.isArray(content)) {
+        content.forEach(item => {
+            const p = document.createElement("p");
+
+            if (typeof item === "object") {
+                p.textContent =
+                    item.summary ||
+                    item.text ||
+                    item.explanation ||
+                    JSON.stringify(item);
+            } else {
+                p.textContent = item;
+            }
+
+            body.appendChild(p);
+        });
+    } else {
+        const p = document.createElement("p");
+        p.textContent = content;
+        body.appendChild(p);
+    }
+
+    card.appendChild(title);
+    card.appendChild(body);
+    container.appendChild(card);
+}
 
         /* start up */
 
