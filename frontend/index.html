@@ -663,10 +663,10 @@
 
             <div class="player-stats">
                 <p>Level: <span id="user-level">Loading...</span></p>
-                <p>Streak: <span id="user-streak">0</span>days</p>
+                <p>Streak: <span id="user-streak">0</span> days</p>
                 <p>XP: <span id="current-xp">0</span></p>
-                <p>XP: <span id="next-level-xp">0</span></p>
-            </div>
+                <p>XP to next level: <span id="next-level-xp">0</span></p>
+            </div> 
             <p>
                 You're about to enter realistic conversations where you
                 must figure out what's legitimate and what's a scam.
@@ -1044,9 +1044,9 @@
 
             <button
                 class="primary-button"
-                onclick="playAgain()">
+                onclick="showBreakdown(window.lastResult)">
 
-                Play Again
+                [See Breakdown]
 
             </button>
 
@@ -1347,7 +1347,7 @@
         }
 
     async function loadPlayerProfile(playerId) {
-      const url = `/player/${playerId}/radar`;
+      const url = `/api/player/${playerId}/radar`;
 
       try {
         const response = await fetch(url);
@@ -1558,6 +1558,7 @@
                 return;
             }
 
+            window.lastResult = result;
             const ending = result.ending;
 
             document.getElementById("resultIcon").textContent =
@@ -1577,25 +1578,6 @@
             details.innerHTML = "";
 
             addDetail(details, "Biggest clue", result.biggest_clue);
-
-            if (verificationCall) {
-                addDetailList(details, verificationCall.title,
-                    verificationCall.lines.map(line =>
-                        (line.speaker === "player" ? "You" : verificationCall.official_name) + ": " + line.text));
-            }
-
-            addDetailList(details, "Points: " + result.points + " (+" + result.xp_earned + " XP)",
-                result.points_breakdown.map(item => item.label + " (" + (item.points > 0 ? "+" : "") + item.points + ")"));
-
-            if (result.explanation.best_decision) {
-                addDetail(details, "Best decision", result.explanation.best_decision);
-            }
-
-            addDetail(details, "Tip", result.tip.text);
-
-            if (result.new_badges.length) {
-                addDetail(details, "New badges", result.new_badges.map(badge => badge.name).join(", "));
-            }
 
             showScreen("resultScreen");
         }
