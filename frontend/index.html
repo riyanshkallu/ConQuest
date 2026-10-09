@@ -1882,20 +1882,18 @@
 
             addDetail(details, "Biggest clue", result.biggest_clue);
 
-            const scoreData = document.createElement("pre");
-            scoreData.style.whiteSpace = "pre-wrap";
-            scoreData.style.overflowWrap = "anywhere";
-            scoreData.textContent =
-                "Score data from backend:\n" +
-                JSON.stringify({
-                    points: result.points, 
-                    xp: result.xp,
-                    score: result.score,
-                    ending: result.ending
-                }, null, 2);
+            addDetail(details, "Points", String(result.points ?? 0));
+            addDetail(details, "XP earned", String(result.xp_earned ?? 0));
 
-        details.appendChild(scoreData);
-        
+            if (Array.isArray(result.points_breakdown)) {
+                addDetail(
+                    details,
+                    "How you scored",
+                    result.points_breakdown
+                        .map(item => `${item.label}: ${item.points > 0 ? "+" : ""}${item.points}')
+                        .join("\n")
+                    );
+            }
             showScreen("resultScreen");
         }
 
