@@ -2009,6 +2009,9 @@ initializeGame();
 
     // Mistakes
     if (explanation.mistakes && explanation.mistakes.length) {
+        const UniqueMistakes = [
+            ...new Set(explanation.mistakes)
+        ];
         addBreakdownCard(
             content,
             "⚠️ Mistakes",
