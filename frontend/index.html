@@ -642,6 +642,38 @@
                 margin-bottom: 10px;
                 margin-top: 0px;
             }
+        
+            .breakdown-card-content {
+                display: flex;
+                flex-direction: column;
+                gap: 14px;
+            }
+            
+            .breakdown-entry {
+                background: #f4f6f8;
+                border: 1px solid #e1e6eb;
+                border-radius: 12px;
+                padding: 16px;
+            }
+            
+            .breakdown-entry h4 {
+                font-size: 16px;
+                margin-bottom: 10px;
+                line-height: 1.5;
+                overflow-wrap: anywhere;
+            }
+            
+            .breakdown-entry p {
+                overflow-wrap: anywhere;
+            }
+            
+            .breakdown-entry p:last-child {
+                margin-bottom: 0;
+            }
+            
+            .breakdown-card h3 {
+                margin-bottom: 14px;
+            }
 
         /* loading screen code */
 
@@ -1983,7 +2015,7 @@ initializeGame();
 
             content.innerHTML = "";
 
-             if (["SCAMMED", "ALMOST_SCAMMED", "OUTSMARTED", "ESCAPED"].includes(ending.code)) {
+            if (explanation.type === "scam_autopsy") {
                 title.textContent = "Scam Autopsy";
             } else {
                 title.textContent = "Legit Breakdown";
@@ -2009,13 +2041,13 @@ initializeGame();
 
     // Mistakes
     if (explanation.mistakes && explanation.mistakes.length) {
-        const UniqueMistakes = [
+        const uniqueMistakes = [
             ...new Set(explanation.mistakes)
         ];
         addBreakdownCard(
             content,
             "⚠️ Mistakes",
-            explanation.mistakes
+            uniqueMistakes
         );
     }
 
@@ -2118,6 +2150,15 @@ if (Array.isArray(content)) {
         }
 
         if (item.player_response) {
+            const responseLabels = {
+        fell_for_it: "❌ Fell for the clue",
+        detected: "✅ Detected the clue",
+        no_response: "➖ No response recorded"
+    };
+
+    const responseText =
+        responseLabels[item.player_response] ||
+        item.player_response.replace(/_/g, " ");
             addDetail(entry, "Your response", item.player_response);
         }
 
