@@ -1954,7 +1954,7 @@
         if (!result) {
             console.error("No result data available.");
             return;
-        }
+        }    
 
             const ending = result.ending || "";
             const explanation = result.explanation || {};
@@ -2008,58 +2008,124 @@
 
     showScreen("breakdownScreen");
 }
-        function addBreakdownCard(container, heading, content) {
-    const card = document.createElement("div");
-    card.className = "breakdown-card";
-
-    const title = document.createElement("h2");
-    title.textContent = heading;
-
-    const body = document.createElement("div");
-
-    if (Array.isArray(content)) {
-        content.forEach(item => {
-            const p = document.createElement("p");
-
-            if (typeof item === "object") {
-                p.textContent =
-                    item.summary ||
-                    item.text ||
-                    item.explanation ||
-                    JSON.stringify(item);
-            } else {
-                p.textContent = item;
-            }
-
-            body.appendChild(p);
-        });
-    } else {
-        const p = document.createElement("p");
-        p.textContent = content;
-        body.appendChild(p);
-    }
-
-    card.appendChild(title);
-    card.appendChild(body);
-    container.appendChild(card);
+        function addBreakdownCard(container, headingText, content) {
+if (
+!container ||
+content === null ||
+content === undefined ||
+content === ""
+) {
+return;
 }
 
-        /* start up */
 
-        async function init() {
+if (Array.isArray(content) && content.length === 0) {
+    return;
+}
 
-            try {
-                await setUpPlayer();
-                await loadPlayerProfile(playerId);
-                await loadScenarios();
-            } catch (error) {
-                console.error("Can't reach the backend:", error);
+const card = document.createElement("div");
+card.className = "breakdown-card";
+
+const heading = document.createElement("h3");
+heading.textContent = headingText;
+card.appendChild(heading);
+
+const body = document.createElement("div");
+body.className = "breakdown-card-content";
+
+function addDetail(parent, label, value) {
+    if (value === null || value === undefined || value === "") {
+        return;
+    }
+
+    const paragraph = document.createElement("p");
+
+    if (label) {
+        const strong = document.createElement("strong");
+        strong.textContent = label + ": ";
+        paragraph.appendChild(strong);
+    }
+
+    const text = typeof value === "object"
+        ? JSON.stringify(value)
+        : String(value);
+
+    paragraph.appendChild(document.createTextNode(text));
+    parent.appendChild(paragraph);
+}
+
+if (Array.isArray(content)) {
+    content.forEach((item, index) => {
+        if (typeof item !== "object" || item === null) {
+            addDetail(body, "", "• " + String(item));
+            return;
+        }
+
+        const entry = document.createElement("div");
+        entry.className = "breakdown-entry";
+
+        const entryHeading = document.createElement("h4");
+        entryHeading.textContent =
+            item.summary ||
+            item.text ||
+            item.label ||
+            "Turn " + (item.turn ?? index + 1);
+
+        entry.appendChild(entryHeading);
+
+        if (item.turn !== undefined) {
+            addDetail(entry, "Turn", item.turn);
+        }
+
+        if (item.flag) {
+            if (typeof item.flag === "object") {
+                addDetail(
+                    entry,
+                    "Clue",
+                    item.flag.label || item.flag.kind || item.flag.id
+                );
+
+                addDetail(
+                    entry,
+                    "Why it matters",
+                    item.flag.explanation
+                );
+            } else {
+                addDetail(entry, "Clue", item.flag);
             }
         }
 
-        init();
+        if (item.player_response) {
+            addDetail(entry, "Your response", item.player_response);
+        }
 
+        if (item.explanation && !item.flag) {
+            addDetail(entry, "Explanation", item.explanation);
+        }
+
+        if (item.text && item.summary) {
+            addDetail(entry, "Details", item.text);
+        }
+
+        body.appendChild(entry);
+    });
+} else if (typeof content === "object") {
+    Object.entries(content).forEach(([key, value]) => {
+        addDetail(
+            body,
+            key.replace(/_/g, " "),
+            value
+        );
+    });
+} else {
+    addDetail(body, "", content);
+}
+
+card.appendChild(body);
+container.appendChild(card);
+
+
+}
     </script>
-
 </body>
-</html>
+    </html>
