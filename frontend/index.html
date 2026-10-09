@@ -1250,8 +1250,14 @@
                 class="primary-button"
                 onclick="showBreakdown(window.lastResult)">
 
-                [See Breakdown]
+                See Breakdown
 
+            </button>
+
+            <button
+                class="primary-button"
+                onclick="playAgain()">
+                Play Again
             </button>
 
         </div>
@@ -1685,7 +1691,7 @@
 
                 if (response.blocked) {
                     sent.remove();  // it was never sent, so don't show it as sent
-                    addMessage("notification", response.blocked_reason);
+                    addMessage("notification", response.blocked_reason || "Due to security concerns, this message was blocked. You may only use information from the fictional ID Card.");
                 }
 
                 handleTurn(response);
