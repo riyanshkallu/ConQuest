@@ -1952,6 +1952,22 @@
                 }
 
             });
+
+        async function initializeGame(){
+            try {
+                await setUpPlayer();
+        await loadPlayerProfile(playerId);
+        await loadScenarios();
+
+        console.log("Game initialized. Player ID:", playerId);
+    } catch (error) {
+        console.error("Game initialization failed:", error);
+    }
+}
+
+initializeGame();
+                
+        }
         /* breakdown screen */
 
         function showBreakdown(result) {
