@@ -112,7 +112,7 @@
         }
 
 
-    .default-tier {color: #f4f6f8; font-weight: 10;}
+    .default-tier {color: #17202a; font-weight: 10;}
         
     .bronze-tier { color: #cd7f32; }
 
@@ -682,94 +682,114 @@
             color: #97bfb9;
         }
 
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
         
-        /* responsive code */
+#verificationScreen {
+    align-items: center;
+    justify-content: center;
+}
 
-        @media (max-width: 750px) {
+.verification-container {
+    max-width: 635px;
+    margin: 20px auto;
+}
 
-            .home-card h1 {
-                font-size: 32px;
-            }
+.verification-subtitle {
+    color: #687481;
+    line-height: 1.6;
+    margin-top: 12px;
+}
 
-            .scenario-grid {
-                grid-template-columns: 1fr;
-            }
+.verification-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 20px 0;
+}
 
-            .chat-container {
-                height: 100vh;
-                max-height: none;
-                border-radius: 0;
-            }
+.verification-line {
+    padding: 14px 16px;
+    border-radius: 14px;
+    line-height: 1.5;
+    background: #f0f3f6;
+}
 
-            #chatScreen {
-                padding: 0;
-            }
+.verification-line.official {
+    align-self: flex-start;
+    max-width: 85%;
+}
 
-            .actions {
-                grid-template-columns: repeat(2, 1fr);
-            }
+.verification-line.player {
+    align-self: flex-end;
+    max-width: 85%;
+    background: #dceafe;
+}
 
-            .bubble {
-                max-width: 85%;
-            }
-        }
+.verification-line p {
+    margin-top: 5px;
+}
 
-        @media (max-width: 450px) {
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
 
-            .chat-id-panel {
-                width: 90%;
-            }
-            .screen {
-                padding: 15px;
-            }
+/* Responsive code */
 
-            .home-card {
-                padding: 35px 22px;
-            }
+@media (max-width: 750px) {
+    .home-card h1 {
+        font-size: 32px;
+    }
 
-            .page-title h2 {
-                font-size: 28px;
-            }
+    .scenario-grid {
+        grid-template-columns: 1fr;
+    }
 
-            .actions {
-                grid-template-columns: repeat(2, 1fr);
-            }
+    .chat-container {
+        height: 100vh;
+        max-height: none;
+        border-radius: 0;
+    }
 
-            .action-button {
-                font-size: 11px;
-            }
-            .verification-container {
-                max-width: 635px;
-                margin: 20px auto;
-            }
+    #chatScreen {
+        padding: 0;
+    }
 
-            .verification-subtitle {
-                color: #687481;
-                line-height: 2.0;
-            }
+    .actions {
+        grid-template-columns: repeat(2, 1fr);
+    }
 
-            .verification-lines {
-                display: flex;
-                flex-direction: column;
-                gap: 12px;
-                margin: 20px;
-            }
-            .verification-lines.official {
-                align-self: flex-start;
-                max-width: 85%;
-            }
+    .bubble {
+        max-width: 85%;
+    }
+}
 
-            .verification-line.player {
-                align-self: flex-end;
-                max-width: 85%;
-                background: #dceafe;
-            }
-        }
+@media (max-width: 450px) {
+    .chat-id-panel {
+        width: 90%;
+    }
+
+    .screen {
+        padding: 15px;
+    }
+
+    .home-card {
+        padding: 35px 22px;
+    }
+
+    .page-title h2 {
+        font-size: 28px;
+    }
+
+    .actions {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .action-button {
+        font-size: 11px;
+    }
+}
+          
     </style>
 </head>
 
@@ -1059,23 +1079,11 @@
                     </div>
 
                 </div>
-
-                <section id="verificationScreen" class="screen">
-                    <div class="container verification container">
-                        <h1 id="verificationTitle">Verification Call</h1>
-
-                        <p class="verification-subtitle"> You have contacted an organization via the trusted number.</p>
-
-                        <div id="verificationLines" class="verification-lines"></div>
-
-                        <button
-                            class="primary-button"
-                            onclick="returnFromVerification()"> Return to Game </button>
-
+                    
                 <div class="turn-counter">
                     Turn <span id="turnNumber">0</span> of <span id="maxTurns">10</span>
                 </div>
-                </section>
+              
 
             <button 
                 class="id-button"
@@ -1197,6 +1205,22 @@
         </div>
 
     </section>
+
+      <section id="verificationScreen" class="screen">
+                    <div class="container verification-container">
+                        <h1 id="verificationTitle">Verification Call</h1>
+
+                        <p class="verification-subtitle"> You have contacted an organization via the trusted number.</p>
+
+                        <div id="verificationLines" class="verification-lines"></div>
+
+                        <button
+                            class="primary-button"
+                            onclick="returnFromVerification()"> Return to Game </button>
+                    </div>
+
+                
+                </section>
 
 
     <!-- resulting html code -->
@@ -1738,7 +1762,7 @@
             const container = document.getElementById("verificationLines");
             container.innerHTML = "";
 
-            (call lines || []).forEach(line => {
+            (call.lines || []).forEach(line => {
                 const bubble = document.createElement("div");
                 bubble.className = "verification-line "+ (line.speaker === "player" ? "player" : "official");
 
@@ -1746,7 +1770,7 @@
                 speaker.textContent =
                     line.speaker === "player" ? "You" : (call.official_name || "Official");
 
-                const message = document.createElement("p);
+                const message = document.createElement("p");
                     message.textContent = line.text;
 
                 bubble.append(speaker, message);
@@ -1761,9 +1785,9 @@
                window.verificationRoundEnded = false;
                finishRound();
         } else {
-            showScreen("chatscreen");
+            showScreen("chatScreen");
         }
-        
+    } 
         
         async function openLink(link) {
 
@@ -1808,7 +1832,7 @@
                 verificationCall = response.verification_call;
                 showVerificationCall(verificationCall);
 
-                window.verificationRoundEnd = response.ended;
+                window.verificationRoundEnded = response.ended;
                 return;
             }
 
