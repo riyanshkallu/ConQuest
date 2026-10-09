@@ -1882,6 +1882,20 @@
 
             addDetail(details, "Biggest clue", result.biggest_clue);
 
+            const scoreData = document.createElement("pre");
+            scoreData.style.whiteSpace = "pre-wrap";
+            scoreData.style.overflowWrap = "anywhere";
+            scoreData.textContent =
+                "Score data from backend:\m" +
+                JSON.stringify({
+                    points: result.points, 
+                    xp: result.xp,
+                    score: result.score,
+                    ending: result.ending
+                }, null, 2};
+
+        details.appendChild(scoreData);
+        
             showScreen("resultScreen");
         }
 
