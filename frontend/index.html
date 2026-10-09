@@ -1886,13 +1886,13 @@
             scoreData.style.whiteSpace = "pre-wrap";
             scoreData.style.overflowWrap = "anywhere";
             scoreData.textContent =
-                "Score data from backend:\m" +
+                "Score data from backend:\n" +
                 JSON.stringify({
                     points: result.points, 
                     xp: result.xp,
                     score: result.score,
                     ending: result.ending
-                }, null, 2};
+                }, null, 2);
 
         details.appendChild(scoreData);
         
