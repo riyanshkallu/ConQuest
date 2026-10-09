@@ -1409,8 +1409,10 @@
                     };
                 }
 
-                const round = await api("POST", "/round/start", body);
+                console.log("Starting round with:", JSON.stringify(body));
 
+                const round = await api("POST", "/round/start", body);
+                
                 roundId = round.round_id;
                 openingRound = round;
                 roundOver = false;
