@@ -1891,6 +1891,7 @@
         /* after turn */
 
         function handleTurn(response) {
+            console.log("TURN RESPONSE:", response);
 
             if (response.reply) {
                 addMessage("contact", response.reply.text, response.reply.links);
