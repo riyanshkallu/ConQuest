@@ -275,27 +275,38 @@
             background: rgba(255,255,255,0.2);
         }
 
+       
+/* Chat and ID card side-by-side layout */
+        .chat-layout {
+            display: flex;
+            align-items: stretch;
+            gap: 20px;
+            width: 100%;
+            max-width: 1060px;
+            height: 90vh;
+            max-height: 850px;
+            margin: auto;
+        }
+
         .chat-id-panel {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 340px;
+            position: static;
+            flex: 0 0 300px;
+            width: 300px;
             height: 100%;
             background: white;
-            z-index: 10;
+            border-radius: 20px;
             padding: 20px;
-            box-shadow: -8px 0 25px rgba(0,0,0,0.15);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
             overflow-y: auto;
-            transform: translateX(100%);
-            transition: transform 0.2s ease;
-            word-break: break-word;
+            overflow-wrap: anywhere;
+            display: none;
         }
 
         .chat-id-panel.open {
-            transform: translateX(0);
+            display: block;
         }
 
-        .chat-id-panel-header {
+     .chat-id-panel-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -306,6 +317,7 @@
             font-size: 25px;
         }
 
+       
         .id-close-button {
             border: none;
             background: #e8ecef;
@@ -313,6 +325,7 @@
             height: 25px;
             border-radius: 13px;
             font-weight: bold;
+            flex-shrink: 0;
         }
 
         .chat-id-description {
@@ -344,10 +357,12 @@
         }
 
         .chat-container {
-            width: 100%;
+            flex: 1;
+            min-width: 0;
+            width: auto;
             max-width: 700px;
-            height: 90vh;
-            max-height: 850px;
+            height: 100%;
+            max-height: none;
             background: white;
             border-radius: 22px;
             position: relative;
@@ -821,7 +836,33 @@
         font-size: 11px;
     }
 }
-          
+      @media (max-width: 900px) {
+        .chat-layout {
+        flex-direction: column;
+        height: auto;
+        max-height: none;
+        gap: 12px;
+    }
+
+    .chat-container {
+        flex: none;
+        width: 100%;
+        max-width: none;
+        height: 85vh;
+        min-height: 500px;
+    }
+
+    .chat-id-panel {
+        flex: none;
+        width: 100%;
+        height: auto;
+        max-height: 300px;
+    }
+
+    #chatScreen {
+        padding: 12px;
+    }
+}    
     </style>
 </head>
 
@@ -1079,7 +1120,6 @@
                 Back to Result
                 
             </button>
-
             
          </div>
      </section>
@@ -1088,6 +1128,7 @@
 
     <section id="chatScreen" class="screen">
 
+        <div class="chat-layout">
         <div class="chat-container">
 
             <header class="chat-header">
@@ -1125,24 +1166,7 @@
 
             </header>
 
-            <div id="chatIdPanel" class="chat-id-panel">
-
-                <div class="chat-id-panel-header">
-                    <h2>ID CARD</h2>
-
-                    <button
-                        class="id-close-button"
-                        onclick="toggleChatIDCard()">
-                        X
-                    </button>
-                </div>
-
-                <p class="chat-id-description">
-                    This information can be used to assist you in the conversation.
-                </p>
-
-                <div id="chatIdRows"></div>
-            </div>
+          
             
             <div
                 id="chatMessages"
@@ -1231,12 +1255,30 @@
                     Send
 
                 </button>
-
             </div>
-
         </div>
+                
+                <div id="chatIdPanel" class="chat-id-panel">
 
+                    <div class="chat-id-panel-header">
+                        <h2>ID CARD</h2>
+
+                        <button
+                            class="id-close-button"
+                            onclick="toggleChatIDCard()">
+                            X
+                        </button>
+                    </div>
+                 
+                    <p class="chat-id-description">
+                        This information can be used to assist you in the conversation.
+                    </p>
+    
+                    <div id="chatIdRows"></div>
+                </div>
+                </div>
     </section>
+    
 
       <section id="verificationScreen" class="screen">
                     <div class="container verification-container">
