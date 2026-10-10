@@ -1598,6 +1598,9 @@
 
             const round = openingRound;
 
+            console.log("Opening round:", round?.round_id);
+            console.log("Current roundId:", roundId);
+
             document.getElementById("chatIdPanel").classList.add("open");
         
             document.getElementById("contactName").textContent = round.contact.name;
@@ -1765,6 +1768,7 @@
             setBusy(true);
 
             try {
+                console.log("Sending message to round:", roundId);
                 const response = await api("POST", "/round/" + roundId + "/message", { text: text });
 
                 if (response.blocked) {
