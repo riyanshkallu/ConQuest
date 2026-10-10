@@ -2195,13 +2195,14 @@ if (Array.isArray(content)) {
             const responseLabels = {
         fell_for_it: "❌ Fell for the clue",
         detected: "✅ Detected the clue",
-        no_response: "➖ No response recorded"
+        no_response: "➖ No response recorded",
+        missed: "❌ Missed the clue"
     };
 
     const responseText =
         responseLabels[item.player_response] ||
         item.player_response.replace(/_/g, " ");
-            addDetail(entry, "Your response", item.player_response);
+            addDetail(entry, "Your response", responseText);
         }
 
         if (item.explanation && !item.flag) {
