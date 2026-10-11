@@ -83,13 +83,18 @@ def test_each_tip_shows_once_per_round(monkeypatch, setup, is_scam):
 
 
 @both
-def test_tapping_a_link_gets_the_link_tip(monkeypatch, setup, is_scam):
+def test_tapping_a_link(monkeypatch, setup, is_scam):
     rnd = start(monkeypatch, is_scam)
     link = "example-link.example/login"
     store.get_round(rnd["round_id"]).transcript.append(
         {"turn": 0, "sender": "contact", "text": link, "links": [link], "flag": None})
     r = client.post(f"/api/round/{rnd['round_id']}/action", json={"action": "open_link", "link": link}).json()
-    assert r["coach_tip"] == game.COACH_TIPS["link"]
+    if is_scam:  # the scammer's fake site ends the round; the result screen explains it
+        assert r["ended"] and r["ending"]["code"] == "SCAMMED"
+        result = client.get(f"/api/round/{rnd['round_id']}/result").json()
+        assert "You opened a link the scammer sent." in result["explanation"]["mistakes"]
+    else:  # a real contact's link is safe, so the round goes on with a tip
+        assert not r["ended"] and r["coach_tip"] == game.COACH_TIPS["link"]
 
 
 def test_sharing_a_code_with_a_real_contact_gets_the_code_tip(monkeypatch, setup):

@@ -121,19 +121,30 @@ async def start_round(request: Request, body: schemas.StartRoundRequest):
 async def send_message(round_id: str, body: schemas.SendMessageRequest):
     rnd = game.require_round(round_id)
     async with _one_at_a_time(rnd):
-        return await game.send_message(rnd, body.text, get_ai())
+        try:
+            return await game.send_message(rnd, body.text, get_ai())
+        finally:
+            store.save_round(rnd)  # so a restart doesn't lose the round
 
 
 @app.post("/api/round/{round_id}/action", response_model=schemas.ActionResponse)
 async def do_action(round_id: str, body: schemas.ActionRequest):
     rnd = game.require_round(round_id)
     async with _one_at_a_time(rnd):
-        return await game.do_action(rnd, body.action, body.link, get_ai())
+        try:
+            return await game.do_action(rnd, body.action, body.link, get_ai())
+        finally:
+            store.save_round(rnd)
 
 
 @app.get("/api/round/{round_id}/result", response_model=schemas.ResultResponse)
 async def get_result(round_id: str):
-    return await game.get_result(game.require_round(round_id), get_ai())
+    rnd = game.require_round(round_id)
+    had_result = rnd.result is not None
+    result = await game.get_result(rnd, get_ai())
+    if not had_result:
+        store.save_round(rnd)  # keep the explanation, so the Explainer runs once even across restarts
+    return result
 
 
 def client_ip(request: Request) -> str:

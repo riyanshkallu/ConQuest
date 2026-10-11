@@ -261,12 +261,20 @@ def test_legit_contact_pressure_is_capped():
 
 # --- Other rules -----------------------------------------------------------
 
-def test_open_link_raises_risk_without_using_a_turn():
+def test_opening_a_scammers_link_ends_the_round_as_scammed():
     state = scam_round()
-    engine.open_link(state, "secure-verify-account.example")
-    assert state.risk == engine.LINK_RISK
-    assert state.turns == 0
+    engine.record_character_move(state, "urgency")
+    assert engine.open_link(state, "secure-verify-account.example") == "SCAMMED"
+    assert state.ending == "SCAMMED" and state.turns == 0  # not a turn, but the round is over
     assert "suspicious_link" in state.tactics_used
+    assert {(e.flag_id, e.response) for e in state.timeline} == {("urgency", "fell_for_it"),
+                                                               ("suspicious_link", "fell_for_it")}
+
+
+def test_opening_a_real_contacts_link_is_safe():
+    state = RoundState(is_scam=False, id_card=make_card(), objective="confirm_charge")
+    assert engine.open_link(state, "careers.riverside.example") is None
+    assert not state.ended and state.risk == engine.LINK_RISK and state.mistakes == 0
 
 
 def test_cannot_play_after_round_ends():

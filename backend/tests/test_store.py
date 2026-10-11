@@ -59,6 +59,32 @@ def test_settings_and_reset_are_saved():
     assert store.get_player(pid).hints is True
 
 
+def test_a_round_in_progress_survives_a_restart():
+    pid = client.post("/api/player", json={}).json()["player_id"]
+    start = client.post("/api/round/start", json={"player_id": pid, "scenario_id": "bank_alert"}).json()
+    rid = start["round_id"]
+    client.post(f"/api/round/{rid}/message", json={"text": "Who is this?"})
+    before = store.get_round(rid)
+
+    store.forget_cache()  # Render restarted the server mid-round
+
+    r = client.post(f"/api/round/{rid}/message", json={"text": "How do I know this is real?"})
+    assert r.status_code == 200 and r.json()["turn"] == 2  # the first turn still counts
+    after = store.get_round(rid)
+    assert after.state.id_card == before.state.id_card and after.state.is_scam == before.state.is_scam
+    assert [m["text"] for m in after.transcript][:3] == [m["text"] for m in before.transcript][:3]
+
+    client.post(f"/api/round/{rid}/action", json={"action": "verify"})
+    result = client.get(f"/api/round/{rid}/result").json()
+    store.forget_cache()
+    assert client.get(f"/api/round/{rid}/result").json() == result  # same explanation, not a new one
+    assert len(rows(db.rounds)) == 1  # finished once, logged once
+
+
+def test_unknown_round_is_still_not_found():
+    assert client.post("/api/round/r_nope/message", json={"text": "hi"}).status_code == 404
+
+
 def test_finished_rounds_are_logged_with_messages():
     pid, rid = play_a_round()
     (rnd,) = rows(db.rounds)

@@ -221,7 +221,10 @@ async def do_action(rnd: store.Round, action: str, link: str | None, ai: AIProvi
         sent_links = {l for m in rnd.transcript if m["sender"] == "contact" for l in m["links"]}
         if link not in sent_links:
             raise GameError(400, "invalid_request", "That link isn't in this conversation.")
-        engine.open_link(state, link)
+        ending = engine.open_link(state, link)
+        _add_notification(rnd, f"You opened {link}.")
+        if ending:  # the scammer's fake site: round over
+            return _ended_response(rnd, schemas.ActionResponse)
         return schemas.ActionResponse(turn=state.turns, max_turns=state.max_turns, hint=_hint(rnd),
                                       coach_tip=_give_tip(rnd, "link"))
 
