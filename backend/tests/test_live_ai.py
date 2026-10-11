@@ -93,6 +93,46 @@ def test_legit_contact_cannot_ask_for_a_code_but_can_warn_about_one():
     assert check_character(warns, ctx) is None
 
 
+@pytest.mark.parametrize("message", [
+    "Please confirm your card PIN so we can unlock the account.",
+    "What is your home address?",
+    "To verify you, reply with your date of birth.",
+    "Please provide the expiration date and CVV on your card.",
+    "Send me your online banking password now.",  # bank_alert's card has no password
+])
+def test_contact_cannot_ask_for_things_not_on_the_id_card(message):
+    out = CharacterOut(message=message, tactic="credential_request", pressure=60)
+    assert check_character(out, make_ctx()) == "asked for something not on the ID card"
+
+
+@pytest.mark.parametrize("message", [
+    "Please read me the one-time code we just sent.",  # bank_alert sends a code, so it's fair game
+    "Confirm your email address and the last four digits of your card.",
+    "We will never ask for your PIN or home address.",
+])
+def test_contact_can_ask_for_id_card_items(message):
+    out = CharacterOut(message=message, tactic="credential_request", pressure=60)
+    assert check_character(out, make_ctx()) is None
+
+
+@pytest.mark.parametrize("message", [
+    "hi, this is the fraud team. we need to verify you.",
+    "This is the fraud team. i need you to verify now.",
+    "Pls verify ur account right away.",
+    "Can u confirm this purchase?",
+    "Your account is locked 🔒 Verify now.",
+])
+def test_informal_writing_is_rejected(message):
+    out = CharacterOut(message=message, tactic="urgency", pressure=60)
+    assert check_character(out, make_ctx()) == "informal writing"
+
+
+def test_fake_links_dont_count_as_lowercase():
+    out = CharacterOut(message="secure-login.example/verify is our secure page. Please log in now.",
+                       tactic="suspicious_link", pressure=60)
+    assert check_character(out, make_ctx()) is None
+
+
 # --- Provider chain -------------------------------------------------------
 
 def test_rate_limited_provider_falls_through_to_next():

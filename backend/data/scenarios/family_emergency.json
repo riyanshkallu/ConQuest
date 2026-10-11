@@ -113,12 +113,12 @@
     ],
     "opening": {
       "flag": "emotional_manipulation",
-      "text": "Hey it's me, {relative}! I lost my phone so I'm texting from a friend's. I'm in trouble and really need your help 😞"
+      "text": "Hi, it's me, {relative}. I lost my phone, so I'm texting from a friend's. I'm in trouble and really need your help."
     },
     "key_message": "Can you get {gift_store} gift cards and text me pics of the codes? That's the only way they'll take payment.",
     "lines": {
       "emotional_manipulation": [
-        "I'm so scared and embarrassed. You're the only one I trust right now. Please help me 😢",
+        "I'm so scared and embarrassed. You're the only one I trust right now. Please help me.",
         "I really messed up and I don't know who else to ask. Please don't let me down."
       ],
       "fear": [

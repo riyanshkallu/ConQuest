@@ -64,6 +64,17 @@ def test_prompts_describe_the_difficulty(difficulty):
     assert f"Difficulty {difficulty} of 5: {prompts.SCAM_STYLE[difficulty]}" in scam
     assert prompts.LEGIT_STYLE[difficulty] in legit
     assert "never ask for secrets or money" in legit  # honesty doesn't depend on difficulty
+    assert "typo" not in scam + legit and "informal" not in scam + legit  # everyone writes properly
+    assert prompts.WRITING_RULES in scam and prompts.WRITING_RULES in legit
+
+
+def test_prompt_lists_only_this_rounds_id_card_items():
+    bank = prompts.character_system(ctx(True, 3))
+    assert "the one-time code the bank texts them" in bank
+    assert "password" not in prompts.card_items(ctx(True, 3))  # bank_alert's card has no password
+    job = get_scenario("job_offer")
+    state = engine.RoundState(is_scam=True, id_card=new_id_card(job, random.Random(1)), objective="x")
+    assert "online banking password" in prompts.card_items(TurnContext(scenario=job, state=state))
 
 
 def test_fallback_scammer_is_patient_at_high_difficulty():
