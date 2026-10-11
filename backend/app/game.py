@@ -37,7 +37,6 @@ SLOW_DOWN_SECONDS = 5.0
 COACH_TIPS = {
     "code": "Never share a one-time code or password, even with someone who seems real.",
     "personal": "Think twice before sharing personal details with someone who contacted you first.",
-    "link": "Links in surprise messages can lead to fake sites. Open the official app or website yourself instead.",
     "slow_down": "You answered in {seconds}. Scammers count on quick replies, so it's OK to pause and check.",
     "ask_first": "Before you go along, you can ask how to check who you're talking to.",
 }
@@ -221,12 +220,9 @@ async def do_action(rnd: store.Round, action: str, link: str | None, ai: AIProvi
         sent_links = {l for m in rnd.transcript if m["sender"] == "contact" for l in m["links"]}
         if link not in sent_links:
             raise GameError(400, "invalid_request", "That link isn't in this conversation.")
-        ending = engine.open_link(state, link)
+        engine.open_link(state, link)  # always ends the round: SCAMMED, or LUCKY for a real contact
         _add_notification(rnd, f"You opened {link}.")
-        if ending:  # the scammer's fake site: round over
-            return _ended_response(rnd, schemas.ActionResponse)
-        return schemas.ActionResponse(turn=state.turns, max_turns=state.max_turns, hint=_hint(rnd),
-                                      coach_tip=_give_tip(rnd, "link"))
+        return _ended_response(rnd, schemas.ActionResponse)
 
     if action == "ask_proof":
         contact = render(version["contact"]["name"], rnd.scenario, state.id_card)
