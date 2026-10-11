@@ -26,6 +26,44 @@ MAX_WORDS = 70
 _REAL_DOMAIN_RE = re.compile(r"\b[\w-]+\.(com|net|org|io|co|gov|us|edu|app|me|ly)\b", re.IGNORECASE)
 _BLOCKLIST_RE = re.compile(r"\b(social security|ssn|kill|hurt you|sexy|as an ai|language model)\b", re.IGNORECASE)
 _ASKS_FOR_SECRET_RE = re.compile(r"\b(send|give|tell|read|share|text)\b[^.?!]{0,40}\b(code|password|pin)\b", re.IGNORECASE)
+_NEGATION_RE = re.compile(r"\b(never|don't|do not|not)\b", re.IGNORECASE)
+_ASK_VERBS = r"\b(?:send|give|tell|share|text|read|confirm|provide|enter|type|verify|need|reply with|what's|what is|ask for)\b"
+# Things no ID card has, so the player could never answer. Asking for them breaks the game.
+_NEVER_ON_CARD = [r"pins?", r"cvv", r"cvc", r"security code on the back", r"(?:3|three)[- ]digit code",
+                  r"expiration date", r"expiry date", r"(?<!email )(?<!e-mail )(?<!web )address(?:es)?",
+                  r"date of birth", r"birth ?date", r"birthday", r"maiden name", r"routing number",
+                  r"account number", r"security questions?", r"driver'?s licen[cs]e"]
+_TEXTING_RE = re.compile(r"\b(?:pls|plz|thx|lol|omg|btw|gonna|wanna|gotta|idk|rn)\b", re.IGNORECASE)
+_LOWERCASE_RE = re.compile(r"(?:^\W*|[.!?]\s+)[a-z]|\b(?:i|u|ur)\b")  # lowercase sentence start, "i", "u", "ur"
+_EMOJI_RE = re.compile("[\U0001F300-\U0001FAFF☀-➿]")
+_FAKE_LINK_RE = re.compile(r"\S+\.example\S*")
+
+
+def _not_on_card(ctx: TurnContext) -> list[str]:
+    """Patterns for items this round's ID card doesn't have."""
+    card, missing = ctx.state.id_card, list(_NEVER_ON_CARD)
+    if not card.password:
+        missing.append(r"passwords?")
+    if not card.gift_card_code:
+        missing.append(r"gift cards?(?: codes?)?")
+    if "code_notification" not in ctx.scenario.raw:
+        missing.append(r"(?:one-time|verification|login) codes?")
+    return missing
+
+
+def asks_off_card(text: str, ctx: TurnContext) -> bool:
+    """True if the message asks for something that isn't on the ID card ("Please confirm your PIN")."""
+    pattern = re.compile(_ASK_VERBS + r"[^.?!]{0,40}?\b(?:" + "|".join(_not_on_card(ctx)) + r")\b", re.IGNORECASE)
+    for match in pattern.finditer(text):
+        if not _NEGATION_RE.search(text[max(0, match.start() - 20):match.start()]):  # "we never ask for your PIN" is fine
+            return True
+    return False
+
+
+def is_informal(text: str) -> bool:
+    """Lowercase sentences, texting shortcuts or emojis. Fake links like secure-login.example are ignored."""
+    text = _FAKE_LINK_RE.sub("Link", text)
+    return bool(_LOWERCASE_RE.search(text) or _TEXTING_RE.search(text) or _EMOJI_RE.search(text))
 
 
 class AnalyzerOut(BaseModel):
@@ -65,6 +103,10 @@ def check_character(out: CharacterOut, ctx: TurnContext) -> str | None:
             around = text[max(0, match.start() - 20):match.end()]  # "don't send us codes" is fine
             if not re.search(r"\b(never|don't|do not|not)\b", around, re.IGNORECASE):
                 return "legit contact asked for a secret"
+    if asks_off_card(text, ctx):
+        return "asked for something not on the ID card"
+    if is_informal(text):
+        return "informal writing"
     if _REAL_DOMAIN_RE.search(text):
         return "real-looking website"
     if engine.blocked_reason(text, ctx.state.id_card):

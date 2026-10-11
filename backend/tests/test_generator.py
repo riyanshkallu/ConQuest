@@ -77,12 +77,12 @@ def test_family_phone_numbers_are_fictional_and_different():
     for seed in range(50):
         v = make_variant(FAMILY, random.Random(seed)).raw["vars"]
         assert v["parent_phone"] != v["friend_phone"]
-        assert re.fullmatch(r"\(614\) 555-01\d\d", v["parent_phone"])
+        assert re.fullmatch(r"\(555\) 555-01\d\d", v["parent_phone"])
 
 
 def test_seed_is_not_changed_by_variants():
     make_variant(BANK, random.Random(1), GOOD["bank_alert"])
-    assert get_scenario("bank_alert").raw["vars"]["bank"] == "Buckeye Federal Credit Union"
+    assert get_scenario("bank_alert").raw["vars"]["bank"] == "Harbor Point Bank"
 
 
 # --- Safety checks on AI-invented names -------------------------------------------
@@ -149,7 +149,7 @@ def test_round_uses_generated_names_everywhere(scenario_id):
 
     main_name = next(iter(names.values()))
     assert main_name in text
-    seed_names = {"bank_alert": "Buckeye Federal", "job_offer": "Riverside", "family_emergency": "Biscuit"}
+    seed_names = {"bank_alert": "Harbor Point", "job_offer": "Riverside", "family_emergency": "Biscuit"}
     assert seed_names[scenario_id] not in text  # the hand-written name was fully replaced
     assert not re.search(r"\{[a-z_]+\}", text), "unfilled placeholder"
     if scenario_id == "bank_alert":
@@ -192,7 +192,7 @@ def test_players_bank_varies_in_every_scenario(scenario):
 
 @pytest.mark.parametrize("bank,short", [
     ("Maple Valley Credit Union", "Maple Valley"),
-    ("Buckeye Federal Credit Union", "Buckeye"),
+    ("Harbor Point Bank", "Harbor Point"),
     ("Riverstone Community Bank", "Riverstone"),
     ("Timberline Savings Bank", "Timberline"),
     ("Pinecrest Credit Dominion", "Pinecrest"),

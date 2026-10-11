@@ -10,7 +10,7 @@
     "tracking": "48213977",
     "fee": "$1.99",
     "short_code": "29384",
-    "bank": "Buckeye Federal Credit Union"
+    "bank": "Harbor Point Bank"
   },
   "generate": {
     "carrier": {"ai": "a fictional package delivery company, one word, like 'SwiftShip'"},
@@ -19,8 +19,8 @@
     "fee": {"choice": ["$1.99", "$2.49", "$3.15", "$0.99"]},
     "short_code": {"digits": 5},
     "bank": {
-      "ai": "a fictional Ohio credit union or community bank where the player keeps their account, 2 to 4 words",
-      "choice": ["Buckeye Federal Credit Union", "Maple Valley Credit Union", "Lakeshore Hollow Credit Union",
+      "ai": "a fictional bank or credit union where the player keeps their account, 2 to 4 words",
+      "choice": ["Harbor Point Bank", "Maple Valley Credit Union", "Lakeshore Hollow Credit Union",
                  "Tall Pines Community Bank", "Cardinal Ridge Credit Union"]
     }
   },

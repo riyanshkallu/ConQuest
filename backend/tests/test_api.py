@@ -192,7 +192,7 @@ def test_verification_call_names_who_you_called(monkeypatch):
         call = act(rid, "verify")["verification_call"]
         assert call["lines"][0]["speaker"] == "official"
         calls[scenario] = call["official_name"]
-    assert calls == {"bank_alert": "Buckeye", "job_offer": "Riverside Outfitters",
+    assert calls == {"bank_alert": "Harbor Point", "job_offer": "Riverside Outfitters",
                      "family_emergency": "Aunt Dana"}
 
 
@@ -225,7 +225,7 @@ def test_job_legit_apply_is_lucky_and_verify_is_smart(monkeypatch):
 def test_family_id_card_has_the_family_details(monkeypatch):
     card = start(new_player(), is_scam=True, monkeypatch=monkeypatch, scenario="family_emergency")["id_card"]
     assert card["family"]["memory_answer"] == "Biscuit"
-    assert re.fullmatch(r"\(614\) 555-01\d\d", card["family"]["parent_phone"])  # randomized, always fictional
+    assert re.fullmatch(r"\(555\) 555-01\d\d", card["family"]["parent_phone"])  # randomized, always fictional
     assert card["gift_card"]["store"] == "PlayMart"
     # bank scenario has no family section
     assert start(new_player(), scenario="bank_alert")["id_card"]["family"] is None
@@ -240,7 +240,7 @@ def test_family_scam_gift_card_code_is_a_trap(monkeypatch):
 
 def test_family_phone_numbers_are_not_blocked(monkeypatch):
     rid = start(new_player(), is_scam=True, monkeypatch=monkeypatch, scenario="family_emergency")["round_id"]
-    assert not say(rid, "I'm calling Aunt Dana at (614) 555-0133")["blocked"]
+    assert not say(rid, "I'm calling Aunt Dana at (555) 555-0133")["blocked"]
 
 
 def test_family_legit_passing_the_message_is_lucky(monkeypatch):

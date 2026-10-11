@@ -6,17 +6,17 @@
   "par_turns": 5,
   "code_turn": 2,
   "vars": {
-    "bank": "Buckeye Federal Credit Union",
-    "bank_short": "Buckeye Federal",
+    "bank": "Harbor Point Bank",
+    "bank_short": "Harbor Point",
     "amount": "$486.20",
     "merchant": "TechZone Online",
     "alert_id": "4471",
-    "link": "secure-verify-account.example/buckeye",
+    "link": "secure-verify-account.example/harborpoint",
     "short_code": "72614"
   },
   "generate": {
     "bank": {
-      "ai": "a fictional Ohio credit union or community bank, 2 to 4 words, like 'Maple Valley Credit Union'"
+      "ai": "a fictional bank or credit union, 2 to 4 words, like 'Maple Valley Credit Union'"
     },
     "merchant": {
       "ai": "a fictional online electronics or sporting goods store, 2 or 3 words"

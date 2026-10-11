@@ -8,19 +8,19 @@
   "vars": {
     "company": "Riverside Outfitters",
     "recruiter": "Marcus Lee",
-    "store_phone": "(614) 555-0160",
+    "store_phone": "(555) 555-0160",
     "careers_link": "careers.riversideoutfitters.example",
     "link": "securechat-hiring.example/join",
     "pay_scam": "$40/hr",
     "pay_legit": "$15/hr",
     "fee": "$75",
-    "bank": "Buckeye Federal Credit Union",
+    "bank": "Harbor Point Bank",
     "role_scam": "remote data entry role",
     "role_legit": "sales associate"
   },
   "generate": {
     "company": {
-      "ai": "a fictional Ohio business that hires local workers (a store, warehouse or service company), 2 or 3 words, like 'Riverside Outfitters'"
+      "ai": "a fictional business that hires local workers (a store, warehouse or service company), 2 or 3 words, like 'Riverside Outfitters'"
     },
     "recruiter": {
       "ai": "a fictional person's full name, first and last",
@@ -68,9 +68,9 @@
       "phone": true
     },
     "bank": {
-      "ai": "a fictional Ohio credit union or community bank where the player keeps their account, 2 to 4 words",
+      "ai": "a fictional bank or credit union where the player keeps their account, 2 to 4 words",
       "choice": [
-        "Buckeye Federal Credit Union",
+        "Harbor Point Bank",
         "Maple Valley Credit Union",
         "Lakeshore Hollow Credit Union",
         "Tall Pines Community Bank",

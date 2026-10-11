@@ -10,7 +10,7 @@
     "ticket": "48213",
     "issue": "laptop won't charge",
     "price": "$199",
-    "bank": "Buckeye Federal Credit Union"
+    "bank": "Harbor Point Bank"
   },
   "generate": {
     "company": {"ai": "a fictional laptop and computer company, 2 words ending in 'Computers' or 'Tech', like 'Brightleaf Computers'"},
@@ -19,8 +19,8 @@
     "issue": {"choice": ["laptop won't charge", "laptop keeps freezing", "screen flickers", "keyboard keys stopped working"]},
     "price": {"choice": ["$149", "$199", "$249", "$299"]},
     "bank": {
-      "ai": "a fictional Ohio credit union or community bank where the player keeps their account, 2 to 4 words",
-      "choice": ["Buckeye Federal Credit Union", "Maple Valley Credit Union", "Lakeshore Hollow Credit Union",
+      "ai": "a fictional bank or credit union where the player keeps their account, 2 to 4 words",
+      "choice": ["Harbor Point Bank", "Maple Valley Credit Union", "Lakeshore Hollow Credit Union",
                  "Tall Pines Community Bank", "Cardinal Ridge Credit Union"]
     }
   },

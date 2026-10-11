@@ -9,13 +9,13 @@
     "relative": "Alex",
     "relation": "cousin",
     "parent": "Aunt Dana",
-    "parent_phone": "(614) 555-0133",
-    "friend_phone": "(614) 555-0147",
+    "parent_phone": "(555) 555-0133",
+    "friend_phone": "(555) 555-0147",
     "pet": "Biscuit",
     "gift_store": "PlayMart",
     "gift_amount": 200,
     "aunt_name": "Dana",
-    "bank": "Buckeye Federal Credit Union"
+    "bank": "Harbor Point Bank"
   },
   "generate": {
     "relative": {
@@ -30,7 +30,7 @@
       "ai": "a fun one-word name for Grandma's dog"
     },
     "gift_store": {
-      "ai": "a fictional Ohio store that sells gift cards, 1 or 2 words, like 'PlayMart'"
+      "ai": "a fictional store that sells gift cards, 1 or 2 words, like 'PlayMart'"
     },
     "gift_amount": {
       "choice": [
@@ -46,9 +46,9 @@
       "phone": true
     },
     "bank": {
-      "ai": "a fictional Ohio credit union or community bank where the player keeps their account, 2 to 4 words",
+      "ai": "a fictional bank or credit union where the player keeps their account, 2 to 4 words",
       "choice": [
-        "Buckeye Federal Credit Union",
+        "Harbor Point Bank",
         "Maple Valley Credit Union",
         "Lakeshore Hollow Credit Union",
         "Tall Pines Community Bank",
@@ -113,12 +113,12 @@
     ],
     "opening": {
       "flag": "emotional_manipulation",
-      "text": "Hey it's me, {relative}! I lost my phone so I'm texting from a friend's. I'm in trouble and really need your help 😞"
+      "text": "Hi, it's me, {relative}. I lost my phone, so I'm texting from a friend's. I'm in trouble and really need your help."
     },
     "key_message": "Can you get {gift_store} gift cards and text me pics of the codes? That's the only way they'll take payment.",
     "lines": {
       "emotional_manipulation": [
-        "I'm so scared and embarrassed. You're the only one I trust right now. Please help me 😢",
+        "I'm so scared and embarrassed. You're the only one I trust right now. Please help me.",
         "I really messed up and I don't know who else to ask. Please don't let me down."
       ],
       "fear": [

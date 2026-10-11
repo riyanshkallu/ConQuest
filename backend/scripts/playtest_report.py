@@ -40,7 +40,7 @@ QUIZ_QUESTIONS = 6
 def load_rounds(engine: Engine, since: date | None, until: date | None) -> list[dict]:
     """Rounds that ended between the start of `since` and the end of `until`, in local time.
 
-    Times are stored in UTC, but playtest days are local: an evening round in Ohio is already
+    Times are stored in UTC, but playtest days are local: an evening round in the Americas is already
     the next day in UTC, so the dates are converted from this computer's time zone.
     """
     query = select(db.rounds).order_by(db.rounds.c.player_id, db.rounds.c.ended_at)
