@@ -169,7 +169,7 @@
     "objective": "pass_on_message",
     "objective_text": "You really are the player's {relation} {relative}. You lost your phone at the gym and are texting from a friend's phone. Ask the player to let {parent} know you're safe and will be home late, since you can't reach her yourself.",
     "objective_is_payment": false,
-    "character_notes": "You really are {relative}. If the player asks a personal question, you know the answer: Grandma's dog is named {pet}. You're happy for them to call {parent} to check.",
+    "character_notes": "You really are {relative}. If the player asks a personal question, you know the answer: Grandma's dog is named {pet}. To check it's really you, they can call {parent} at {parent_phone} (it's on their ID card) or ask you something only you would know. Suggest those, nothing else: your own phone is lost, so they can't call or message it.",
     "allowed_flags": [
       "checkable_details",
       "no_credentials_asked",

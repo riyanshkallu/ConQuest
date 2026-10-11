@@ -109,6 +109,7 @@ def test_contact_cannot_ask_for_things_not_on_the_id_card(message):
     "Please read me the one-time code we just sent.",  # bank_alert sends a code, so it's fair game
     "Confirm your email address and the last four digits of your card.",
     "We will never ask for your PIN or home address.",
+    "I can send the replacement part to the address on file.",  # tells, doesn't ask
 ])
 def test_contact_can_ask_for_id_card_items(message):
     out = CharacterOut(message=message, tactic="credential_request", pressure=60)
@@ -125,6 +126,15 @@ def test_contact_can_ask_for_id_card_items(message):
 def test_informal_writing_is_rejected(message):
     out = CharacterOut(message=message, tactic="urgency", pressure=60)
     assert check_character(out, make_ctx()) == "informal writing"
+
+
+@pytest.mark.parametrize("message", [
+    "Please send the one-time code from your ID so I can stop the charge.",
+    "Read me the card number on your ID card.",
+])
+def test_contact_cannot_mention_the_id_card(message):
+    out = CharacterOut(message=message, tactic="credential_request", pressure=60)
+    assert check_character(out, make_ctx()) == "mentioned the ID card"
 
 
 def test_fake_links_dont_count_as_lowercase():

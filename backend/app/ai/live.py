@@ -30,13 +30,14 @@ _NEGATION_RE = re.compile(r"\b(never|don't|do not|not)\b", re.IGNORECASE)
 _ASK_VERBS = r"\b(?:send|give|tell|share|text|read|confirm|provide|enter|type|verify|need|reply with|what's|what is|ask for)\b"
 # Things no ID card has, so the player could never answer. Asking for them breaks the game.
 _NEVER_ON_CARD = [r"pins?", r"cvv", r"cvc", r"security code on the back", r"(?:3|three)[- ]digit code",
-                  r"expiration date", r"expiry date", r"(?<!email )(?<!e-mail )(?<!web )address(?:es)?",
+                  r"expiration date", r"expiry date", r"(?<!email )(?<!e-mail )(?<!web )address(?:es)?(?! on file)",
                   r"date of birth", r"birth ?date", r"birthday", r"maiden name", r"routing number",
                   r"account number", r"security questions?", r"driver'?s licen[cs]e"]
 _TEXTING_RE = re.compile(r"\b(?:pls|plz|thx|lol|omg|btw|gonna|wanna|gotta|idk|rn)\b", re.IGNORECASE)
 _LOWERCASE_RE = re.compile(r"(?:^\W*|[.!?]\s+)[a-z]|\b(?:i|u|ur)\b")  # lowercase sentence start, "i", "u", "ur"
 _EMOJI_RE = re.compile("[\U0001F300-\U0001FAFF☀-➿]")
 _FAKE_LINK_RE = re.compile(r"\S+\.example\S*")
+_MENTIONS_ID_CARD_RE = re.compile(r"\bID card\b|\b(?:your|the|my) ID\b")  # "the code from your ID" breaks the story
 
 
 def _not_on_card(ctx: TurnContext) -> list[str]:
@@ -107,6 +108,8 @@ def check_character(out: CharacterOut, ctx: TurnContext) -> str | None:
         return "asked for something not on the ID card"
     if is_informal(text):
         return "informal writing"
+    if _MENTIONS_ID_CARD_RE.search(text):
+        return "mentioned the ID card"
     if _REAL_DOMAIN_RE.search(text):
         return "real-looking website"
     if engine.blocked_reason(text, ctx.state.id_card):
