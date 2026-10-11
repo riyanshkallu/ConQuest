@@ -72,12 +72,12 @@ def test_request_contains_the_engines_facts():
 def test_words_replace_summaries_notes_and_best_decision():
     rnd = finished_round()
     words = ExplainerText(
-        timeline={"authority": "They claimed to be the Buckeye fraud team so you'd trust the text."},
+        timeline={"authority": "They claimed to be the Harbor Point fraud team so you'd trust the text."},
         messages={0: "This opening text pretended to come from your bank."},
     )
     result = build_result(rnd, words)
     cards = {c.flag.id: c.summary for c in result.explanation.timeline}
-    assert cards["authority"].startswith("They claimed to be the Buckeye")
+    assert cards["authority"].startswith("They claimed to be the Harbor Point")
     assert cards["trust_building"] == "They acted friendly and helpful so you'd lower your guard."  # engine fallback
     assert result.transcript[0].note == "This opening text pretended to come from your bank."
     # facts, including the best decision, never change
@@ -106,7 +106,7 @@ def test_explainer_runs_once_per_round():
 
 def good_reply(**changes):
     reply = {
-        "timeline": {"authority": "They said they were Buckeye's fraud team.",
+        "timeline": {"authority": "They said they were Harbor Point's fraud team.",
                      "trust_building": "They said they were here to protect your money."},
         "messages": {"0": "This text pretended to be a fraud alert from your bank.",
                      "1": "This is your message, which shouldn't get a note.",
@@ -129,7 +129,7 @@ def test_live_explainer_keeps_only_known_flags_and_contact_messages():
 
 def test_live_explainer_rejects_unsafe_text_and_falls_back():
     rnd = finished_round()
-    bad = good_reply(timeline={"authority": "They wanted you to log in at buckeyebank.com."})
+    bad = good_reply(timeline={"authority": "They wanted you to log in at harborpointbank.com."})
     ai = live_ai([bad, bad])
     assert asyncio.run(ai.explain(explain_request(rnd))) is None
 

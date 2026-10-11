@@ -17,7 +17,7 @@ MAX_LENGTH = 40
 LETTERS = "ABCDEFGHJKLMNPRSTW"
 
 # Real organizations and brands the game must never imitate (lowercase, whole words).
-# Ohio banks are here on purpose: the game is built for Ohio players.
+# Regional banks are here too, so the AI never lands on a real bank a player might know.
 REAL_NAMES = {
     "chase", "wells fargo", "bank of america", "citi", "citibank", "capital one", "pnc", "huntington",
     "fifth third", "keybank", "key bank", "us bank", "u.s. bank", "td bank", "truist",
@@ -31,11 +31,11 @@ _REAL_NAME_RES = [re.compile(r"\b" + re.escape(name) + r"\b", re.IGNORECASE) for
 
 
 def generator_system() -> str:
-    return """You invent fictional details for an educational scam-awareness game played by people of all ages in Ohio.
+    return """You invent fictional details for an educational scam-awareness game played by people of all ages around the world.
 Return JSON only, with exactly the keys you are given and a short string value for each.
 Rules:
 - Everything must be fictional. Never use a real bank, company, store, app, game, website or famous person.
-- Sound realistic and ordinary, like local businesses and people in Ohio.
+- Sound realistic and ordinary, like everyday local businesses and people. Don't tie names to any one country or region.
 - For businesses, use made-up place or nature words (like "Amber Ridge" or "Tall Pines"), never a real
   city, county, region or lake name, so a name can't match a real local business.
 - Each value is under 40 characters, with no digits, no web addresses and no emojis.

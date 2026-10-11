@@ -51,7 +51,7 @@ Used for the opening message, every reply, and notifications.
 ```json
 {
   "sender": "contact",
-  "text": "Buckeye Federal Fraud Alert: Did you attempt a $486.20 purchase at TechZone Online? Reply YES or NO.",
+  "text": "Harbor Point Fraud Alert: Did you attempt a $486.20 purchase at TechZone Online? Reply YES or NO.",
   "links": []
 }
 ```
@@ -182,12 +182,12 @@ Response `201`:
   "channel": "sms",
   "difficulty": 2,
   "max_turns": 10,
-  "contact": { "name": "Buckeye Federal", "handle": "72614" },
+  "contact": { "name": "Harbor Point", "handle": "72614" },
   "id_card": {
     "name": "Jordan Rivera",
     "email": "jordan.rivera@mail.example",
     "phone": "(555) 010-3382",
-    "bank": "Buckeye Federal Credit Union",
+    "bank": "Harbor Point Bank",
     "card_number": "4000 0037 1822 4417",
     "card_last4": "4417",
     "password": null,
@@ -206,7 +206,7 @@ Response `201`:
 - `id_card.gaming_account` (when present): `{ "game": "Blockcraft", "username": "jordan_builds" }`.
 - `id_card.family` (family emergency scenario; proposed, see decision 7): what the player knows
   about their family, so they can check who's really texting:
-  `{ "relative": "Alex (your cousin)", "parent": "Aunt Dana (Alex's mom)", "parent_phone": "(614) 555-0133",
+  `{ "relative": "Alex (your cousin)", "parent": "Aunt Dana (Alex's mom)", "parent_phone": "(555) 555-0133",
   "memory_question": "Name of Grandma's dog", "memory_answer": "Biscuit" }`.
 - `id_card.extras` (proposed, see decision 8): extra lines for a scenario, shown as more ID card rows
   in order. Example (tech support): `[{ "label": "Your open support ticket", "value": "#48213: laptop won't charge" }]`.
@@ -234,7 +234,7 @@ Response `200` (round continues):
   "max_turns": 10,
   "reply": { "sender": "contact", "text": "...", "links": [] },
   "notifications": [
-    { "sender": "notification", "text": "Buckeye Federal: Your one-time code is 482913. We will never ask you for this code.", "links": [] }
+    { "sender": "notification", "text": "Harbor Point: Your one-time code is 482913. We will never ask you for this code.", "links": [] }
   ],
   "suggested_replies": ["...", "...", "..."],
   "hint": { "suspicion": 55 },
@@ -290,10 +290,10 @@ Response `200`: the same shape as the message response, plus two fields:
   "player_message": null,
   "reply": null, "notifications": [], "suggested_replies": [], "hint": null,
   "verification_call": {
-    "title": "Calling Buckeye Federal (number on the back of your card)",
-    "official_name": "Buckeye Federal",
+    "title": "Calling Harbor Point (number on the back of your card)",
+    "official_name": "Harbor Point",
     "lines": [
-      { "speaker": "official", "text": "Thanks for calling Buckeye Federal. How can I help?" },
+      { "speaker": "official", "text": "Thanks for calling Harbor Point. How can I help?" },
       { "speaker": "player", "text": "I got a text saying my card was used for a $486 purchase." },
       { "speaker": "official", "text": "I don't see any fraud alert or pending purchase on your account. That text did not come from us." }
     ]
@@ -362,7 +362,7 @@ Only after the round ended (otherwise `409 round_not_ended`).
 - `timeline[].player_response`: in scam rounds `"resisted"`, `"fell_for_it"` or `"no_response"`.
   In legit rounds, `"noticed"` or `"missed"`.
 - `scam_twin` (only after `LUCKY`): the matching scam version's key message, to show side by side:
-  `{ "contact_name": "Buckeye Federal Fraud Team", "text": "..." }`.
+  `{ "contact_name": "Harbor Point Fraud Team", "text": "..." }`.
 - `transcript[].flag` is on contact messages. `note` is on player messages (what that reply did),
   and, with live AI, also on flagged contact messages (what that specific message was doing).
   Every message in the transcript is tappable: show the flag and the note when there is one.

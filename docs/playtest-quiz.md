@@ -59,11 +59,11 @@ Scam / Real
 
 **A5.** A window that pops up while browsing
 > ⚠️ WARNING: Your computer is infected with 5 viruses! Call Certified Tech Support now at
-> (614) 555-0199 before your files are deleted. Do not close this window.
+> (555) 555-0199 before your files are deleted. Do not close this window.
 
 Scam / Real
 
-**A6.** Text message from (614) 555-0152
+**A6.** Text message from (555) 555-0152
 > Hi Aunt Rosa, it's Jamie! I dropped my phone in the lake 😅 so I'm using my friend Sam's phone.
 > Nothing's wrong, I just wanted you to know in case you text me. Call my mom if you want to check.
 > New phone should come Thursday.
@@ -90,7 +90,7 @@ Scam / Real
 
 Scam / Real
 
-**B3.** Text message from (614) 555-0187
+**B3.** Text message from (555) 555-0187
 > Grandma it's me, I'm in trouble and I need $500 in PlayMart gift cards right away. Please don't
 > tell Mom and Dad, I'll explain later. Send pictures of the cards here.
 
@@ -99,7 +99,7 @@ Scam / Real
 **B4.** Email from careers@cedarbrookgrocery.example
 > Hi Sam, thanks for applying for the Cashier position at Cedarbrook Grocery. We'd like to invite
 > you to an in-person interview at our Elm Street store on Tuesday at 3 PM. Reply to confirm, or
-> call the store at (614) 555-0128. There is no cost to apply.
+> call the store at (555) 555-0128. There is no cost to apply.
 
 Scam / Real
 

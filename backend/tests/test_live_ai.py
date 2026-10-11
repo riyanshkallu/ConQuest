@@ -70,7 +70,7 @@ def test_valid_scam_message_passes():
 @pytest.mark.parametrize("message,tactic,problem", [
     ("word " * 71, "urgency", "too long"),
     ("Act now please.", "sexual_content", "not allowed"),
-    ("Log in at buckeye-secure.com right now.", "suspicious_link", "real-looking website"),
+    ("Log in at harborpoint-secure.com right now.", "suspicious_link", "real-looking website"),
     ("Call me back at 614-292-1234.", "authority", "real-looking number"),
     ("What's your SSN?", "credential_request", "blocked word"),
 ])

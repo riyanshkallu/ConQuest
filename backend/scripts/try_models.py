@@ -40,7 +40,7 @@ def scene(is_scam: bool, player_lines: list[str], code_now: bool = False, decisi
     version = scenario.version(is_scam)
     state = engine.RoundState(is_scam=is_scam, id_card=card, objective=version["objective"])
     engine.record_character_move(state, version["opening"]["flag"])
-    transcript = [{"sender": "contact", "text": "Buckeye Federal Fraud Alert: ... card ending " + card.card_last4}]
+    transcript = [{"sender": "contact", "text": "Harbor Point Fraud Alert: ... card ending " + card.card_last4}]
     for line in player_lines:
         state.turns += 1
         transcript.append({"sender": "player", "text": line})

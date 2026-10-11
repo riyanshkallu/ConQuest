@@ -78,7 +78,7 @@ def render(text: str, scenario: Scenario, card: IdCard) -> str:
 #   {"ai": "description"}         -> invented by the Scenario Generator (names, places)
 #   {"money": [low, high]}        -> random dollar amount, e.g. "$486.20"
 #   {"digits": n}                 -> random n-digit number (no leading zero)
-#   {"phone": true}               -> random fictional (614) 555-01xx number
+#   {"phone": true}               -> random fictional (555) 555-01xx number
 #   {"choice": [...]}             -> one of the listed values
 #   {"ai": ..., "choice": [...]}  -> AI invents it; the list is the fallback without AI
 # Then "derived_vars" are built from the others, in order:
@@ -110,9 +110,9 @@ def make_variant(scenario: Scenario, rng: random.Random, ai_vars: dict[str, str]
             n = spec["digits"]
             values[key] = str(rng.randint(10 ** (n - 1), 10 ** n - 1))
         elif spec.get("phone"):
-            phone = f"(614) 555-01{rng.randint(0, 99):02d}"
+            phone = f"(555) 555-01{rng.randint(0, 99):02d}"
             while phone in used_phones:
-                phone = f"(614) 555-01{rng.randint(0, 99):02d}"
+                phone = f"(555) 555-01{rng.randint(0, 99):02d}"
             used_phones.add(phone)
             values[key] = phone
         elif "choice" in spec:
@@ -177,8 +177,8 @@ def new_id_card(scenario: Scenario, rng: random.Random) -> IdCard:
     return IdCard(
         name=f"{first} {last}",
         email=f"{first.lower()}.{last.lower()}@mail.example",
-        phone=f"(614) 555-01{rng.randint(0, 99):02d}",  # 555-01xx is reserved for fiction
-        bank=scenario.raw.get("vars", {}).get("bank", "Buckeye Federal Credit Union"),
+        phone=f"(555) 555-01{rng.randint(0, 99):02d}",  # 555-01xx is reserved for fiction
+        bank=scenario.raw.get("vars", {}).get("bank", "Harbor Point Bank"),
         card_number=" ".join(card[i:i + 4] for i in range(0, 16, 4)),
         verification_code=f"{rng.randint(0, 999999):06d}",
         password=rng.choice(_PASSWORDS) if scenario.raw.get("uses_password") else None,

@@ -77,7 +77,7 @@ def test_empty_report():
 
 
 def test_dates_are_local_days():
-    """An evening round in Ohio is already the next day in UTC; it must still count for that local day."""
+    """An evening round in the Americas is already the next day in UTC; it must still count for that local day."""
     from datetime import datetime, time, timezone
     from scripts.playtest_report import _local
     start, end = _local(date(2026, 10, 14), time.min), _local(date(2026, 10, 14), time.max)
