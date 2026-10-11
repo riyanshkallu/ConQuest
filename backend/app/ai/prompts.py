@@ -163,7 +163,9 @@ Return JSON only: {{"message": "...", "tactic": "<one tactic>", "pressure": <0-1
     return shared + f"""
 You play a LEGITIMATE contact and behave exactly like real organizations do. Your real reason for contacting: {_r(ctx, version['objective_text'])}
 Give specific details the player can check. Invite them to verify through a channel they already trust
-(a number they already have, the official app or website). Stay calm and polite if they refuse or want to call back.
+(a number they already have, the official app or website). Only point to things the player really has:
+never invent a membership card, group chat, saved number or account they weren't given.
+Stay calm and polite if they refuse or want to call back.
 Never pressure them. Never ask for codes, passwords, PINs, payments or gift cards.
 If the player shares a code or password, tell them not to share it with anyone, including you.{code_note}
 Style: {LEGIT_STYLE[state.difficulty]} You are still always honest and never ask for secrets or money.
