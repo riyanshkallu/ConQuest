@@ -282,8 +282,10 @@ async function act(action) {
 async function openLink(link) {
   if (state.busy || state.ended) return;
   try {
-    await api("POST", `/round/${state.roundId}/action`, { action: "open_link", link });
+    const r = await api("POST", `/round/${state.roundId}/action`, { action: "open_link", link });
     addBubble({ sender: "notification", text: `You opened ${link}. (In the real game this shows a fake website.)`, links: [] });
+    if (r.coach_tip) addBubble({ sender: "notification", text: "💡 Tip: " + r.coach_tip, links: [] });
+    if (r.ended) handleTurn(r);  // a scammer's link ends the round as SCAMMED
   } catch (err) { showError(err); }
 }
 

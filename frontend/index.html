@@ -2180,8 +2180,11 @@ function returnHome() {
             }
 
             try {
-                await api("POST", "/round/" + roundId + "/action", { action: "open_link", link: link });
+                const response = await api("POST", "/round/" + roundId + "/action", { action: "open_link", link: link });
                 addMessage("notification", "You opened " + link);
+                if (response.ended) {
+                    handleTurn(response);  // a scammer's link ends the round as SCAMMED
+                }
             } catch (error) {
                 addMessage("notification", "Something went wrong: " + error.message);
             }

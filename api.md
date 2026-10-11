@@ -280,7 +280,7 @@ For `open_link`, also send the link: `{ "action": "open_link", "link": "secure-v
 | `report` | Report as scam | yes | |
 | `trust` | It's legit *(proposed addition)* | yes | The player decides the contact is real |
 | `ask_proof` | Ask for proof | no | Counts as a player turn. The canned question is returned in `player_message` |
-| `open_link` | *(tapping a link)* | no | Does not count as a turn. No reply |
+| `open_link` | *(tapping a link)* | scam rounds only | Does not count as a turn. No reply. In a scam round the link is the scammer's fake site, so the round ends as `SCAMMED` (`ended: true`); check `ended` like any other action |
 
 Response `200`: the same shape as the message response, plus two fields:
 
@@ -429,7 +429,8 @@ this way.
    least one scam tactic the player called out. Otherwise the ending is ESCAPED. A clean
    ESCAPED gets its own message ("You got out safely…"), so always show `ending.message`
    from the API instead of hard-coding the text for each ending.
-4. **Links** are reported with the `open_link` action. Risk +25, not a turn.
+4. **Links** are reported with the `open_link` action. Risk +25, not a turn. Opening a scammer's
+   link ends the round as `SCAMMED`; a real contact's link doesn't end it.
 5. **The one-time code** arrives as a `notification` on a set turn in *both* scam and legit
    rounds, so its arrival doesn't give away which kind of round it is.
 6. **Settings and reset endpoints** (above) were added for the Settings screen.
