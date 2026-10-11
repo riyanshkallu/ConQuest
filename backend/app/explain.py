@@ -134,8 +134,10 @@ def _good_decisions(rnd: Round) -> list[str]:
 
 def _mistakes(rnd: Round) -> list[str]:
     bad = [e.label for e in rnd.state.score if e.points < 0]
-    if rnd.state.is_scam and rnd.state.links_opened:
-        bad.append("You opened a link the scammer sent.")
+    if rnd.state.links_opened:
+        bad.append("You opened a link the scammer sent." if rnd.state.is_scam else
+                   "You opened a link in a message you weren't expecting. It was safe this time, "
+                   "but open the official app or website yourself instead.")
     bad += [m["note"] for m in rnd.transcript
             if m["sender"] == "player" and m.get("mistake") and m.get("note") and m["note"] not in bad]
     return bad

@@ -2183,7 +2183,7 @@ function returnHome() {
                 const response = await api("POST", "/round/" + roundId + "/action", { action: "open_link", link: link });
                 addMessage("notification", "You opened " + link);
                 if (response.ended) {
-                    handleTurn(response);  // a scammer's link ends the round as SCAMMED
+                    handleTurn(response);  // opening a link ends the round: SCAMMED, or LUCKY if the contact was real
                 }
             } catch (error) {
                 addMessage("notification", "Something went wrong: " + error.message);

@@ -271,10 +271,10 @@ def test_opening_a_scammers_link_ends_the_round_as_scammed():
                                                                ("suspicious_link", "fell_for_it")}
 
 
-def test_opening_a_real_contacts_link_is_safe():
+def test_opening_a_real_contacts_link_is_lucky():
     state = RoundState(is_scam=False, id_card=make_card(), objective="confirm_charge")
-    assert engine.open_link(state, "careers.riverside.example") is None
-    assert not state.ended and state.risk == engine.LINK_RISK and state.mistakes == 0
+    assert engine.open_link(state, "careers.riverside.example") == "LUCKY"
+    assert state.ending == "LUCKY" and state.turns == 0 and state.mistakes == 1
 
 
 def test_cannot_play_after_round_ends():

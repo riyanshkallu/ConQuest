@@ -89,12 +89,10 @@ def test_tapping_a_link(monkeypatch, setup, is_scam):
     store.get_round(rnd["round_id"]).transcript.append(
         {"turn": 0, "sender": "contact", "text": link, "links": [link], "flag": None})
     r = client.post(f"/api/round/{rnd['round_id']}/action", json={"action": "open_link", "link": link}).json()
-    if is_scam:  # the scammer's fake site ends the round; the result screen explains it
-        assert r["ended"] and r["ending"]["code"] == "SCAMMED"
-        result = client.get(f"/api/round/{rnd['round_id']}/result").json()
-        assert "You opened a link the scammer sent." in result["explanation"]["mistakes"]
-    else:  # a real contact's link is safe, so the round goes on with a tip
-        assert not r["ended"] and r["coach_tip"] == game.COACH_TIPS["link"]
+    # Any link ends the round: the scammer's fake site is SCAMMED, a real contact's is LUCKY.
+    assert r["ended"] and r["ending"]["code"] == ("SCAMMED" if is_scam else "LUCKY")
+    mistakes = client.get(f"/api/round/{rnd['round_id']}/result").json()["explanation"]["mistakes"]
+    assert any(m.startswith("You opened a link") for m in mistakes)
 
 
 def test_sharing_a_code_with_a_real_contact_gets_the_code_tip(monkeypatch, setup):

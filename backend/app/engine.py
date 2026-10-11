@@ -433,20 +433,21 @@ def apply_action(state: RoundState, action: str) -> str:
     return _finish(state, "OUTSMARTED" if clean and state.recognized else "ESCAPED")
 
 
-def open_link(state: RoundState, link: str) -> str | None:
-    """The player tapped a link in the chat. Raises risk; does not use a turn.
+def open_link(state: RoundState, link: str) -> str:
+    """The player tapped a link in the chat. Always ends the round (but doesn't use a turn).
 
-    In a scam round the link is the scammer's fake site, so opening it ends the round as
-    SCAMMED and returns that ending. A real contact's link is safe: returns None.
+    In a scam round the link is the scammer's fake site: SCAMMED. A real contact's link
+    happened to be safe, but tapping a link in a surprise message is the habit scams rely
+    on, so it's LUCKY: "It was real this time."
     """
     _require_active(state)
     state.links_opened.append(link)
     state.risk = _clamp(state.risk + LINK_RISK)
+    state.mistakes += 1
     if not state.is_scam:
-        return None
+        return _finish(state, "LUCKY")
     if "suspicious_link" not in state.tactics_used:
         state.tactics_used.append("suspicious_link")
-    state.mistakes += 1
     _resolve_pending(state, fell_for_it=True)
     if not any(e.flag_id == "suspicious_link" and e.response == "fell_for_it" for e in state.timeline):
         state.timeline.append(TimelineEvent(state.turns, "suspicious_link", "fell_for_it"))
