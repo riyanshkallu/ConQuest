@@ -48,8 +48,8 @@ It uses about 70 AI calls. Run the server with a throwaway database
    `https://outsmart-scam-game.onrender.com` (Render may add a suffix if the name is taken).
 5. Check `https://<your-url>/api/health`. It should say `"ai_provider": "live"`.
 
-Every push to `main` redeploys automatically. Rounds are kept in memory until the Supabase
-step, so a redeploy or restart clears them.
+Every push to `main` redeploys automatically. Rounds in progress are saved to the database
+after every turn (the `live_rounds` table), so a redeploy, restart or sleep doesn't end them.
 
 **Save progress (Supabase, free):** without a database, Render's disk is wiped on every
 redeploy, and with it every player's XP and Scam Radar.

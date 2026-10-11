@@ -5,7 +5,7 @@ DATABASE_URL picks the database:
   sqlite://                      -> in memory, for tests
   postgresql://...supabase...    -> Supabase in production (use the pooler connection string)
 
-The four tables follow the plan. No real names, emails or phone numbers are stored, and
+The four tables follow the plan, plus small ones for AI stats and rounds in progress. No real names, emails or phone numbers are stored, and
 messages are only saved when the player leaves "save conversations" on.
 """
 
@@ -81,6 +81,15 @@ messages = Table(
     Column("text", Text, nullable=False),
     Column("flag", String(40)),                      # tactic or green flag on contact messages
     Column("analysis", JSON),                        # the analyzer's judgment of player messages
+)
+
+# Rounds in progress, saved after every turn so a restart (Render's free plan sleeps when
+# idle, and every deploy restarts it) doesn't lose the round the player is in.
+live_rounds = Table(
+    "live_rounds", metadata,
+    Column("id", String(20), primary_key=True),
+    Column("data", JSON, nullable=False),             # the whole round: state, transcript, result
+    Column("updated_at", DateTime(timezone=True), nullable=False, index=True),
 )
 
 

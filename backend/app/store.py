@@ -1,25 +1,31 @@
 """Where players and rounds live.
 
-Players are saved to the database (db.py) on every change and cached in memory, so they
-survive restarts and redeploys. Rounds in progress are kept in memory only: a restart
-mid-round loses that round, nothing else. When a round ends, its summary (and messages,
-if the player allows it) is saved for the playtest results.
+Players and rounds in progress are saved to the database (db.py) on every change and
+cached in memory, so they survive restarts and redeploys (Render's free plan also restarts
+the server after it sleeps). When a round ends, its summary (and messages, if the player
+allows it) is saved for the playtest results.
 """
 
 from __future__ import annotations
 
 import asyncio
+import logging
 import secrets
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from dataclasses import asdict, dataclass, field, fields
+from datetime import datetime, timedelta, timezone
 
 from sqlalchemy import delete, insert, select, update
 
-from . import db
-from .engine import RoundState
+from . import db, schemas
+from .engine import IdCard, RoundState, ScoreEvent, TimelineEvent
 from .flags import RADAR_CATEGORIES
 from .progress import Player
 from .scenarios import Scenario
+
+log = logging.getLogger(__name__)
+
+# Saved rounds older than this are deleted. Long enough to finish a round and read the result.
+LIVE_ROUND_DAYS = 2
 
 
 @dataclass
@@ -97,11 +103,71 @@ def get_player(player_id: str) -> Player | None:
 # ---------------------------------------------------------------------------
 
 def save_round(rnd: Round) -> None:
+    """Cache the round and write it to the database. Called after every change to it."""
     _rounds[rnd.id] = rnd
+    values = {"data": _round_to_json(rnd), "updated_at": _now()}
+    with db.get_engine().begin() as conn:
+        updated = conn.execute(update(db.live_rounds).where(db.live_rounds.c.id == rnd.id).values(**values))
+        if updated.rowcount == 0:  # a new round: also clear out old ones
+            conn.execute(insert(db.live_rounds).values(id=rnd.id, **values))
+            cutoff = _now() - timedelta(days=LIVE_ROUND_DAYS)
+            conn.execute(delete(db.live_rounds).where(db.live_rounds.c.updated_at < cutoff))
 
 
 def get_round(round_id: str) -> Round | None:
-    return _rounds.get(round_id)
+    if round_id in _rounds:
+        return _rounds[round_id]
+    with db.get_engine().connect() as conn:
+        row = conn.execute(select(db.live_rounds.c.data).where(db.live_rounds.c.id == round_id)).first()
+    if row is None:
+        return None
+    try:
+        rnd = _round_from_json(row.data)
+    except (KeyError, TypeError, ValueError):  # saved by an older version that no longer fits
+        log.warning("could not load saved round %s", round_id, exc_info=True)
+        return None
+    _rounds[round_id] = rnd
+    return rnd
+
+
+def _round_to_json(rnd: Round) -> dict:
+    return {
+        "id": rnd.id, "player_id": rnd.player_id,
+        "scenario": {"id": rnd.scenario.id, "raw": rnd.scenario.raw},
+        "state": asdict(rnd.state), "transcript": rnd.transcript,
+        "started_at": rnd.started_at.isoformat(),
+        "ended_at": rnd.ended_at.isoformat() if rnd.ended_at else None,
+        "xp_earned": rnd.xp_earned, "new_badges": rnd.new_badges, "finalized": rnd.finalized,
+        "code_sent": rnd.code_sent, "ai_live": rnd.ai_live, "ai_fallback": rnd.ai_fallback,
+        "coach_given": sorted(rnd.coach_given), "demo": rnd.demo,
+        "result": rnd.result.model_dump(mode="json") if rnd.result is not None else None,
+    }
+
+
+def _known(cls, data: dict) -> dict:
+    """Only the keys the dataclass still has, so a field removed in a later version is ignored."""
+    names = {f.name for f in fields(cls)}
+    return {k: v for k, v in data.items() if k in names}
+
+
+def _round_from_json(data: dict) -> Round:
+    state = dict(data["state"])
+    state["id_card"] = IdCard(**_known(IdCard, state["id_card"]))
+    state["timeline"] = [TimelineEvent(**_known(TimelineEvent, e)) for e in state.get("timeline", [])]
+    state["score"] = [ScoreEvent(**_known(ScoreEvent, e)) for e in state.get("score", [])]
+    return Round(
+        id=data["id"], player_id=data["player_id"],
+        scenario=Scenario(data["scenario"]["id"], data["scenario"]["raw"]),
+        state=RoundState(**_known(RoundState, state)), transcript=data["transcript"],
+        started_at=datetime.fromisoformat(data["started_at"]),
+        ended_at=datetime.fromisoformat(data["ended_at"]) if data.get("ended_at") else None,
+        xp_earned=data.get("xp_earned", 0), new_badges=data.get("new_badges", []),
+        finalized=data.get("finalized", False), code_sent=data.get("code_sent", False),
+        ai_live=data.get("ai_live", 0), ai_fallback=data.get("ai_fallback", 0),
+        coach_given=set(data.get("coach_given", [])), demo=data.get("demo", False),
+        result=schemas.ResultResponse.model_validate(data["result"]) if data.get("result") else None,
+        # last_contact_at is a clock reading from the old process, so it isn't kept.
+    )
 
 
 def last_scenario_id(player_id: str) -> str | None:

@@ -7,7 +7,7 @@ services:
     runtime: python
     plan: free
     buildCommand: pip install -r backend/requirements.txt
-    # One process only: rounds are kept in memory until the Supabase step (Oct 9).
+    # One process only: each round has an in-memory cache and lock (it's also saved to the database).
     startCommand: uvicorn app.main:app --app-dir backend --host 0.0.0.0 --port $PORT
     healthCheckPath: /api/health
     envVars:
