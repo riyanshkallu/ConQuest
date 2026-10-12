@@ -774,6 +774,80 @@
 .verification-line p {
     margin-top: 5px;
 }
+        
+.radar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.radar-header p {
+    margin-top: 8px;
+    color: #667085;
+    line-height: 1.5;
+}
+
+#radarScreen h2 {
+    margin: 24px 0 12px;
+}
+
+#radarGrid,
+#badgeGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+}
+
+.radar-card,
+.badge-card {
+    background: white;
+    border: 1px solid #e0e4e8;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.radar-card h3,
+.badge-card h3 {
+    margin-bottom: 8px;
+}
+
+.radar-card p,
+.badge-card p {
+    color: #667085;
+    line-height: 1.5;
+}
+
+.radar-track {
+    height: 9px;
+    margin-top: 12px;
+    background: #e9edf2;
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+.radar-fill {
+    height: 100%;
+    background: #3478f6;
+    border-radius: 99px;
+}
+
+.badge-card.locked {
+    opacity: 0.6;
+}
+
+#radarError {
+    margin: 12px 0;
+    color: #b42318;
+}
+
+@media (max-width: 550px) {
+    .radar-header {
+        flex-direction: column;
+    }
+}
+
 
 @keyframes spin {
     to {
@@ -911,6 +985,10 @@
 
             <button class="primary-button" onclick="showScreen('scenarioScreen')">
                 Start Game
+            </button>
+
+            <button class="primary-button" onclick="loadRadarScreen()">
+                📡 Scam Radar
             </button>
 
             <button class="primary-button"
@@ -1110,6 +1188,26 @@
     </section>
 
 
+    <!-- Scam Radar screen html--->
+
+    <section id="radarScreen" class="screen hidden">
+        <div class="radar-header">
+            <div>
+                <h1>📡 Scam Radar</h1>
+                <p>See which tactics you've resisted and where you can improve.</p>
+            </div>
+            <button type="button" onclick="returnHome()">Home</button>
+        </div>
+
+        <h2>Your Tactics</h2>
+        <div id="radarGrid">
+            <p>Loading your stats...</p>
+        </div>
+
+        <p id="radarError" role="status"></p>
+
+        <button type="button" onclick="loadRadarScreen()">Refresh Radar</button>
+    </section>
     <!--loading screen html -->
 
     <section id="loadingScreen" class="screen">
@@ -1490,6 +1588,239 @@
             }
         }
 
+
+/* Scam Radar: load and display real backend data */
+
+async function loadRadarScreen() {
+    showScreen("radarScreen");
+
+    const radarGrid = document.getElementById("radarGrid");
+    const badgeGrid = document.getElementById("badgeGrid");
+    const errorBox = document.getElementById("radarError");
+
+    radarGrid.replaceChildren();
+    badgeGrid.replaceChildren();
+    errorBox.textContent = "";
+
+    const loading = document.createElement("p");
+    loading.className = "radar-empty";
+    loading.textContent = "Loading your stats...";
+    radarGrid.appendChild(loading);
+
+    try {
+        const data = await api(
+            "GET",
+            "/player/" + encodeURIComponent(playerId) + "/radar"
+        );
+
+        renderRadar(data);
+    } catch (error) {
+        radarGrid.replaceChildren();
+
+        const message = document.createElement("p");
+        message.className = "radar-empty";
+        message.textContent =
+            "Could not load your radar. Check your connection and try again.";
+
+        radarGrid.appendChild(message);
+        errorBox.textContent = error.message;
+    }
+}
+
+function renderRadar(data) {
+    const radarGrid = document.getElementById("radarGrid");
+    const badgeGrid = document.getElementById("badgeGrid");
+
+    radarGrid.replaceChildren();
+    badgeGrid.replaceChildren();
+
+    /*
+      Supports a list of radar entries or an object keyed by tactic.
+      Confirm the exact field names against the backend response.
+    */
+    let entries = data.radar ?? data.tactics ?? data.categories ?? [];
+
+    if (!Array.isArray(entries) && entries && typeof entries === "object") {
+        entries = Object.entries(entries).map(([name, value]) => ({
+            tactic: name,
+            ...(typeof value === "object" && value !== null
+                ? value
+                : { percentage: value })
+        }));
+    }
+
+    if (Array.isArray(entries) && entries.length > 0) {
+        entries.forEach(item => {
+            const name =
+                item.tactic ??
+                item.category ??
+                item.name ??
+                item.id ??
+                "Detection skill";
+
+            const encountered =
+                item.times_encountered ?? item.encountered ?? null;
+
+            const resisted =
+                item.times_resisted ?? item.resisted ?? null;
+
+            let percent =
+                item.percentage ??
+                item.percent ??
+                item.success_rate ??
+                item.resistance_rate;
+
+            if (
+                percent == null &&
+                typeof encountered === "number" &&
+                encountered > 0 &&
+                typeof resisted === "number"
+            ) {
+                percent = (resisted / encountered) * 100;
+            }
+
+            const card = document.createElement("div");
+            card.className = "radar-item";
+
+            const header = document.createElement("div");
+            header.className = "radar-item-header";
+
+            const title = document.createElement("strong");
+            title.textContent = String(name).replace(/_/g, " ");
+
+            const percentage = document.createElement("span");
+            percentage.className = "radar-percent";
+
+            const track = document.createElement("div");
+            track.className = "radar-track";
+
+            const fill = document.createElement("div");
+            fill.className = "radar-fill";
+
+            if (typeof percent === "number" && Number.isFinite(percent)) {
+                // Supports either 0–1 proportions or 0–100 percentages.
+                const normalized = Math.max(
+                    0,
+                    Math.min(100, percent <= 1 ? percent * 100 : percent)
+                );
+
+                percentage.textContent = Math.round(normalized) + "%";
+                fill.style.width = normalized + "%";
+                track.setAttribute(
+                    "aria-label",
+                    Math.round(normalized) + "% resisted"
+                );
+            } else {
+                percentage.textContent = "—";
+                fill.style.width = "0%";
+            }
+
+            header.append(title, percentage);
+            track.appendChild(fill);
+            card.append(header, track);
+
+            if (
+                typeof encountered === "number" &&
+                typeof resisted === "number"
+            ) {
+                const meta = document.createElement("p");
+                meta.className = "radar-meta";
+                meta.textContent =
+                    resisted + " resisted out of " +
+                    encountered + " encounters";
+                card.appendChild(meta);
+            }
+
+            radarGrid.appendChild(card);
+        });
+    } else {
+        const empty = document.createElement("p");
+        empty.className = "radar-empty";
+        empty.textContent =
+            "No radar data is available yet. Complete a round to build your stats.";
+        radarGrid.appendChild(empty);
+    }
+
+    renderBadges(data.badges ?? []);
+}
+
+function renderBadges(badges) {
+    const badgeGrid = document.getElementById("badgeGrid");
+
+    const catalog = [
+        {
+            id: "first_escape",
+            name: "First Escape",
+            icon: "🛡️",
+            description: "Complete your first escape."
+        },
+        {
+            id: "no_mistakes",
+            name: "No Mistakes",
+            icon: "✨",
+            description: "Finish a round without mistakes."
+        },
+        {
+            id: "detective",
+            name: "Detective",
+            icon: "🔎",
+            description: "Make five correct calls in a row."
+        },
+        {
+            id: "verifier",
+            name: "Verifier",
+            icon: "📞",
+            description: "Verify independently ten times."
+        },
+        {
+            id: "family_player",
+            name: "Family Player",
+            icon: "👥",
+            description: "Create a second profile on this device."
+        }
+    ];
+
+    const earned = new Set(
+        (Array.isArray(badges) ? badges : [])
+            .map(badge => {
+                const raw = typeof badge === "string"
+                    ? badge
+                    : badge.id ?? badge.name ?? badge.badge;
+
+                return String(raw ?? "")
+                    .toLowerCase()
+                    .replace(/[\s-]+/g, "_");
+            })
+    );
+
+    catalog.forEach(badge => {
+        const isEarned = earned.has(badge.id) ||
+            earned.has(badge.name.toLowerCase().replace(/[\s-]+/g, "_"));
+
+        const card = document.createElement("div");
+        card.className = "badge-item" + (isEarned ? " earned" : "");
+
+        const icon = document.createElement("div");
+        icon.className = "badge-icon";
+        icon.textContent = badge.icon;
+
+        const title = document.createElement("h3");
+        title.textContent = badge.name;
+
+        const description = document.createElement("p");
+        description.textContent = isEarned
+            ? "Badge earned!"
+            : badge.description;
+
+        card.append(icon, title, description);
+        badgeGrid.appendChild(card);
+    });
+}
+
+function returnHome() {
+    showScreen("homeScreen");
+    loadPlayerProfile(playerId);
+}
 
         /* screen navigation */
 
