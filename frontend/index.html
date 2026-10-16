@@ -2051,15 +2051,10 @@ function returnHome() {
                 const linkButton = document.createElement("button");
                 linkButton.className = "link";
                 linkButton.textContent = link;
-                linkButton.onclick = () => {
-                    if (link.startsWith('http://') || link.startsWith('https://')) {
-                    openLink(link);
-                    } else {
-                    console.warn("You have been blocked due to non-http/http link click;", link);
-                }
-            };
-                
-                
+                // Links are fake (.example, no http://) and never open in the browser:
+                // tapping one only tells the backend, which ends the round.
+                linkButton.onclick = () => openLink(link);
+
                 bubble.append(linkButton);
 
                 rest = rest.slice(at + link.length);
