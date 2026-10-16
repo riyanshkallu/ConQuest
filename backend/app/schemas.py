@@ -48,6 +48,7 @@ class SettingsUpdate(BaseModel):
 
 class CreatePlayerRequest(BaseModel):
     display_name: str | None = Field(default=None, max_length=30)
+    other_player_ids: list[str] = Field(default_factory=list, max_length=10)  # profiles already on this device
 
 
 class PlayerResponse(BaseModel):

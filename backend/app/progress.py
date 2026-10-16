@@ -18,7 +18,7 @@ BADGES: dict[str, tuple[str, str]] = {
     "no_mistakes": ("No Mistakes", "Get the best ending in a round without a single mistake."),
     "detective": ("Detective", "Make five correct scam-or-legit calls in a row."),
     "verifier": ("Verifier", "Verify independently ten times."),
-    # Needs the frontend to tell us about other profiles on the device (see api.md).
+    # Earned when a player is created, not after a round (see game.create_player).
     "family_player": ("Family Player", "Add a second player on the same device."),
 }
 

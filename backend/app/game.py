@@ -52,9 +52,17 @@ class GameError(Exception):
 # Players and scenarios
 # ---------------------------------------------------------------------------
 
-def create_player(display_name: str | None) -> progress.Player:
+def create_player(display_name: str | None, other_player_ids: list[str] = ()) -> progress.Player:
     player = progress.Player(id=store.new_id("p"), display_name=display_name)
+    # A second profile on the same device earns everyone on it Family Player. Unknown ids are ignored.
+    others = [p for p in map(store.get_player, dict.fromkeys(other_player_ids)) if p]
+    if others:
+        player.badges.append("family_player")
     store.save_player(player)
+    for other in others:
+        if "family_player" not in other.badges:
+            other.badges.append("family_player")
+            store.save_player(other)
     return player
 
 

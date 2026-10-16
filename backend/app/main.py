@@ -76,7 +76,8 @@ async def health():
 @app.post("/api/player", response_model=schemas.PlayerResponse, status_code=201)
 async def create_player(request: Request, body: schemas.CreatePlayerRequest | None = None):
     _limit(f"player:ip:{client_ip(request)}", get_settings().players_per_ip_per_hour)
-    player = game.create_player(body.display_name if body else None)
+    body = body or schemas.CreatePlayerRequest()
+    player = game.create_player(body.display_name, body.other_player_ids)
     return _player_out(player)
 
 
