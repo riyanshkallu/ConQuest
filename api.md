@@ -106,8 +106,12 @@ Creates an anonymous player. Store `player_id` in `localStorage`.
 Request (all fields optional):
 
 ```json
-{ "display_name": "Riya" }
+{ "display_name": "Riya", "other_player_ids": ["p_7f3c9a1e2b4d"] }
 ```
+
+- `other_player_ids` (proposed, see decision 12): the player ids already saved in this browser,
+  up to 10. If any of them is a real player, the new player and those players all earn the
+  Family Player badge. Unknown ids are ignored.
 
 Response `201`:
 
@@ -417,6 +421,7 @@ this way.
 | 9 | Optional `focus` on round start, for Train Your Weakness | agreed | waiting |
 | 10 | `coach_tip` on message and action responses (hints on) | agreed | waiting |
 | 11 | `"scenario_id": "random"` for a Surprise Me card | agreed | waiting |
+| 12 | `other_player_ids` on player create, for the Family Player badge | agreed | waiting |
 
 1. **`trust` action ("It's legit").** The plan had no way to say "I believe you," so the
    LUCKY and SMART AND SAFE endings had no clear trigger. In a legit round, `trust` gives
@@ -456,11 +461,8 @@ this way.
     and never give the answer away. At most one per turn, each once per round.
 11. **Surprise Me.** Starting a round with `"scenario_id": "random"` picks any scenario except the one
     the player just played. The response has the real `scenario_id`. `index.html` has a 🎲 Surprise Me card.
-
-### Still open
-
-- **Family Player badge.** The plan awards it for "a second profile on the same device," but
-  only the browser knows about other profiles. Idea: when creating a player, the frontend sends
-  the ids already saved in `localStorage`, for example
-  `POST /api/player {"display_name": "Grandpa", "other_player_ids": ["p_7f3c9a1e2b4d"]}`.
+12. **Family Player badge.** The plan awards it for "a second profile on the same device," but only
+    the browser knows about other profiles. So when the frontend creates a player (for example an
+    "Add player" button), it sends the ids already saved in `localStorage` as `other_player_ids`.
+    Everyone on the device then earns the badge, and it shows as `earned` in `GET /radar`.
   Not built yet. Discuss at the Oct 4 integration day.

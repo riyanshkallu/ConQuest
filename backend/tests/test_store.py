@@ -49,6 +49,30 @@ def test_progress_survives_a_restart():
     assert client.get(f"/api/player/{pid}/radar").json()["xp"] > after["xp"]
 
 
+def family_player(pid: str) -> bool:
+    badges = client.get(f"/api/player/{pid}/radar").json()["badges"]
+    return next(b["earned"] for b in badges if b["id"] == "family_player")
+
+
+def test_second_profile_on_a_device_earns_family_player_for_both():
+    first = client.post("/api/player", json={}).json()["player_id"]
+    assert not family_player(first)
+
+    r = client.post("/api/player", json={"display_name": "Grandpa", "other_player_ids": [first, first, "p_nobody"]})
+    assert r.status_code == 201
+    second = r.json()["player_id"]
+
+    store.forget_cache()
+    assert family_player(first) and family_player(second)
+
+
+def test_family_player_needs_a_real_other_profile():
+    pid = client.post("/api/player", json={"other_player_ids": ["p_nobody"]}).json()["player_id"]
+    assert not family_player(pid)
+    r = client.post("/api/player", json={"other_player_ids": [f"p_{i}" for i in range(11)]})
+    assert r.status_code == 400
+
+
 def test_settings_and_reset_are_saved():
     pid, _ = play_a_round()
     client.patch(f"/api/player/{pid}/settings", json={"hints": True})
