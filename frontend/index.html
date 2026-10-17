@@ -804,17 +804,20 @@
 #badgeGrid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 14px;
+    gap: 16px;
+    width: 100%;
 }
 
 
 .radar-item,
 .badge-item {
+    min-width: 0;
     background: #ffffff;
     border: 1px solid #e0e4e8;
-    border-radius: 14px;
+    border-radius: 12px;
     padding: 18px;
     box-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
+    text-align: center;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -924,6 +927,7 @@
     color: #b42318;
 }
 
+
 @media (max-width: 550px) {
     .radar-header {
         flex-direction: column;
@@ -943,7 +947,7 @@
         line-height: 1.5;
     }
 
-    @media (max-width: 550px) {
+     (max-width: 550px) {
         .radar-grid {
             grid-template-columns: 1fr;
         }
@@ -958,6 +962,11 @@
     }
 /* Responsive code */
 
+@media (max-width: 600px) {
+    #badgeGrid {
+        grid-template-columns: repeat(2, minmax(0,1fr));
+    }
+}
 @media (max-width: 750px) {
     .home-card h1 {
         font-size: 32px;
