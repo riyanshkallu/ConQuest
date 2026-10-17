@@ -796,6 +796,23 @@
     line-height: 1.5;
 }
 
+.radar-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.radar-section-header h2 {
+    margin: 24px 0 12px;
+}
+
+.radar-section-header button {
+    width: auto;
+    flex-shrink: 0;
+    }
+
 #radarScreen h2 {
     margin: 24px 0 12px;
 }
@@ -803,7 +820,7 @@
 #radarGrid,
 #badgeGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 16px;
     width: 100%;
 }
@@ -1255,14 +1272,18 @@
             <p>Loading your stats...</p>
         </div>
 
+    <div class="radar-section-header">
         <h2>Your Badges</h2>
+        <button type="button" onclick="loadRadarScreen()">Refresh Radar</button>
+    </div>
+        
         <div id="badgeGrid">
             <p>Loading Badges...</p>
         </div>
 
         <p id="radarError" role="status"></p>
 
-        <button type="button" onclick="loadRadarScreen()">Refresh Radar</button>
+        
     </section>
     <!--loading screen html -->
 
