@@ -37,7 +37,7 @@ async def lifespan(_: FastAPI):
         task.cancel()
 
 
-app = FastAPI(title="Outsmart API", description="See api.md in the repo for the full contract.", lifespan=lifespan)
+app = FastAPI(title="ConQuest API", description="See api.md in the repo for the full contract.", lifespan=lifespan)
 
 
 # --- Errors in the api.md shape --------------------------------------------
