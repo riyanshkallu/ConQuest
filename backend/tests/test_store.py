@@ -1,6 +1,7 @@
 """Saving to the database: progress survives restarts, rounds are logged, privacy setting respected."""
 
 import dataclasses
+from types import SimpleNamespace
 
 import pytest
 from fastapi.testclient import TestClient
@@ -47,6 +48,17 @@ def test_progress_survives_a_restart():
     rid = client.post("/api/round/start", json={"player_id": pid, "scenario_id": "bank_alert"}).json()["round_id"]
     client.post(f"/api/round/{rid}/action", json={"action": "report"})
     assert client.get(f"/api/player/{pid}/radar").json()["xp"] > after["xp"]
+
+
+@pytest.mark.parametrize("url", ["", "sqlite:///outsmart.db", "postgresql://app:secret@db.example:5432/postgres"])
+def test_clear_refuses_anything_but_a_test_database(monkeypatch, url):
+    # "" is what a script gets when it drops DATABASE_URL: the app then falls back to .env (real data)
+    monkeypatch.setattr(store, "get_settings", lambda: SimpleNamespace(database_url=url))
+    monkeypatch.delenv("TEST_DATABASE_URL", raising=False)
+    pid = client.post("/api/player", json={}).json()["player_id"]
+    with pytest.raises(RuntimeError, match="only runs on a test database"):
+        store.clear()
+    assert store.get_player(pid)  # nothing was cleared, not even the memory cache
 
 
 def family_player(pid: str) -> bool:

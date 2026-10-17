@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
 import secrets
 from dataclasses import asdict, dataclass, field, fields
 from datetime import datetime, timedelta, timezone
@@ -17,6 +18,7 @@ from datetime import datetime, timedelta, timezone
 from sqlalchemy import delete, insert, select, update
 
 from . import db, schemas
+from .config import get_settings
 from .engine import IdCard, RoundState, ScoreEvent, TimelineEvent
 from .flags import RADAR_CATEGORIES
 from .progress import Player
@@ -211,7 +213,15 @@ def database_ok() -> bool:
 
 
 def clear() -> None:
-    """For tests: forget everything, in memory and in the database."""
+    """For tests: forget everything, in memory and in the database.
+
+    Only runs on a test database. A script that leaves DATABASE_URL unset still picks up the
+    real Supabase from .env, and this would delete every player and playtest round there.
+    """
+    url = get_settings().database_url
+    if url != "sqlite://" and url != (os.environ.get("TEST_DATABASE_URL") or None):
+        raise RuntimeError("store.clear() deletes every row, so it only runs on a test database: "
+                           "in-memory SQLite (DATABASE_URL=sqlite://) or TEST_DATABASE_URL.")
     _players.clear()
     _rounds.clear()
     with db.get_engine().begin() as conn:
