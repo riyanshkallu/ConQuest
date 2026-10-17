@@ -910,7 +910,7 @@
 
 
         #homeScreen {
-            max-width: 1000px;
+            max-width: 850px;
             margin: 0 auto;
             padding: 28px 20px 40px;
         }
@@ -1238,57 +1238,70 @@
         
 /* ===== ConQuest home screen redesign ===== */
 
+
+/* ===== Separated ConQuest dashboard ===== */
+
 #homeScreen {
-    padding: 32px 18px 48px;
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 30px 18px 44px;
+}
+
+#homeScreen .home-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+#homeScreen .home-header .logo {
+    font-size: 38px;
+    background: #e0e7ff;
+    width: 66px;
+    height: 66px;
+    border-radius: 18px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+}
+
+#homeScreen .home-header h1 {
+    margin: 0;
+    font-size: clamp(2rem, 5vw, 2.7rem);
+    color: #172554;
+}
+
+#homeScreen .home-header p {
+    margin: 4px 0 0;
+    color: #64748b;
 }
 
 #homeScreen > .home-card {
     width: 100%;
-    max-width: 760px;
-    margin: 0 auto;
-    padding: 32px;
-    border: 1px solid #e2e8f0;
-    border-radius: 24px;
-    background: #ffffff;
-    box-shadow: 0 12px 36px rgba(15, 23, 42, 0.08);
-}
-
-#homeScreen .logo {
-    width: 68px;
-    height: 68px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 12px;
-    border-radius: 20px;
-    background: #eef2ff;
-    font-size: 38px;
-}
-
-#homeScreen h1 {
+    box-sizing: border-box;
     margin: 0 0 22px;
-    color: #172554;
-    font-size: clamp(2rem, 5vw, 2.7rem);
-    font-weight: 800;
-    letter-spacing: -1.2px;
+    padding: 26px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    box-shadow: 0 8px 26px rgba(15, 23, 42, 0.06);
 }
 
 #homeScreen .player-stats {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
-    margin: 0 0 22px;
+    margin-bottom: 22px;
 }
 
 #homeScreen .player-stats p {
     margin: 0;
-    padding: 16px;
-    border: 1px solid #e2e8f0;
-    border-radius: 14px;
+    padding: 15px;
     background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 13px;
     color: #64748b;
     font-size: 0.9rem;
-    line-height: 1.5;
 }
 
 #homeScreen .player-stats span {
@@ -1299,99 +1312,80 @@
     font-weight: 800;
 }
 
-#homeScreen > .home-card > p {
-    margin: 0 0 20px;
+#homeScreen .home-description {
+    margin: 0 0 18px;
     color: #475569;
-    font-size: 1rem;
-    line-height: 1.75;
+    line-height: 1.7;
 }
 
 #homeScreen button {
     box-sizing: border-box;
+    display: block;
     width: 100%;
     min-height: 50px;
-    margin: 6px 0;
+    margin: 9px 0 0;
     padding: 13px 18px;
     border-radius: 12px;
     font: inherit;
     font-weight: 700;
     cursor: pointer;
-    transition: transform 0.18s ease, box-shadow 0.18s ease,
-                background 0.18s ease;
+    transition: transform 0.18s ease, box-shadow 0.18s ease;
 }
 
 #homeScreen button:not(:disabled):hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+    box-shadow: 0 5px 14px rgba(15, 23, 42, 0.12);
 }
 
-#homeScreen button:focus-visible {
-    outline: 3px solid #93c5fd;
-    outline-offset: 3px;
-}
-
-/* Main action */
-#homeScreen > .home-card > button.primary-button:first-of-type {
-    color: #ffffff;
+#homeScreen button.primary-button {
+    color: white;
     background: #4f46e5;
     border: 1px solid #4f46e5;
 }
 
-/* Secondary action */
-#homeScreen > .home-card > button.primary-button:nth-of-type(2) {
+#homeScreen button.radar-button {
     color: #334155;
-    background: #ffffff;
+    background: white;
     border: 1px solid #cbd5e1;
 }
 
-/* Training panel */
-#trainWeaknessCard {
-    margin-top: 28px;
-    padding: 24px;
-    border: 1px solid #e0e7ff;
-    border-radius: 18px;
+/* Separate training card */
+#homeScreen > .training-card {
     background: linear-gradient(135deg, #ffffff, #f5f7ff);
-    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.06);
+    border-color: #c7d2fe;
 }
 
-#trainWeaknessCard h3 {
+#homeScreen .training-card h3 {
     margin: 0 0 12px;
     color: #172554;
-    font-size: 1.25rem;
+    font-size: 1.3rem;
 }
 
-#trainWeaknessCard p {
-    margin: 8px 0;
+#homeScreen .training-card p {
     color: #475569;
     line-height: 1.6;
 }
 
-#trainWeaknessCard button {
-    margin-top: 12px;
-    color: #ffffff;
+#homeScreen .training-card button {
+    color: white;
     background: linear-gradient(135deg, #4f46e5, #6d5dfc);
     border: none;
 }
 
-#trainWeaknessCard button:disabled {
+#homeScreen .training-card button:disabled {
     color: #64748b;
     background: #e2e8f0;
     cursor: not-allowed;
-    opacity: 1;
     box-shadow: none;
+    opacity: 1;
 }
 
 @media (max-width: 550px) {
     #homeScreen {
-        padding: 18px 12px 30px;
+        padding: 20px 12px 30px;
     }
 
     #homeScreen > .home-card {
-        padding: 20px;
-        border-radius: 18px;
-    }
-
-    #trainWeaknessCard {
         padding: 18px;
     }
 
@@ -1400,7 +1394,7 @@
     }
 
     #homeScreen .player-stats p {
-        padding: 12px;
+        padding: 11px;
     }
 }
 
@@ -1413,11 +1407,14 @@
 
     <section id="homeScreen" class="screen active">
 
-        <div class="home-card">
-
+        <header class="home-header">
             <div class="logo">🛡️</div>
-
-            <h1>ConQuest</h1>
+            <div>
+                <h1>ConQuest</h1>
+                <p>Think smart. Verify independently. </p>
+            </div>
+        
+        <div class="home-card">
 
             <div class="player-stats">
                 <p>Level: <span id="user-level">Loading...</span></p>
@@ -1425,19 +1422,20 @@
                 <p>XP: <span id="current-xp">0</span></p>
                 <p>XP to next level: <span id="next-level-xp">0</span></p>
             </div> 
-            <p>
+            <p class="home-description">
                 You're about to enter realistic conversations where you
                 must figure out what's legitimate and what's a scam.
                 Think carefully. Verify independently. Don't get tricked.
             </p>
 
             <button class="primary-button" onclick="showScreen('scenarioScreen')">
-                Start Game
+                ▶ Start Game
             </button>
 
             <button class="primary-button" onclick="loadRadarScreen()">
                 📡View Scam Radar 
             </button>
+        </div>
 
             <div id="trainWeaknessCard" class="home-card">
                 <h3>🎯 Train Your Weakness </h3>
