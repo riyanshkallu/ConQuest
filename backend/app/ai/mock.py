@@ -106,7 +106,10 @@ def mock_character_move(ctx: TurnContext) -> CharacterMove:
     pushed_back = ctx.last_decision in PUSHBACK
 
     if state.is_scam:
-        allowed = [t for t in version["allowed_tactics"] if t in lines]
+        waiting_for_code = "code_notification" in ctx.scenario.raw and not ctx.code_arrived
+        # credential_request's lines ask for the code, so not before it has arrived
+        allowed = [t for t in version["allowed_tactics"]
+                   if t in lines and not (waiting_for_code and t == "credential_request")]
         if ctx.code_just_sent and "credential_request" in allowed:
             flag = "credential_request"
         elif state.difficulty >= 4 and not pushed_back and "trust_building" in allowed                 and "trust_building" not in state.tactics_used:
