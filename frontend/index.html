@@ -2056,6 +2056,10 @@ function escapeHTML(value) {
                     scenario_id: scenarioId
                 };
 
+                if(focus) {
+                    body.focus = focus;
+                }
+
                 // Demo mode for recording the video: ?demo=KEY&force=scam|legit&seed=7
                 const params = new URLSearchParams(window.location.search);
                 if (params.get("demo")) {
@@ -2082,6 +2086,15 @@ function escapeHTML(value) {
                 showScreen("scenarioScreen");
                 alert("Could not start the round: " + error.message);
             }
+        }
+
+        function startWeaknessTraining(training) {
+            if(!training?.scenario_id || !training?.category) {
+                alert("Training data is unavailable. Please refresh your scenarios.);
+                      return;
+            }
+
+            selectScenario(training.scenario_id, training.category);
         }
 
 
