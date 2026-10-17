@@ -1185,6 +1185,12 @@
                 📡View Scam Radar 
             </button>
 
+            <div id="trainWeaknessCard" class="home-card">
+                <h3>🎯 Train Your Weakness </h3>
+                <p> Finish a round to unlock personalized training.</p>
+                <button type="button" disabled>Play a round first </button>
+            </div>
+
         </div>
     </section>
 
@@ -1973,21 +1979,71 @@ function returnHome() {
 
         /* scenario list */
 
-        async function loadScenarios() {
+    
+async function loadScenarios() {
+    const data = await api(
+        "GET",
+        "/scenarios?player_id=" + encodeURIComponent(playerId)
+    );
 
-            const data = await api("GET", "/scenarios?player_id=" + playerId);
-            const available = data.scenarios.map(scenario => scenario.id);
+    const available = (data.scenarios || []).map(scenario => scenario.id);
 
-            document
-                .querySelectorAll("[data-scenario]")
-                .forEach(button => {
-                    // "random" (Surprise Me) isn't in the list but is always playable
-                    const ready = button.dataset.scenario === "random" || available.includes(button.dataset.scenario);
-                    button.disabled = !ready;
-                    button.textContent = ready ? "Play" : "Coming soon";
-                });
-        }
+    document.querySelectorAll("[data-scenario]").forEach(button => {
+        const ready =
+            button.dataset.scenario === "random" ||
+            available.includes(button.dataset.scenario);
 
+        button.disabled = !ready;
+        button.textContent = ready ? "Play" : "Coming soon";
+    });
+
+    const card = document.getElementById("trainWeaknessCard");
+
+    // If the training card isn't in the HTML, stop safely.
+    if (!card) {
+        console.warn("Missing #trainWeaknessCard element in the home screen.");
+        return;
+    }
+
+    const training = data.train_your_weakness;
+
+    // No recommendation until the player finishes a round.
+    if (!training) {
+        card.innerHTML = `
+            <h3>🎯 Train Your Weakness</h3>
+            <p>Finish a round to unlock personalized training.</p>
+            <button type="button" disabled>Play a round first</button>
+        `;
+        return;
+    }
+
+    card.innerHTML = `
+        <h3>🎯 Train Your Weakness</h3>
+        <p>Practice: <strong>${escapeHTML(training.label)}</strong></p>
+        <p>Your current resistance rate: ${
+            training.percent == null
+                ? "Not enough data yet"
+                : `${Number(training.percent)}%`
+        }</p>
+        <button type="button" id="trainWeaknessButton">
+            Practice this weakness
+        </button>
+    `;
+
+    document.getElementById("trainWeaknessButton").addEventListener("click", () => {
+        startWeaknessTraining(training);
+    });
+}
+
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[character]);
+}
 
         /* select scenario */
 
