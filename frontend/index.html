@@ -1234,6 +1234,176 @@
         padding: 12px;
     }
 }    
+
+        
+/* ===== ConQuest home screen redesign ===== */
+
+#homeScreen {
+    padding: 32px 18px 48px;
+}
+
+#homeScreen > .home-card {
+    width: 100%;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px;
+    border: 1px solid #e2e8f0;
+    border-radius: 24px;
+    background: #ffffff;
+    box-shadow: 0 12px 36px rgba(15, 23, 42, 0.08);
+}
+
+#homeScreen .logo {
+    width: 68px;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+    border-radius: 20px;
+    background: #eef2ff;
+    font-size: 38px;
+}
+
+#homeScreen h1 {
+    margin: 0 0 22px;
+    color: #172554;
+    font-size: clamp(2rem, 5vw, 2.7rem);
+    font-weight: 800;
+    letter-spacing: -1.2px;
+}
+
+#homeScreen .player-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin: 0 0 22px;
+}
+
+#homeScreen .player-stats p {
+    margin: 0;
+    padding: 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+#homeScreen .player-stats span {
+    display: block;
+    margin-top: 5px;
+    color: #172554;
+    font-size: 1.5rem;
+    font-weight: 800;
+}
+
+#homeScreen > .home-card > p {
+    margin: 0 0 20px;
+    color: #475569;
+    font-size: 1rem;
+    line-height: 1.75;
+}
+
+#homeScreen button {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 50px;
+    margin: 6px 0;
+    padding: 13px 18px;
+    border-radius: 12px;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.18s ease, box-shadow 0.18s ease,
+                background 0.18s ease;
+}
+
+#homeScreen button:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+}
+
+#homeScreen button:focus-visible {
+    outline: 3px solid #93c5fd;
+    outline-offset: 3px;
+}
+
+/* Main action */
+#homeScreen > .home-card > button.primary-button:first-of-type {
+    color: #ffffff;
+    background: #4f46e5;
+    border: 1px solid #4f46e5;
+}
+
+/* Secondary action */
+#homeScreen > .home-card > button.primary-button:nth-of-type(2) {
+    color: #334155;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+}
+
+/* Training panel */
+#trainWeaknessCard {
+    margin-top: 28px;
+    padding: 24px;
+    border: 1px solid #e0e7ff;
+    border-radius: 18px;
+    background: linear-gradient(135deg, #ffffff, #f5f7ff);
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.06);
+}
+
+#trainWeaknessCard h3 {
+    margin: 0 0 12px;
+    color: #172554;
+    font-size: 1.25rem;
+}
+
+#trainWeaknessCard p {
+    margin: 8px 0;
+    color: #475569;
+    line-height: 1.6;
+}
+
+#trainWeaknessCard button {
+    margin-top: 12px;
+    color: #ffffff;
+    background: linear-gradient(135deg, #4f46e5, #6d5dfc);
+    border: none;
+}
+
+#trainWeaknessCard button:disabled {
+    color: #64748b;
+    background: #e2e8f0;
+    cursor: not-allowed;
+    opacity: 1;
+    box-shadow: none;
+}
+
+@media (max-width: 550px) {
+    #homeScreen {
+        padding: 18px 12px 30px;
+    }
+
+    #homeScreen > .home-card {
+        padding: 20px;
+        border-radius: 18px;
+    }
+
+    #trainWeaknessCard {
+        padding: 18px;
+    }
+
+    #homeScreen .player-stats {
+        gap: 8px;
+    }
+
+    #homeScreen .player-stats p {
+        padding: 12px;
+    }
+}
+
     </style>
 </head>
 
