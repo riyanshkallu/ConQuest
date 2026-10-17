@@ -1017,6 +1017,12 @@
     opacity: 0.7;
 }
 
+/* "No badges yet" and similar messages span the whole grid instead of one card's width */
+.radar-empty {
+    grid-column: 1 / -1;
+    color: #667085;
+}
+
 
 .radar-track {
     height: 9px;
@@ -1903,71 +1909,41 @@ function renderRadar(data) {
 
 function renderBadges(badges) {
     const badgeGrid = document.getElementById("badgeGrid");
+    badgeGrid.replaceChildren();
 
-    const catalog = [
-        {
-            id: "first_escape",
-            name: "First Escape",
-            icon: "🛡️",
-            description: "Complete your first escape."
-        },
-        {
-            id: "no_mistakes",
-            name: "No Mistakes",
-            icon: "✨",
-            description: "Finish a round without mistakes."
-        },
-        {
-            id: "detective",
-            name: "Detective",
-            icon: "🔎",
-            description: "Make five correct calls in a row."
-        },
-        {
-            id: "verifier",
-            name: "Verifier",
-            icon: "📞",
-            description: "Verify independently ten times."
-        },
-        {
-            id: "family_player",
-            name: "Family Player",
-            icon: "👥",
-            description: "Create a second profile on this device."
-        }
-    ];
+    // Names and descriptions come from GET /radar; only the icons live here.
+    const icons = {
+        first_escape: "🛡️",
+        no_mistakes: "✨",
+        detective: "🔎",
+        verifier: "📞",
+        family_player: "👥"
+    };
 
-    const earned = new Set(
-        (Array.isArray(badges) ? badges : [])
-            .map(badge => {
-                const raw = typeof badge === "string"
-                    ? badge
-                    : badge.id ?? badge.name ?? badge.badge;
+    // GET /radar lists every badge with earned true or false. Show only the earned ones.
+    const earned = (Array.isArray(badges) ? badges : []).filter(badge => badge.earned);
 
-                return String(raw ?? "")
-                    .toLowerCase()
-                    .replace(/[\s-]+/g, "_");
-            })
-    );
+    if (earned.length === 0) {
+        const empty = document.createElement("p");
+        empty.className = "radar-empty";
+        empty.textContent = "No badges yet. Finish a round to start earning them.";
+        badgeGrid.appendChild(empty);
+        return;
+    }
 
-    catalog.forEach(badge => {
-        const isEarned = earned.has(badge.id) ||
-            earned.has(badge.name.toLowerCase().replace(/[\s-]+/g, "_"));
-
+    earned.forEach(badge => {
         const card = document.createElement("div");
-        card.className = "badge-item" + (isEarned ? " earned" : "");
+        card.className = "badge-item earned";
 
         const icon = document.createElement("div");
         icon.className = "badge-icon";
-        icon.textContent = badge.icon;
+        icon.textContent = icons[badge.id] || "🏅";
 
         const title = document.createElement("h3");
         title.textContent = badge.name;
 
         const description = document.createElement("p");
-        description.textContent = isEarned
-            ? "Badge earned!"
-            : badge.description;
+        description.textContent = badge.description;
 
         card.append(icon, title, description);
         badgeGrid.appendChild(card);

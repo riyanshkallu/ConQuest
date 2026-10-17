@@ -393,7 +393,7 @@ Only after the round ended (otherwise `409 round_not_ended`).
     { "category": "real_contacts", "label": "Recognizing real contacts", "encountered": 10, "resisted": 7, "percent": 70 }
   ],
   "badges": [
-    { "id": "first_escape", "name": "First Escape", "description": "Finish a scam round without getting scammed.", "earned": true }
+    { "id": "first_escape", "name": "First Escape", "description": "Get away from a scammer safely, with an Outsmarted or Escaped ending.", "earned": true }
   ]
 }
 ```
