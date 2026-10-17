@@ -1,4 +1,4 @@
-# Outsmart API contract
+# ConQuest API contract
 
 This file is the handoff point between the backend (Python/FastAPI, `backend/`) and the
 frontend (HTML/CSS/JS, `frontend/`). **Change it only when both teammates agree**, and

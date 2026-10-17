@@ -174,7 +174,7 @@ def test_frontend_is_served():
 
 def test_test_console_is_served():
     r = client.get("/play")
-    assert r.status_code == 200 and "Outsmart test console" in r.text
+    assert r.status_code == 200 and "ConQuest test console" in r.text
 
 
 # --- Job offer and family emergency -------------------------------------------

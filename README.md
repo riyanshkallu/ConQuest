@@ -1,4 +1,4 @@
-# Scam-Shield: Can You Outsmart the Scammer?
+# ConQuest
 
 A web game where you chat with an AI that is trying to scam you, or with a contact who is
 actually real, and have to decide who to trust. Built for the Congressional App Challenge 2026.

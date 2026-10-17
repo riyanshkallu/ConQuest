@@ -41,7 +41,7 @@ It uses about 70 AI calls. Run the server with a throwaway database
 
 `render.yaml` in the repo root describes the service, so setup is mostly clicking:
 
-1. On render.com, sign in with GitHub and allow access to the `Scam-Shield` repo.
+1. On render.com, sign in with GitHub and allow access to the `ConQuest` repo.
 2. **New > Blueprint**, pick the repo and the `main` branch. Render reads `render.yaml`.
 3. When asked, paste `GROQ_API_KEY` and `GEMINI_API_KEY` (the same values as your `.env`).
 4. Click **Apply**. The first build takes a few minutes. The app is then live at
