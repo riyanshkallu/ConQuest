@@ -37,7 +37,8 @@ _TEXTING_RE = re.compile(r"\b(?:pls|plz|thx|lol|omg|btw|gonna|wanna|gotta|idk|rn
 _LOWERCASE_RE = re.compile(r"(?:^\W*|[.!?]\s+)[a-z]|\b(?:i|u|ur)\b")  # lowercase sentence start, "i", "u", "ur"
 _EMOJI_RE = re.compile("[\U0001F300-\U0001FAFF☀-➿]")
 _FAKE_LINK_RE = re.compile(r"\S+\.example\S*")
-_MENTIONS_ID_CARD_RE = re.compile(r"\bID card\b|\b(?:your|the|my) ID\b")  # "the code from your ID" breaks the story
+_ONE_TIME_CODE = r"(?:one-time|verification|login|\d-digit|six-digit) codes?"
+_MENTIONS_ID_CARD_RE =re.compile(r"\bID card\b|\b(?:your|the|my) ID\b")  # "the code from your ID" breaks the story
 
 
 def _not_on_card(ctx: TurnContext) -> list[str]:
@@ -48,7 +49,9 @@ def _not_on_card(ctx: TurnContext) -> list[str]:
     if not card.gift_card_code:
         missing.append(r"gift cards?(?: codes?)?")
     if "code_notification" not in ctx.scenario.raw:
-        missing.append(r"(?:one-time|verification|login) codes?")
+        missing.append(_ONE_TIME_CODE)
+    elif not ctx.code_arrived:  # the code comes later in the chat, so there's nothing to read back yet
+        missing += [_ONE_TIME_CODE, r"(?:the|that|your) codes?"]
     return missing
 
 

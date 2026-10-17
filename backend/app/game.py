@@ -349,6 +349,7 @@ def _context(rnd: store.Round, text: str, decision: str = "neutral", code_now: b
         scenario=rnd.scenario, state=rnd.state,
         transcript=[{"sender": m["sender"], "text": m["text"]} for m in rnd.transcript],
         player_text=text, last_decision=decision, code_just_sent=code_now,
+        code_arrived=rnd.code_sent or code_now,
     )
 
 

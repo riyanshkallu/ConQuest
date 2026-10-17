@@ -25,6 +25,7 @@ class TurnContext:
     player_text: str = ""
     last_decision: str = "neutral"
     code_just_sent: bool = False  # the one-time code arrives alongside this reply
+    code_arrived: bool = False    # the player has the code by now (earlier, or with this reply)
 
     @property
     def version(self) -> dict:

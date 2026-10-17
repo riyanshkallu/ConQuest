@@ -65,7 +65,7 @@
       "handle": "{short_code}"
     },
     "objective": "obtain_verification_code",
-    "objective_text": "Get the player to read back the one-time code that was just texted to them.",
+    "objective_text": "Get the player to read back the one-time code the real bank texts them during the chat.",
     "objective_is_payment": false,
     "allowed_tactics": [
       "authority",

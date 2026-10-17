@@ -54,7 +54,7 @@ def ctx(is_scam: bool, difficulty: int) -> TurnContext:
     scenario = get_scenario("bank_alert")
     state = engine.RoundState(is_scam=is_scam, id_card=new_id_card(scenario, random.Random(1)),
                               objective="x", difficulty=difficulty)
-    return TurnContext(scenario=scenario, state=state)
+    return TurnContext(scenario=scenario, state=state, code_arrived=True)
 
 
 @pytest.mark.parametrize("difficulty", [1, 2, 3, 4, 5])

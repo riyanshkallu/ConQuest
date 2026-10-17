@@ -45,7 +45,8 @@ def scene(is_scam: bool, player_lines: list[str], code_now: bool = False, decisi
         state.turns += 1
         transcript.append({"sender": "player", "text": line})
     return TurnContext(scenario=scenario, state=state, transcript=transcript,
-                       player_text=player_lines[-1], last_decision=decision, code_just_sent=code_now)
+                       player_text=player_lines[-1], last_decision=decision, code_just_sent=code_now,
+                       code_arrived=code_now)
 
 
 CHARACTER_SCENES = {

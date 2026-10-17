@@ -105,7 +105,7 @@ def card_items(ctx: TurnContext) -> list[str]:
         items.append("online banking password")
     if card.gift_card_code:
         items.append(f"{ctx.scenario.raw.get('vars', {}).get('gift_store', 'store')} gift card code")
-    if "code_notification" in ctx.scenario.raw:
+    if "code_notification" in ctx.scenario.raw and ctx.code_arrived:
         items.append("the one-time code the bank texts them")
     items += [_r(ctx, e["label"]).removeprefix("Your ").lower() for e in ctx.scenario.raw.get("id_card_extras", [])]
     return items
@@ -145,8 +145,13 @@ Example lines in your voice:
 """
     if state.is_scam:
         tactics = list(version["allowed_tactics"])
-        code_note = ("\nThe real bank just texted the player a one-time code. Ask them to read it back to you now."
-                     if ctx.code_just_sent else "")
+        if ctx.code_just_sent:
+            code_note = "\nThe real bank just texted the player a one-time code. Ask them to read it back to you now."
+        elif "code_notification" in ctx.scenario.raw and not ctx.code_arrived:
+            code_note = ("\nNo code has been texted to the player yet, so don't ask for one. "
+                         "Build trust and urgency for now; the code arrives later in the chat.")
+        else:
+            code_note = ""
         return shared + f"""
 You play the SCAMMER. Your goal in the story: {_r(ctx, version['objective_text'])}
 Each message uses exactly one tactic from: {tactics}.

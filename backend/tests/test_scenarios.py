@@ -19,7 +19,8 @@ UNFILLED = re.compile(r"\{[a-z_0-9]+\}")
 def make_ctx(scenario, is_scam: bool) -> TurnContext:
     card = new_id_card(scenario, random.Random(5))
     state = engine.RoundState(is_scam=is_scam, id_card=card, objective="x")
-    return TurnContext(scenario=scenario, state=state)
+    # After any one-time code has arrived, when every line (even asking for the code) may be used
+    return TurnContext(scenario=scenario, state=state, code_arrived=True)
 
 
 def all_texts(value):

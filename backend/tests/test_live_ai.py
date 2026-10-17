@@ -11,17 +11,19 @@ import pytest
 
 from app import engine
 from app.ai.base import TurnContext
+from app.ai import prompts
 from app.ai.live import CharacterOut, LiveAI, check_character
 from app.ai.llm import LLM, parse_models
+from app.ai.mock import mock_character_move
 from app.config import Settings
 from app.scenarios import get_scenario, new_id_card
 
 
-def make_ctx(is_scam: bool = True) -> TurnContext:
+def make_ctx(is_scam: bool = True, code_arrived: bool = True) -> TurnContext:
     scenario = get_scenario("bank_alert")
     card = new_id_card(scenario, random.Random(3))
     state = engine.RoundState(is_scam=is_scam, id_card=card, objective="x")
-    return TurnContext(scenario=scenario, state=state, player_text="who is this?")
+    return TurnContext(scenario=scenario, state=state, player_text="who is this?", code_arrived=code_arrived)
 
 
 class FakeClient:
@@ -114,6 +116,35 @@ def test_contact_cannot_ask_for_things_not_on_the_id_card(message):
 def test_contact_can_ask_for_id_card_items(message):
     out = CharacterOut(message=message, tactic="credential_request", pressure=60)
     assert check_character(out, make_ctx()) is None
+
+
+@pytest.mark.parametrize("message", [
+    "Please read the one-time code sent to your phone.",
+    "I only need that 6-digit code we texted you.",
+    "Text back the code we just sent so I can stop the charge.",
+])
+def test_contact_cannot_ask_for_the_code_before_it_arrives(message):
+    out = CharacterOut(message=message, tactic="credential_request", pressure=60)
+    assert check_character(out, make_ctx(code_arrived=False)) == "asked for something not on the ID card"
+    assert check_character(out, make_ctx(code_arrived=True)) is None
+
+
+def test_contact_can_mention_codes_before_one_arrives():
+    out = CharacterOut(message="We will never ask for your one-time code.", tactic="trust_building", pressure=20)
+    assert check_character(out, make_ctx(code_arrived=False)) is None
+
+
+def test_prewritten_lines_and_prompt_wait_for_the_code():
+    ctx = make_ctx(code_arrived=False)
+    for tactic in ("authority", "urgency"):  # credential_request would be next
+        engine.record_character_move(ctx.state, tactic)
+    assert mock_character_move(ctx).flag != "credential_request"
+    assert "one-time code" not in prompts.card_items(ctx)
+    assert "don't ask for one" in prompts.character_system(ctx)
+
+    ctx.code_arrived = True
+    assert mock_character_move(ctx).flag == "credential_request"
+    assert "the one-time code the bank texts them" in prompts.card_items(ctx)
 
 
 @pytest.mark.parametrize("message", [
