@@ -702,6 +702,45 @@
                 margin-bottom: 14px;
             }
 
+            .transcript-list {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                margin-top: 16px;
+            }
+
+            .transcript-item {
+                border: 1px solid #d9dee7;
+                border-radius: 10px;
+                padding: 12px;
+                background: #f8fafc;
+            }
+
+            .transcript-item summary {
+                cursor: pointer;
+                font-weight: 600;
+                overflow-wrap: anywhere;
+            }
+
+            .transcript-item p {
+                margin-top: 10px;
+                line-height: 1.5;
+                overflow-wrap: anywhere;
+            }
+
+            .transcrirpt-item.contact {
+                border-left: 4px solid #68748b;
+            }
+
+            .transcript-item.player {
+                border-left: 4px solid #2563eb;
+            }
+
+            .transcript-item.notification {
+                border-left: 4px solid #d97706;
+            }
+        
+
         /* loading screen code */
 
         #loadingScreen {
@@ -1022,26 +1061,9 @@
         line-height: 1.5;
     }
 
-     (max-width: 550px) {
-        .radar-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .radar-section {
-            padding: 17px;
-        }
-
-        .radar-header h1 {
-            font-size: 28px;
-        }
-    }
+   
 /* Responsive code */
 
-@media (max-width: 600px) {
-    #badgeGrid {
-        grid-template-columns: repeat(2, minmax(0,1fr));
-    }
-}
 @media (max-width: 750px) {
     .home-card h1 {
         font-size: 32px;
@@ -1157,9 +1179,6 @@
                 📡View Scam Radar 
             </button>
 
-        
-
-        </div>
         </div>
     </section>
 
@@ -2579,67 +2598,145 @@ initializeGame();
                 
         /* breakdown screen */
 
-        function showBreakdown(result) {
-        if (!result) {
-            console.error("No result data available.");
-            return;
-        }    
+      
+function showBreakdown(result) {
+    if (!result) {
+        console.error("No result data available.");
+        return;
+    }
 
-            const ending = result.ending || "";
-            const explanation = result.explanation || {};
+    const explanation = result.explanation || {};
+    const title = document.getElementById("breakdownTitle");
+    const content = document.getElementById("breakdownContent");
 
-            const title = document.getElementById("breakdownTitle");
-            const content = document.getElementById("breakdownContent");
-
-            content.innerHTML = "";
-
-            if (explanation.type === "scam_autopsy") {
-                title.textContent = "Scam Autopsy";
-            } else {
-                title.textContent = "Legit Breakdown";
-            }
+    content.innerHTML = "";
+    title.textContent =
+        explanation.type === "scam_autopsy"
+            ? "Scam Autopsy"
+            : "Legit Breakdown";
 
     // Biggest clue
-            if (result.biggest_clue) {
-                addBreakdownCard(
-                    content,
-                    "🔎 Biggest Clue",
-                    result.biggest_clue
-            );
-        }
+    if (result.biggest_clue) {
+        addBreakdownCard(content, "🔎 Biggest Clue", result.biggest_clue);
+    }
 
     // Best decision
-            if (explanation.best_decision) {
-                addBreakdownCard(
-                    content,
-                    "⭐ Best Decision",
-                    explanation.best_decision
-                );
-            }
+    if (explanation.best_decision) {
+        addBreakdownCard(content, "⭐ Best Decision", explanation.best_decision);
+    }
+
+    // Good decisions
+    if (explanation.good_decisions?.length) {
+        addBreakdownCard(
+            content,
+            "✅ Good Decisions",
+            [...new Set(explanation.good_decisions)]
+        );
+    }
 
     // Mistakes
-    if (explanation.mistakes && explanation.mistakes.length) {
-        const uniqueMistakes = [
-            ...new Set(explanation.mistakes)
-        ];
+    if (explanation.mistakes?.length) {
         addBreakdownCard(
             content,
             "⚠️ Mistakes",
-            uniqueMistakes
+            [...new Set(explanation.mistakes)]
         );
     }
 
     // Timeline
-    if (explanation.timeline && explanation.timeline.length) {
+    if (explanation.timeline?.length) {
+        addBreakdownCard(content, "🧠 What Happened", explanation.timeline);
+    }
+
+    // Matching scam example after a lucky outcome
+    if (explanation.scam_twin) {
+        const twin = explanation.scam_twin;
         addBreakdownCard(
             content,
-            "🧠 What Happened",
-            explanation.timeline
+            "🪞 What the Scam Version Looked Like",
+            `${twin.contact_name || "Scam contact"}: ${twin.text || ""}`
         );
+    }
+
+    // End-of-round tip
+    if (result.tip?.text) {
+        addBreakdownCard(content, "💡 Remember This", result.tip.text);
+    }
+
+    // Newly earned badges
+    if (result.new_badges?.length) {
+        addBreakdownCard(
+            content,
+            "🏅 New Badges",
+            result.new_badges.map(
+                badge => `${badge.name}: ${badge.description}`
+            )
+        );
+    }
+
+    // Full transcript
+    if (result.transcript?.length) {
+        const transcriptCard = document.createElement("div");
+        transcriptCard.className = "breakdown-card";
+
+        const heading = document.createElement("h3");
+        heading.textContent = "💬 Full Conversation Transcript";
+        transcriptCard.appendChild(heading);
+
+        const intro = document.createElement("p");
+        intro.textContent =
+            "Select any message to inspect its clue or explanation.";
+        transcriptCard.appendChild(intro);
+
+        const transcriptList = document.createElement("div");
+        transcriptList.className = "transcript-list";
+
+        result.transcript.forEach((message, index) => {
+            const item = document.createElement("details");
+            item.className = `transcript-item ${message.sender || "unknown"}`;
+
+            const summary = document.createElement("summary");
+            const sender =
+                message.sender === "contact" ? "Contact" :
+                message.sender === "player" ? "You" :
+                message.sender === "notification" ? "Notification" :
+                "Message";
+
+            summary.textContent =
+                `${sender}${message.turn != null ? ` · Turn ${message.turn}` : ""}: ${message.text || ""}`;
+
+            item.appendChild(summary);
+
+            if (message.flag) {
+                const flag = document.createElement("p");
+                flag.textContent =
+                    `${message.flag.kind === "red" ? "🚩 Red flag" : "🟢 Green flag"}: ${message.flag.label}` +
+                    (message.flag.explanation ? ` — ${message.flag.explanation}` : "");
+                item.appendChild(flag);
+            }
+
+            if (message.note) {
+                const note = document.createElement("p");
+                note.textContent = `📝 ${message.note}`;
+                item.appendChild(note);
+            }
+
+            if (!message.flag && !message.note) {
+                const detail = document.createElement("p");
+                detail.textContent = "No additional explanation for this message.";
+                item.appendChild(detail);
+            }
+
+            transcriptList.appendChild(item);
+        });
+
+        transcriptCard.appendChild(transcriptList);
+        content.appendChild(transcriptCard);
     }
 
     showScreen("breakdownScreen");
 }
+
         function addBreakdownCard(container, headingText, content) {
 if (
 !container ||
