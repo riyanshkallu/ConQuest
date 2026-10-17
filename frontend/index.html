@@ -825,6 +825,20 @@
     width: 100%;
 }
 
+    @media (max-width: 750px) {
+        #radarGrid,
+        #badgeGrid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 480px) {
+        #radarGrid,
+        #badgeGrid {
+            grid-template-columns: 1fr;
+        }
+    }
+
 
 .radar-item,
 .badge-item {
@@ -1705,6 +1719,9 @@ async function loadRadarScreen() {
 }
 
 function renderRadar(data) {
+    console.log("FULL RADAR DATA:",data);
+    console.log("BADGES FROM BACKEND:", data.badges);
+    
     const radarGrid = document.getElementById("radarGrid");
     const badgeGrid = document.getElementById("badgeGrid");
 
