@@ -14,7 +14,7 @@ from .flags import RADAR_CATEGORIES, RED_FLAGS
 GOOD_CALL_ENDINGS = {"OUTSMARTED", "ESCAPED", "SMART_AND_SAFE"}
 
 BADGES: dict[str, tuple[str, str]] = {
-    "first_escape": ("First Escape", "Finish a scam round without getting scammed."),
+    "first_escape": ("First Escape", "Get away from a scammer safely, with an Outsmarted or Escaped ending."),
     "no_mistakes": ("No Mistakes", "Get the best ending in a round without a single mistake."),
     "detective": ("Detective", "Make five correct scam-or-legit calls in a row."),
     "verifier": ("Verifier", "Verify independently ten times."),
