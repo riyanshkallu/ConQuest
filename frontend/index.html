@@ -2119,6 +2119,7 @@ function renderRadar(data) {
     if (Array.isArray(entries) && entries.length > 0) {
         entries.forEach(item => {
             const name =
+                item.label ??
                 item.tactic ??
                 item.category ??
                 item.name ??
