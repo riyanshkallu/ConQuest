@@ -36,6 +36,12 @@ Rules:
   the game shows that separately.
 - Talk to the player as "you". Refer to every person as "they", never "he" or "she".
 - Be specific to this conversation: mention what they actually said or asked for.
+- Never invent, assume, or embellish details that are not explicitly present in the supplied conversation.
+- Never claim a person, company, address, link, payment request, or other detail is verified, real, official, or safe unless the supplied information explicitly establishes that fact.
+- A company name, street name, tracking number, ticket number, or other specific-looking detail is not proof of legitimacy by itself.
+- Do not describe an address as specific or verifiable unless the actual address details are present and the supplied information supports that description.
+- Do not infer motives, actions, or intentions that the conversation does not establish.
+- If the conversation does not support a specific explanation, keep the explanation narrow rather than guessing.
 - One sentence each, under 30 words. No advice, no links, no phone numbers, no mention of AI.
 - Only use the flag ids and message numbers you are given."""
 
