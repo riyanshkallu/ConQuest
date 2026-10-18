@@ -2864,12 +2864,16 @@ function escapeHTML(value) {
             addDetail(details, "Points", String(result.points ?? 0));
             addDetail(details, "XP earned", String(result.xp_earned ?? 0));
 
-            if (Array.isArray(result.points_breakdown)) {
+            if (
+                Array.isArray(result.points_breakdown)  &&
+                result.points_breakdown.length > 0
+                ) {
                 addDetail(
                     details,
                     "How you scored",
                     result.points_breakdown
-                        .map(item => `${item.label}: ${item.points > 0 ? "+" : ""}${item.points}`)
+                        .map(item => `${item.label}: ${item.points > 0 ? "+" : ""}${item.points}`
+                            )
                         .join("\n")
                     );
             }
@@ -2978,6 +2982,14 @@ function showBreakdown(result) {
             "✅ Good Decisions",
             [...new Set(explanation.good_decisions)]
         );
+    }
+
+    if (explanation.biggest_weakness) {
+        addBreakdownCard(
+            content,
+            "🎯 Biggest Weakness",
+            explanation.biggest_weakness
+            );
     }
 
     // Mistakes
