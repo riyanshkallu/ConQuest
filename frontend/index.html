@@ -2151,6 +2151,22 @@
             }
         }
 
+        function loadLocalSettings() {
+            try {
+                const saved = JSON.parse(localStorage.getItem("outsmart_settings") || "{}");
+
+                document.getElementById("settingsHints").checked =
+                    saved.hints ?? false;
+
+                document.getElementById("settingsSaveConversations").checked=
+                    saved.save_conversations ?? true;
+            } catch(error) {
+                console.error("Could not load local settings:", error);
+            }
+        }
+
+        
+
         async function setUpPlayer() {
 
             playerId = loadPlayerId();
@@ -2170,8 +2186,22 @@
                 console.log("Assigned playerId:", playerId);
                 savePlayerId(playerId);
             }
+
+            loadLocalSettings();
         }
 
+        async function loadSettings() {
+            try {
+                const settings = await api("GET", "/player/" + playerId + "/settings");
+
+                document.getElementById("settingsHints").checked = settings.hints;
+                document.getElementById("settingsSaveConversations").checked = settings.save_conversations;
+            } catch(error) {
+                console.error("Could not load settings:", error);
+            }
+        
+        }
+        
         async function saveSettings() {
             const status = document.getElementById("settingsStatus");
             const hints = document.getElementById("settingsHints").checked;
@@ -2185,6 +2215,10 @@
                     save_conversations: saveConversations
                 });
 
+                localStorage.setItem("outsmart_settings", JSON.stringify({
+                    hints: hints,
+                    save_conversations: saveConversations
+                }));
                 status.textContent = "Settings saved successfully.";
             } catch (error) {
                 status.textContent = "Could not save settings: " + error.message;
