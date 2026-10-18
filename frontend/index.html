@@ -1557,6 +1557,10 @@
             </button>
         </div>
 
+            <button class="primary-button" onclick="showScreen('settingsScreen')">
+                ⚙️ Settings
+            </button>
+
             <div id="trainWeaknessCard" class="home-card">
                 <h3>🎯 Train Your Weakness </h3>
                 <p> Finish a round to unlock personalized training.</p>
@@ -1744,6 +1748,50 @@
 
         
     </section>
+
+    <!-- settings screen html -->
+    <section id="settingsScreen" class="screen hidden">
+        <div class="radar-header">
+            <div>
+                <h1>⚙️ Settings</h1>
+                <p>Customize your ConQuest experience.</p>
+            </div>
+        <button type="button" onclick="returnHome()">Home</button>
+        </div>
+
+        <div class="home-card">
+            <h2>Game Preferences</h2>
+
+        <label>
+            <input type="checkbox" id="settingsHints">
+            Show hints and coaching tips
+        </label>
+
+            <label>
+                <input type="checkbox" id="settingsSaveConversations">
+                Save conversations
+            </label>
+
+            <button type="button" class="primary-button"
+                onclick="saveSettings()">
+                Save Settings
+            </button>
+
+            <p id="settingsStatus" role="status"></p>
+        </div>
+
+        <div class="home-card">
+            <h2>Reset progress</h2>
+            <p>This resets your game progress. This action may not be reversible.</p>
+            <button type="button"
+                onclick="resetProgress()">
+                Reset Progress
+            </button>
+            <p id="resetStatus" role="status"></p>
+        </div>
+    </section>
+        
+        
     <!--loading screen html -->
 
     <section id="loadingScreen" class="screen">
@@ -2122,6 +2170,43 @@
                 console.log("Assigned playerId:", playerId);
                 savePlayerId(playerId);
             }
+        }
+
+        async function saveSettings() {
+            const status = document.getElementById("settingsStatus");
+            const hints = document.getElementById("settingsHints").checked;
+            const saveConversations = document.getElementById("settingsSaveConversations").checked;
+
+            status.textContent = "Saving settings...";
+
+            try {
+                await api("PATCH", "/player/" + playerId + "/settings", {
+                    hints: hints,
+                    save_conversations: saveConversations
+                });
+
+                status.textContent = "Settings saved successfully.";
+            } catch (error) {
+                status.textContent = "Could not save settings: " + error.message;
+            }
+        }
+
+        async function resetProgress() {
+            const status = document.getElementById("resetStatus");
+
+            if (!confirm("Are you sure you want to reset your game progress. This may not be reversible.")) {
+                return;
+            }
+
+            status.textContent = "Resetting Progress...";
+
+            try {
+                await api("POST", "/player/" + playerId + "/reset", {});
+                status.textContent = "Progress reset successfully.";
+            } catch(error) {
+                status.textContent = "Could not reset progress: " + error.message;
+            }
+            
         }
 
 
