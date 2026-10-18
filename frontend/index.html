@@ -3046,10 +3046,24 @@ function showBreakdown(result) {
     // Matching scam example after a lucky outcome
     if (explanation.scam_twin) {
         const twin = explanation.scam_twin;
+
+        const twinContent = document.createElement("div");
+
+        const intro = document.createElement("p");
+        intro.textContent =
+            "You identified a legitimate content. Here's how a scammer could use a similar situation to trick you:";
+        twinContent.appendChild(intro);
+
+        const message = document.createElement("p");
+        message.style.marginTop = "10px";
+        message.textContent =
+            `${twin.contact_name || "Scam Contact"}: ${twin.text || ""}`;
+        twinContent.appendChild(message);
+        
         addBreakdownCard(
             content,
             "🪞 What the Scam Version Looked Like",
-            `${twin.contact_name || "Scam contact"}: ${twin.text || ""}`
+            twinContent
         );
     }
 
