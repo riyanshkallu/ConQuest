@@ -35,7 +35,7 @@ RED_FLAGS: dict[str, Flag] = {f.id: f for f in [
          "They asked you to pay a fee or move money. Real jobs and banks don't work that way.",
          "financial"),
     Flag("suspicious_link", "red", "Suspicious link",
-         "They sent a link to a lookalike site built to steal logins.", "links_logins"),
+        "They sent a link to download software. Verify the link independently before opening or installing anything.",
     Flag("credential_request", "red", "Credential request",
          "Asking for a one-time code or password is a credential request. Real banks never ask for these.",
          "links_logins"),
