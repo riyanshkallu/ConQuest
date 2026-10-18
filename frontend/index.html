@@ -1452,7 +1452,7 @@
         }
 
         #chatMessages[data-channel="dm"] {
-            background: #ff5f3ff;
+            background: #ff5f3f;
         }
 
         #chatMessages[data-channel="email"] {
@@ -2508,6 +2508,9 @@ function escapeHTML(value) {
         function startChat() {
 
             const round = openingRound;
+
+
+            document.getElementById("chatMessages").dataset.channel = round.channel;
 
             console.log("Opening round:", round?.round_id);
             console.log("Current roundId:", roundId);
