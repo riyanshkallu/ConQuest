@@ -1446,6 +1446,22 @@
         #resultScreen p {
             white-space: pre-line;
         }
+
+        #chatMessages[data-channel="sms"] {
+            background: #f1f5f9;
+        }
+
+        #chatMessages[data-channel="dm"] {
+            background: #ff5f3ff;
+        }
+
+        #chatMessages[data-channel="email"] {
+            background: #ffffff;
+        }
+
+        #chatMessages[data-channel="chat"] {
+            background: #eff6ff;
+        }
         
     </style>
 </head>
@@ -2348,7 +2364,7 @@ function escapeHTML(value) {
 
         /* select scenario */
 
-        async function selectScenario(scenarioId) {
+        async function selectScenario(scenarioId, focus = null) {
 
             showScreen("loadingScreen");
             try {
@@ -2497,6 +2513,10 @@ function escapeHTML(value) {
             console.log("Current roundId:", roundId);
 
             document.getElementById("chatIdPanel").classList.add("open");
+
+            const chatMessages = document.getElementById("chatMessages");
+
+            chatMessages.dataset.channel = round.channel;
         
             document.getElementById("contactName").textContent = round.contact.name;
             document.getElementById("contactStatus").textContent =
