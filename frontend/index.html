@@ -2992,6 +2992,21 @@ function showBreakdown(result) {
             );
     }
 
+    // Biggest weakness
+
+    const weakness =
+        result.biggest_weakness || explanation.biggest_weakness;
+
+    if (weakness) {
+        addBreakdownCard(
+            content,
+            "🎯 Biggest Weakness",
+            weakness.label
+            ? `${weakness.label} (${weakness.category||"general"})`
+            : weakness
+            );
+    }
+
     // Mistakes
     if (explanation.mistakes?.length) {
         addBreakdownCard(
