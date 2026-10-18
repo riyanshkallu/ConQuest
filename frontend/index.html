@@ -2990,13 +2990,43 @@ function showBreakdown(result) {
         result.biggest_weakness || explanation.biggest_weakness;
 
     if (weakness) {
+        const weaknessDescriptions = {
+            urgency: "You may need to practice being more alert in time-crunching situations.",
+            links_logins: "You may need to spend more practice identifying the safety of a link.",
+            real_contacts: "You may need to spend more practice identifying what is a real contact, and what is a scam contact.",
+            financial: "You may need to practice understanding how financial pressures from a contact may hint it's a scam."
+    };
+
+    const weaknessLabel =
+        typeof weakness === "object"
+            ? weakness.label
+            : weakness;
+
+    const weaknessCategory =
+        typeof weakness === "object"
+            ? weakness.category
+            :null;
+
+    const weaknessDescription =
+        weaknessDescriptions[weaknessCategory] ||
+        "Review the clues in this round to strengthen your scam-detection skills.";
+
+        const weaknessContent = document.createElement("div");
+
+        const label = document.createElement("p");
+        label.textContent = weaknessLabel || "Your biggest weakness";
+        label.style.fontWeight = "bold";
+        weaknessContent.appendChild(label);
+
+        const description = document.createElement("p");
+        description.textContent = weaknessDescription;
+        weaknessContent.appendChild(description);
+            
         addBreakdownCard(
             content,
             "🎯 Biggest Weakness",
-            weakness.label
-            ? `${weakness.label} (${weakness.category||"general"})`
-            : weakness
-            );
+            weaknessContent
+            );   
     }
 
     // Mistakes
@@ -3215,6 +3245,10 @@ if (Array.isArray(content)) {
 
         body.appendChild(entry);
     });
+
+
+} else if (content instanceof Node) {
+    body.appendChild(content);
 } else if (typeof content === "object") {
     Object.entries(content).forEach(([key, value]) => {
         addDetail(
