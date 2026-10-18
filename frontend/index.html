@@ -1475,7 +1475,7 @@
             margin-bottom: 24px;
         }
 
-        #homeScreen >. home-card {
+        #homeScreen > .home-card {
             margin-left: auto;
             margin-right: auto;
             margin-bottom: 22px;
@@ -1515,6 +1515,158 @@
 
         #chatMessages[data-channel="chat"] {
             background: #eff6ff;
+        }
+
+        /* Settings Screen */
+
+        #settingsScreen {
+            display: none;
+        }
+
+        #settingsScreen.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 30px 20px 44px;
+        }
+
+        #settingsScreen > .radar-header {
+            width: 100%;
+            max-width: 900px;
+            align-items: center;
+            margin-bottom: 28px;
+            padding: 0 2px;
+        }
+
+        #settingsScreen .radar-header h1 {
+            color: #172554;
+            font-size: clamp(2rem, 4vw, 2.5rem);
+            letter-spacing: -0.7px;
+        }
+
+        #settingsScreen .radar-header p {
+            color: #68748b;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        #settingsScreen > .home-card {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 0 22px;
+            padding: 28px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            box-shadow: 0 8px 26px rgba(15, 23, 42, 0.06);
+            flex: none;
+        }
+
+        #settingsScreen .home-card h2 {
+            margin-bottom: 18px;
+            color: #172554;
+            font-size: 1.3rem;
+        }
+
+        #settingsScreen .home-card label {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 0 0 16px;
+            color: #334155;
+            line-height: 1.5;
+            cursor: pointer;
+        }
+
+        #settingsScreen .home-card input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+            accent-color: #4f46e5;
+            cursor: pointer;
+        }
+
+        #settingsScreen .home-card p {
+            color: #68748b;
+            line-height: 1.6;
+        }
+
+        #settingsScreen .home-card button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: auto;
+            min-height: 46px;
+            margin-top: 8px;
+            padding: 12px 20px;
+            border: 1px solid #4f46e5;
+            border-radius: 11px;
+            background: #4f46e5;
+            color: #ffffff;
+            font-weight: 700;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        #settingsScreen .home-card button:hover {
+            background: #4338ca;
+            transform: translateY(-1px);
+        }
+
+        #settingsScreen .radar-header > button {
+            flex-shrink: 0;
+            width: auto;
+            min-height: 44px;
+            padding: 11px 18px;
+            border: 1px solid #cbd5e1;
+            border-radius: 11px;
+            background: #ffffff;
+            color: #334155;
+            font-weight: 700;
+        }
+
+        #settingsScreen .radar-header > button:hover {
+            background: #f1f5f9;
+        }
+
+        #settingsScreen #resetStatus,
+        #settingsScreen #settingsStatus {
+            margin-top: 12px;
+            overflow-wrap: anywhere;
+        }
+
+        #settingsScreen > .home-card:last-child {
+            border-color: #fecaca;
+        }
+
+        #settingsScreen > .home-card:last-child button {
+            border-color: #b91c1c;
+            background: #b91c1c;
+        }
+
+        #settingsScreen > .home-card:last-child button:hover {
+            background: #991b1b;
+        }
+
+        @media(max-width: 550px) {
+            #settingsScreen.active {
+                padding: 20px 14px 30px;
+            }
+
+            #settingsScreen > .radar-header {
+                align-items: flex-start;
+            }
+
+            #settingsScreen > .home-card {
+                padding: 20px;
+            }
+
+            #settingsScreen .radar-header h1 {
+                font-size: 1.8rem;
+            }
         }
         
     </style>
