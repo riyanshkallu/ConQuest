@@ -81,6 +81,12 @@ async def create_player(request: Request, body: schemas.CreatePlayerRequest | No
     return _player_out(player)
 
 
+@app.get("/api/player/{player_id}/settings", response_model=schemas.Settings)
+async def get_player_settings(player_id: str):
+    player = game.require_player(player_id)
+    return schemas.Settings(hints=player.hints, save_conversations=player.save_conversations)
+
+
 @app.patch("/api/player/{player_id}/settings", response_model=schemas.Settings)
 async def update_settings(player_id: str, body: schemas.SettingsUpdate):
     player = game.require_player(player_id)
