@@ -1668,7 +1668,81 @@
                 font-size: 1.8rem;
             }
         }
-        
+
+        #onboardingScreen {
+            padding: 24px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #onboardingScreen.active {
+            display: flex;
+        }
+
+        .onboarding-card {
+            width: 100%;
+            max-width: 650px;
+            padding: 24px;
+            background: white; 
+            color: #17202a;
+            border-radius: 14px;
+            box-shadow: 0 6px 29px rgba(0,0,0,0.12);
+        }
+
+        .onboarding-card h1 {
+            margin-bottom: 10px;
+        }
+
+        .onboarding-subtitle {
+            color: #52606d;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        .onboarding-step {
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid #dce3ea;
+            border-radius: 12px;
+        }
+
+        .onboarding-step h2 {
+            font-size: 20px;
+            margin-bottom: 6px;
+        }
+
+        .onboarding-step p {
+            line-height: 1.5;
+            color: #52606d;
+        }
+
+        .onboarding-card button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 9px;
+            cursor: pointer;
+            background: #17202a;
+            color: white;
+            font-weight: bold;
+        }
+
+        .onboarding-card .onboarding-skip {
+            background: transparent;
+            color: #52606d;
+            border: 1px solid #dce3ea;
+        }
+
+        @media (max-width: 475px) {
+            #onboardingScreen {
+                padding: 12px;
+            }
+
+            .onboarding-card {
+                padding: 20px;
+            }
+        }
     </style>
 </head>
 
@@ -2237,6 +2311,43 @@
         </div>
 
     </section>
+
+    <div id="onboardingScreen" class="screen">
+        <div class="onboarding-card">
+            <h1>Welcome to ConQuest!</h1>
+            <p class="onboarding-subtitle">
+                Learn to recognize scams, investigate suspicious messages, and protect yourself online.
+            </p>
+
+            <div class="onboarding-step">
+                <h2>1. Check all details</h2>
+                <p>
+                    Make sure you review your ID Card's fictional details, and use it's information to answer what the contact is telling you.
+                </p>
+            </div>
+
+            <div class="onboarding-step">
+                <h2>2. Investigate Cautiously</h2>
+                <p>
+                    Preview questions, identify red flags, and verify all claims independently instead of blindly trusting a message or link.
+                </p>
+            </div>
+
+            <div class="onboarding-step">
+                <h2>3. Learn from each round.</h2>
+                <p>Review your results, understand missed clues, and improve you scam detection skills.</p>
+            </div>
+
+            <button onclick="finishOnboarding()">
+                Get Started
+            </button>
+
+            <button class="onboarding-skip"
+                onclick="finishOnboarding()">
+                Skip Tutorial
+            </button>
+        </div>
+    </div>
 
 
     <!-- =========================
@@ -3309,11 +3420,26 @@ function escapeHTML(value) {
 
             });
 
+        function finishOnboarding() {
+            localStorage.setItem("conquest_onboarding_complete", "true");
+            showScreen("homeScreen");
+        }
+
+        function shouldShowOnboarding() {
+            return localStorage.getItem("conquest_onboarding_complete") !== "true";
+        }
+
         async function initializeGame(){
             try {
                 await setUpPlayer();
-        await loadPlayerProfile(playerId);
-        await loadScenarios();
+                await loadPlayerProfile(playerId);
+                await loadScenarios();
+
+                if(shouldShowOnboarding()) {
+                    showScreen("onboardingScreen");
+                } else {
+                    showScreen("homeScreen");
+                }
 
         console.log("Game initialized. Player ID:", playerId);
     } catch (error) {
