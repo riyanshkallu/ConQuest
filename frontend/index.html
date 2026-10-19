@@ -1743,6 +1743,130 @@
                 padding: 20px;
             }
         }
+
+        #fakeWebsiteScreen {
+            align-items: center;
+            justify-content: center;
+        }
+
+        #fakeWebsiteScreen.active {
+            display: flex;
+        }
+
+        .fake-browser {
+            width: 100%;
+            max-width: 730px;
+            overflow: hidden;
+            border: 1px solid #dce3ea;
+            border-radius: 14px;
+            background: white;
+            color: #17202a;
+            box-shadow: 0 6px 26px rgba(0,0,0,0.12);
+        }
+
+        .fake-browser-top {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 14px;
+            background: #e9edf2;
+        }
+
+        .fake-browser-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 65%;
+            background: #98a2b3;
+        }
+
+        .fake-browser-label {
+            margin-left: 8px;
+            color: #52606d;
+            font-size: 13px;
+        }
+
+        .fake-address-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 12px 16px;
+            border-bottom: 1px solid #dce3ea;
+            color: #52606d;
+            font-size: 13px;
+            overflow-wrap: anywhere;
+        }
+
+        #fakeWebsiteAddress {
+            overflow-wrap: anywhere;
+        }
+
+        .fake-website-content {
+            padding: 28px;
+        }
+
+        .fake-site-warning {
+            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 7px;
+            background: #fff4d6;
+            color: #795500;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .fake-website-content h1 {
+            margin-bottom: 14px;
+            font-size: 26px;
+        }
+
+        .fake-website-content p {
+            line-height: 1.6;
+            margin-bottom: 14px;
+        }
+
+        .fake-site-panel {
+            margin: 22px 0;
+            padding: 18px;
+            border: 1px solid #dce3ea;
+            border-radius: 13px;
+            background: #f7f9fc;
+        }
+
+        .fake-site-panel h2 {
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .fake-site-reminder {
+            color: #8b3434;
+            font-weight: 600;
+        }
+
+        .fake-website-content button {
+            width: 100%;
+            padding: 13px;
+            border: none;
+            border-radius: 9px;
+            background: #17202a;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        @media (max-width: 550px) {
+            #fakeWebsiteScreen {
+                padding: 12px;
+            }
+
+            .fake-website-content {
+                padding: 18px;
+            }
+
+            .fake-website-content h1 {
+                font-size: 22px;
+            }
+        }
     </style>
 </head>
 
@@ -2347,8 +2471,51 @@
                 Skip Tutorial
             </button>
         </div>
-    </div>
 
+        <!-- Fake Website Screen -->
+
+        <section id="fakeWebsiteScreen" class="screen">
+            <div class="fake-browser">
+                <div class="fake-browser-top">
+                    <span class="fake-browser-dot"></span>
+                    <span class="fake-browser-dot"></span>
+                    <span class="fake-browser-dot"></span>
+                    <span class="fake-browser-label">Simulated Browser</span>
+                </div>
+
+                <div class="fake-address-bar">
+                    <span>Simulated link:</span>
+                    <span id="fakeWebsiteAddress"></span>
+                </div>
+
+                <div class="fake-website-content">
+                    <div class="fake-site-warning">
+                        Not a Real Website - Conquest Directories
+                    </div>
+
+                    <h1 id="fakeWebsiteTitle">Account Verification Center</h1>
+
+                    <p>
+                        You opened a page from the conversation. Before trusting it, examine what the page asks you to do and whether its claims can be verified independently.
+                    </p>
+
+                    <div class="fake-site-panel">
+                        <h2>Before you continue...</h2>
+                        <p>
+                            Does this page create urgency, request sensitive information, or ask you to trust a link supplied by an unverified contact?
+                        </p>
+
+                        <p class="fake-site-reminder">
+                            Never enter real passwords, verification codes, or personal information into a simulated page.
+                        </p>
+                    </div>
+
+                    <button onclick="returnFromFakeWebsite()">
+                        Return to Conversation
+                    </button>
+                </div>
+    </div>
+        </section>
 
     <!-- =========================
          JAVASCRIPT
@@ -2365,6 +2532,7 @@
         let playerId = null;
         let roundId = null;
         let openingRound = null;
+        let pendingFakeLink = null;
         let busy = false;
         let roundOver = false;
         let verificationCall = null;
@@ -3263,6 +3431,28 @@ function escapeHTML(value) {
             if (busy || roundOver) {
                 return;
             }
+
+            pendingFakeLink = link;
+
+            const address = document.getElementById("fakeWebsiteAddress");
+            if (address) {
+                address.textContent = link;
+            }
+
+            showScreen("fakeWebsiteScreen");
+
+        }
+
+            async function returnFromFakeWebsite() {
+                if (busy || roundOver || !roundId || !pendingFakeLink) {
+                    return;
+                }
+
+                const clickedLink = pendingFakeLink;
+                pendingFakeLink = null;
+
+                showScreen("chatScreen");
+                addMessage("notification", "You opened " + clickedLink);
 
             try {
                 const response = await api("POST", "/round/" + roundId + "/action", { action: "open_link", link: link });
