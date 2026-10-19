@@ -2363,19 +2363,9 @@
                     error
                     );
             }
-            }
-
-            if (!playerId) {
-                const player = await api("POST", "/player", {});
-                console.log("Player creation response:", player);
-                playerId = player.player_id;
-                console.log("Assigned playerId:", playerId);
-                savePlayerId(playerId);
-            }
-
-            loadLocalSettings();
         }
 
+           
         async function loadSettings() {
             try {
                 const settings = await api("GET", "/player/" + playerId + "/settings");
