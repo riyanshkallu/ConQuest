@@ -2331,6 +2331,40 @@
                 }
             }
 
+            if(!playerId) {
+                const player = await api("POST", "/player", {});
+                console.log("Player creation: response:", player);
+                playerId = player.player_id;
+                console.log("Assigned playerId:", playerId);
+                savePlayerId(playerId);
+            }
+
+            loadLocalSettings();
+
+            try {
+                const settings = await api(
+                    "GET",
+                    "/player/" + playerId + "/settings"
+                    );
+
+                document.getElementById("settingsHints").checked =
+                    settings.hints;
+
+                document.getElementById("settingsSaveConversations").checked =
+                    settings.save_conversations;
+
+                localStorage.setItem("outsmart_settings", JSON.stringify({
+                    hints: settings.hints,
+                    save_conversations: settings.save_conversations
+                }));
+            } catch (error) {
+                console.error(
+                    "Could not load settings from backend; keeping local settings:",
+                    error
+                    );
+            }
+            }
+
             if (!playerId) {
                 const player = await api("POST", "/player", {});
                 console.log("Player creation response:", player);
