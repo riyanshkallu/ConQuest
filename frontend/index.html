@@ -2524,6 +2524,7 @@
                 Skip Tutorial
             </button>
         </div>
+    </div>
 
         <!-- Fake Website Screen -->
 
@@ -3508,8 +3509,7 @@ function escapeHTML(value) {
                 addMessage("notification", "You opened " + clickedLink);
 
             try {
-                const response = await api("POST", "/round/" + roundId + "/action", { action: "open_link", link: link });
-                addMessage("notification", "You opened " + link);
+                const response = await api("POST", "/round/" + roundId + "/action", { action: "open_link", link: clickedLink });
                 if (response.ended) {
                     handleTurn(response);  // opening a link ends the round: SCAMMED, or LUCKY if the contact was real
                 }
