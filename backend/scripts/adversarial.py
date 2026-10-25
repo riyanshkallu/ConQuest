@@ -2,7 +2,7 @@
 
 Run a server first (live AI is the point of this), then from backend/:
   .venv/Scripts/python scripts/adversarial.py                      # http://127.0.0.1:8000
-  .venv/Scripts/python scripts/adversarial.py https://outsmart-scam-game.onrender.com
+  .venv/Scripts/python scripts/adversarial.py https://conquestgame.onrender.com
 
 Uses roughly 60 AI calls, so don't run it in a loop on the free tier. Rerun it after any
 prompt change. Lines marked ✗ need a look. Also check the server log for "rejected"/"failed"

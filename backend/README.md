@@ -45,7 +45,7 @@ It uses about 70 AI calls. Run the server with a throwaway database
 2. **New > Blueprint**, pick the repo and the `main` branch. Render reads `render.yaml`.
 3. When asked, paste `GROQ_API_KEY` and `GEMINI_API_KEY` (the same values as your `.env`).
 4. Click **Apply**. The first build takes a few minutes. The app is then live at
-   `https://outsmart-scam-game.onrender.com` (Render may add a suffix if the name is taken).
+   `https://conquestgame.onrender.com` (Render may add a suffix if the name is taken).
 5. Check `https://<your-url>/api/health`. It should say `"ai_provider": "live"`.
 
 Every push to `main` redeploys automatically. Rounds in progress are saved to the database
@@ -112,7 +112,7 @@ message, completely different conversation" shot.
 1. In Render, go to **Environment** and add `DEMO_KEY` with any secret word (for example a long
    random string). Never put it in the repo. Without it, demo mode is off.
 2. Open the game with the key in the address:
-   `https://outsmart-scam-game.onrender.com/?demo=YOURKEY&force=scam&seed=7`, record the scam round,
+   `https://conquestgame.onrender.com/?demo=YOURKEY&force=scam&seed=7`, record the scam round,
    then open it again with `force=legit&seed=7` for the real one. The same `seed` gives the same
    bank, amount and card ending, so the two opening texts match.
 3. Demo rounds are saved with `"demo": true` in their details, so they're easy to tell apart.

@@ -3,7 +3,7 @@
 # No rootDir on purpose: frontend/ changes must trigger a redeploy too.
 services:
   - type: web
-    name: outsmart-scam-game
+    name: conquestgame
     runtime: python
     plan: free
     buildCommand: pip install -r backend/requirements.txt
