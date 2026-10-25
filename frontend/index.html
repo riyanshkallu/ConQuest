@@ -6,6 +6,10 @@
 
     <title>ConQuest</title>
 
+    <!-- GoatCounter: anonymous visit counts, no cookies. Dashboard: conquest.goatcounter.com -->
+    <script data-goatcounter="https://conquest.goatcounter.com/count"
+            async src="https://gc.zgo.at/count.js"></script>
+
     <style>
         * {
             box-sizing: border-box;
@@ -1751,6 +1755,13 @@
             border: 1px solid #dce3ea;
         }
 
+        .onboarding-privacy {
+            margin-top: 14px;
+            font-size: 13px;
+            color: #687481;
+            text-align: center;
+        }
+
         @media (max-width: 475px) {
             #onboardingScreen {
                 padding: 12px;
@@ -2550,6 +2561,10 @@
                 onclick="finishOnboarding()">
                 Skip Tutorial
             </button>
+
+            <p class="onboarding-privacy">
+                We count visits anonymously, with no cookies, to see how many people play.
+            </p>
         </div>
     </div>
 
@@ -3005,6 +3020,20 @@ function returnHome() {
             document
                 .getElementById(screenId)
                 .classList.add("active");
+
+            countScreen(screenId);
+        }
+
+        // Counts each screen a player reaches (as a GoatCounter event), so the dashboard shows
+        // how far people get. Skipped if the script is blocked or hasn't loaded yet.
+        function countScreen(screenId) {
+            if (window.goatcounter && window.goatcounter.count) {
+                window.goatcounter.count({
+                    path: "screen/" + screenId.replace(/Screen$/, ""),
+                    title: screenId,
+                    event: true
+                });
+            }
         }
 
 
