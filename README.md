@@ -112,6 +112,9 @@ Every AI response is checked against a schema, regenerated once if it fails, and
 pre-written line if it fails again. The backend tries Groq first and Google Gemini as a backup,
 with a time limit on each turn.
 
+For the full picture (every screen, the engine's rules, the database tables and the API), see
+[architecture.md](architecture.md).
+
 ## Safety and privacy
 
 - Players only ever use the fictional ID card. If a reply looks like a real card number, Social
@@ -169,6 +172,7 @@ Setup details, deployment and the attack script are in [backend/README.md](backe
 | [`frontend/`](frontend/) | The whole game UI in one `index.html` |
 | [`backend/`](backend/) | FastAPI app, game engine, AI roles, database, tests and scripts |
 | [`backend/data/scenarios/`](backend/data/scenarios/) | One JSON file per scam/legit scenario pair |
+| [`architecture.md`](architecture.md) | How the frontend, backend, game engine, AI roles and database fit together |
 | [`api.md`](api.md) | The JSON contract between frontend and backend. Change only when both of us agree |
 | [`docs/screenshots/`](docs/screenshots/) | The screenshots in this README |
 | [`render.yaml`](render.yaml) | Render deployment settings |

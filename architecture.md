@@ -56,15 +56,18 @@ The frontend is a single-page web application built with HTML, CSS, and plain Ja
 
 The frontend is responsible for displaying the game and collecting player actions. Its screens include:
 
-- **Home:** Player level, XP, streak, scenario selection, and Scam Radar access.
+- **Onboarding:** Three short cards explaining the game, shown on a player's first visit.
+- **Home:** Player level, XP, streak, the Train Your Weakness card, and Scam Radar access.
+- **Scenario Selection:** The five scenarios plus a random "Surprise Me" option.
 - **ID Card:** Fictional identity details used during the current round.
 - **Chat:** Conversation messages, suggested replies, free-text input, and action buttons.
 - **Verification Call:** A scripted verification interaction that reveals whether the contact is legitimate.
+- **Simulated Website:** A clearly fake page shown when a player taps a link in the conversation.
 - **Results:** The ending, points, XP, and the reveal of whether the contact was a scam or legitimate.
 - **Scam Autopsy and Legit Breakdown:** Explanations of tactics, clues, mistakes, and good decisions.
 - **Flagged Transcript:** Message-level red and green flags with explanations.
 - **Scam Radar:** Tactic-recognition statistics and earned badges.
-- **Settings:** Planned controls for hints, conversation saving, large text, and resetting progress.
+- **Settings:** Controls for hints, saving conversations, and resetting progress.
 
 The frontend sends requests to the API and renders the returned data. It does not independently decide whether a player wins or loses.
 
@@ -141,7 +144,7 @@ These controls help make the game's educational outcomes more predictable than a
 
 ConQuest uses Supabase with PostgreSQL for persistent data. SQLite is used for local development and testing.
 
-The planned database structure contains four main tables:
+The database contains six tables:
 
 | Table | Purpose |
 |---|---|
@@ -149,8 +152,10 @@ The planned database structure contains four main tables:
 | `rounds` | Scenario information, difficulty, ending, points, turn count, and round timestamps |
 | `messages` | Conversation messages, sender, detected tactic or flag, and analyzer data |
 | `radar` | Tactic encounters and successful resistance counts |
+| `round_ai` | How many AI answers in each round came from a live model or from the prewritten fallbacks |
+| `live_rounds` | Rounds in progress, so a server restart or redeploy doesn't end them |
 
-The database supports persistent player progress, Scam Radar statistics, and completed-round history used for playtest analysis.
+The database supports persistent player progress, Scam Radar statistics, and completed-round history.
 
 The project is designed to use anonymous player identifiers rather than requiring players to register with their real names or email addresses.
 
@@ -190,9 +195,8 @@ ConQuest uses multiple testing approaches because AI-driven conversations can va
 - **AI attack testing:** A dedicated script tests adversarial and unexpected inputs to identify failures in AI behavior and validation.
 - **Interactive testing:** The `/play` page allows complete rounds to be exercised through the backend.
 - **Manual testing:** Browser testing checks screen transitions, API integration, and the gameplay experience.
-- **Playtest analysis:** A report script processes playtest data to help evaluate the game's educational impact.
 
-The backend test suite and manual playtests serve different purposes: automated tests check repeatable rules, while playtests help reveal usability problems and whether players understand the lessons.
+The automated tests and our own play sessions serve different purposes: automated tests check repeatable rules, while playing the game ourselves reveals usability problems and whether the lessons come across clearly.
 
 ## 11. Technology Stack
 
