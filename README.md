@@ -132,7 +132,7 @@ with a time limit on each turn.
 | Validation | Pydantic models for every AI response and API request |
 | Database | Supabase (PostgreSQL) in production, SQLite locally and in tests |
 | Hosting | Render free web service, kept awake by UptimeRobot |
-| Tests | pytest (283 tests) and an attack script that tries to break the AI |
+| Tests | pytest (277 tests) and an attack script that tries to break the AI |
 
 ## Run it locally
 
@@ -158,8 +158,7 @@ cd backend
 .venv/Scripts/python -m pytest
 ```
 
-Setup details, deployment, the attack script and the playtest report are in
-[backend/README.md](backend/README.md).
+Setup details, deployment and the attack script are in [backend/README.md](backend/README.md).
 
 ## Repo layout
 

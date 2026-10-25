@@ -3,7 +3,7 @@
 Players and rounds in progress are saved to the database (db.py) on every change and
 cached in memory, so they survive restarts and redeploys (Render's free plan also restarts
 the server after it sleeps). When a round ends, its summary (and messages, if the player
-allows it) is saved for the playtest results.
+allows it) is saved to the database.
 """
 
 from __future__ import annotations
@@ -48,7 +48,7 @@ class Round:
     ai_live: int = 0       # analyzer + character answers written by a live model
     ai_fallback: int = 0   # ... and by the fallback rules / pre-written lines
     coach_given: set[str] = field(default_factory=set)  # coaching tips already shown this round
-    demo: bool = False  # recorded for the video; left out of the playtest report
+    demo: bool = False  # recorded for the video; marked as demo when the round is saved
     last_contact_at: float | None = None  # when the contact's latest message was sent (monotonic)
     lock: asyncio.Lock = field(default_factory=asyncio.Lock, repr=False)
 
@@ -216,7 +216,7 @@ def clear() -> None:
     """For tests: forget everything, in memory and in the database.
 
     Only runs on a test database. A script that leaves DATABASE_URL unset still picks up the
-    real Supabase from .env, and this would delete every player and playtest round there.
+    real Supabase from .env, and this would delete every player and saved round there.
     """
     url = get_settings().database_url
     if url != "sqlite://" and url != (os.environ.get("TEST_DATABASE_URL") or None):

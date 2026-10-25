@@ -374,7 +374,7 @@ def _add_notification(rnd: store.Round, text: str) -> schemas.Message:
 
 def _annotate(entry: dict, analysis: engine.Analysis, pre: engine.PreCheck, state: engine.RoundState) -> None:
     """The note shown when the player taps their own message in the flagged transcript."""
-    entry["analysis"] = asdict(analysis)  # saved with the round for the playtest results
+    entry["analysis"] = asdict(analysis)  # saved with the round
     if pre.traps:
         entry.update(note=f"You shared your {pre.traps[0]}. A real contact never needs it.", mistake=True)
     elif pre.minor:
