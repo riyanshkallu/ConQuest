@@ -13,6 +13,8 @@ phones and computers, no sign-up)
 
 Built for the [Congressional App Challenge](https://www.congressionalappchallenge.us/) 2026.
 
+![A bank fraud alert scam in progress: the scammer asks for the one-time code just as it arrives](docs/screenshots/chat.webp)
+
 ## Why we built it
 
 Americans reported a record $15.9 billion in fraud losses to the FTC in 2025, and people 60 and
@@ -40,6 +42,26 @@ already trust.
 
 About 2 in 3 rounds are scams and 1 in 3 are real. Every scenario has a scam version and a real
 "twin" that starts almost the same way, so the first message alone isn't enough to tell.
+
+## Screenshots
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/home.webp" alt="Home screen with level, XP, streak and the Train Your Weakness card"><br><b>Home:</b> level, XP, streak and Train Your Weakness</td>
+    <td width="50%"><img src="docs/screenshots/scenarios.webp" alt="Six scenario cards: bank fraud alert, job offer, family emergency, package delivery, tech support and surprise me"><br><b>Pick a scenario:</b> it could be a scam or real</td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/id-card.webp" alt="A fictional ID card with name, email, phone, bank and card number"><br><b>Fictional ID card:</b> never type real information</td>
+    <td><img src="docs/screenshots/result.webp" alt="Result screen: This was a SCAM, Scammed, with the biggest clue and points"><br><b>Result:</b> the reveal, the biggest clue and how you scored</td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/autopsy.webp" alt="Scam Autopsy with biggest clue, best decision, good decisions, biggest weakness and mistakes"><br><b>Scam Autopsy:</b> what you did well and what you missed</td>
+    <td><img src="docs/screenshots/what-happened.webp" alt="Each tactic the scammer used, why it matters, and whether the player fell for it"><br><b>What happened:</b> every tactic, and whether you fell for it</td>
+  </tr>
+  <tr>
+    <td colspan="2"><img src="docs/screenshots/transcript.webp" alt="The full conversation transcript, where each message can be opened to see its clue"><br><b>Flagged transcript:</b> open any message to see its red or green flag</td>
+  </tr>
+</table>
 
 ## Features
 
@@ -148,6 +170,7 @@ Setup details, deployment, the attack script and the playtest report are in
 | [`backend/data/scenarios/`](backend/data/scenarios/) | One JSON file per scam/legit scenario pair |
 | [`api.md`](api.md) | The JSON contract between frontend and backend. Change only when both of us agree |
 | [`docs/playtest-quiz.md`](docs/playtest-quiz.md) | The before-and-after quiz for playtesters |
+| [`docs/screenshots/`](docs/screenshots/) | The screenshots in this README |
 | [`render.yaml`](render.yaml) | Render deployment settings |
 
 ## Everything runs on free tiers
