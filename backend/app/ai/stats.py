@@ -1,7 +1,7 @@
 """How often the AI answered live vs fell back to pre-written lines, since the server started.
 
 Shown in /api/health, so you can spot a free-tier limit being hit (fallbacks climbing)
-before a playtest or while judges are playing.
+while judges are playing.
 """
 
 from __future__ import annotations

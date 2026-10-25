@@ -35,7 +35,7 @@ lines. Set `AI_PROVIDER=live` and add a free Groq and/or Gemini key to use real 
 insults, harmful requests, "I know you're a scammer", the code hidden in a sentence, real card
 numbers, double taps) and marks anything that broke with ✗. Rerun it after changing a prompt.
 It uses about 70 AI calls. Run the server with a throwaway database
-(`DATABASE_URL=sqlite:///test.db`) so attack rounds don't end up in your Supabase playtest data.
+(`DATABASE_URL=sqlite:///test.db`) so attack rounds don't end up in your real Supabase data.
 
 ## Deploy (Render, free)
 
@@ -71,14 +71,6 @@ touches the database, which keeps it active.
 visit after that takes about a minute. On uptimerobot.com (free), add an HTTP monitor for
 `https://<your-url>/api/health` every 5 minutes. One always-on service uses about 744 of the 750
 free hours a month, so don't run a second free Render service in the same account.
-
-**Playtest results** (Oct 13-14): after the playtest, run
-`.venv/Scripts/python scripts/playtest_report.py --since 2026-10-13 --until 2026-10-14 --quiz quiz.csv --out report.md`.
-It only reads the saved rounds in Supabase (it never changes them) and prints the numbers for
-the video and the written answers: scams avoided, real contacts handled, false alarms, verify
-rate, improvement from first to later rounds, and Scam Radar totals. `quiz.csv` holds the
-before/after quiz scores. Copy `scripts/quiz_template.csv` (`tester,age,before,after`, scores
-out of 6). Dates are in your local time.
 
 ## How it fits together
 
@@ -123,7 +115,7 @@ message, completely different conversation" shot.
    `https://outsmart-scam-game.onrender.com/?demo=YOURKEY&force=scam&seed=7`, record the scam round,
    then open it again with `force=legit&seed=7` for the real one. The same `seed` gives the same
    bank, amount and card ending, so the two opening texts match.
-3. Demo rounds are saved but left out of the playtest report.
+3. Demo rounds are saved with `"demo": true` in their details, so they're easy to tell apart.
 
 ## Reliability
 
@@ -139,8 +131,7 @@ message, completely different conversation" shot.
   instead of 1.5-2s.
 - **AI health**: `/api/health` shows `ai_turns`, how many answers came from a live model vs the
   fallback lines since startup, per role. If `fallback` climbs, a free-tier limit is probably being
-  hit. Each finished round's counts are saved in the `round_ai` table, and the playtest report
-  prints the live share.
+  hit. Each finished round's counts are saved in the `round_ai` table.
 
 ## Free-tier notes
 

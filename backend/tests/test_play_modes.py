@@ -7,7 +7,6 @@ from sqlalchemy import select
 from app import db, store
 from app.config import get_settings
 from app.main import app
-from scripts import playtest_report as report
 
 client = TestClient(app)
 KEY = "test-demo-key"
@@ -79,10 +78,9 @@ def test_wrong_key_or_demo_off_is_refused(monkeypatch):
     assert start(new_player(), **demo("scam", key="")).status_code == 403
 
 
-def test_demo_rounds_are_saved_but_left_out_of_the_report():
+def test_demo_rounds_are_saved_and_marked_as_demo():
     rid = start(new_player(), **demo("scam")).json()["round_id"]
     client.post(f"/api/round/{rid}/action", json={"action": "report"})
     with db.get_engine().connect() as conn:
         details = conn.execute(select(db.rounds.c.details)).scalar()
     assert details["demo"] is True
-    assert report.load_rounds(db.get_engine(), None, None) == []
