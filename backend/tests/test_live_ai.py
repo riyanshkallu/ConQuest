@@ -73,7 +73,7 @@ def test_valid_scam_message_passes():
     ("word " * 71, "urgency", "too long"),
     ("Act now please.", "sexual_content", "not allowed"),
     ("Log in at harborpoint-secure.com right now.", "suspicious_link", "real-looking website"),
-    ("Call me back at 614-292-1234.", "authority", "real-looking number"),
+    ("Call me back at 999-382-4710.", "authority", "real-looking number"),
     ("What's your SSN?", "credential_request", "blocked word"),
 ])
 def test_bad_scam_messages_are_rejected(message, tactic, problem):

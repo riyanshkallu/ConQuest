@@ -98,7 +98,7 @@ def test_trap_in_legit_round_is_serious_mistake_not_ending():
     "my ssn is 123-45-6789",
     "123456789",
     "card 4111 1111 1111 1111",
-    "call me at 614-292-1234",
+    "call me at 999-382-4710",  # area code 999 is never assigned, but looks real
 ])
 def test_real_data_is_blocked(text):
     assert engine.blocked_reason(text, make_card()) is not None
