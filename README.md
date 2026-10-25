@@ -169,7 +169,6 @@ Setup details, deployment, the attack script and the playtest report are in
 | [`backend/`](backend/) | FastAPI app, game engine, AI roles, database, tests and scripts |
 | [`backend/data/scenarios/`](backend/data/scenarios/) | One JSON file per scam/legit scenario pair |
 | [`api.md`](api.md) | The JSON contract between frontend and backend. Change only when both of us agree |
-| [`docs/playtest-quiz.md`](docs/playtest-quiz.md) | The before-and-after quiz for playtesters |
 | [`docs/screenshots/`](docs/screenshots/) | The screenshots in this README |
 | [`render.yaml`](render.yaml) | Render deployment settings |
 
