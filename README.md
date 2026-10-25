@@ -193,3 +193,7 @@ so the game never stops.
 We used Claude Code as a coding assistant, mostly on the backend for scaffolding, tests,
 refactoring and debugging, and ChatGPT for brainstorming. We designed the game, wrote the
 scenarios, and reviewed and tested the code ourselves.
+
+## License
+
+[MIT](LICENSE): you're free to use and build on this code, as long as you keep our names on it.
