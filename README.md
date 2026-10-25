@@ -8,7 +8,7 @@ You're dropped into a live text, DM or support chat with an AI contact. Sometime
 that adapts to everything you say. Sometimes it's your real bank, a real recruiter or a cousin
 who really did lose their phone. You have to decide who to trust.
 
-**Play it:** [outsmart-scam-game.onrender.com](https://outsmart-scam-game.onrender.com) (works on
+**Play it:** [conquestgame.onrender.com](https://conquestgame.onrender.com) (works on
 phones and computers, no sign-up)
 
 Built for the [Congressional App Challenge](https://www.congressionalappchallenge.us/) 2026.
