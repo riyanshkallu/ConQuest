@@ -120,6 +120,8 @@ with a time limit on each turn.
 - Players are anonymous IDs saved in the browser. No real names, emails or phone numbers are
   stored, and saving conversations can be turned off in Settings.
 - Rate limits protect the free AI quota from abuse.
+- Visits are counted anonymously with [GoatCounter](https://www.goatcounter.com/), which uses no
+  cookies and doesn't track people across sites.
 
 ## Tech stack
 
