@@ -1,3 +1,4 @@
+<!-- ConQuest v1.0, Congressional App Challenge 2026 -->
 # ConQuest
 
 **Can you survive a conversation with an AI that is trying to manipulate you, and can you tell

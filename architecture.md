@@ -1,3 +1,4 @@
+<!-- ConQuest v1.0, Congressional App Challenge 2026 -->
 # ConQuest — System Architecture
 
 ## 1. Overview

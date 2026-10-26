@@ -1,3 +1,4 @@
+# ConQuest v1.0, Congressional App Challenge 2026
 # Render Blueprint: one free web service that serves both the API and the frontend.
 # Set up once in the Render dashboard: New > Blueprint > pick this repo.
 # No rootDir on purpose: frontend/ changes must trigger a redeploy too.

@@ -1,3 +1,4 @@
+<!-- ConQuest v1.0, Congressional App Challenge 2026 -->
 # ConQuest API contract
 
 This file is the handoff point between the backend (Python/FastAPI, `backend/`) and the
