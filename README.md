@@ -11,6 +11,10 @@ who really did lose their phone. You have to decide who to trust.
 **Play it:** [conquestgame.onrender.com](https://conquestgame.onrender.com) (works on
 phones and computers, no sign-up)
 
+**Watch the demo:** [ConQuest demo video on YouTube](https://www.youtube.com/watch?v=AnZTo_R1Yp8)
+
+[![ConQuest demo video on YouTube](https://img.youtube.com/vi/AnZTo_R1Yp8/hqdefault.jpg)](https://www.youtube.com/watch?v=AnZTo_R1Yp8)
+
 Built for the [Congressional App Challenge](https://www.congressionalappchallenge.us/) 2026.
 
 ![A bank fraud alert scam in progress: the scammer asks for the one-time code just as it arrives](docs/screenshots/chat.webp)
